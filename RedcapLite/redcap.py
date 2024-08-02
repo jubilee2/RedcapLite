@@ -43,3 +43,8 @@ class RedcapClient(Client):
     def delete_events(self, **kwargs):
         return self.post(delete_events(kwargs))
     
+    # field_names
+    def get_field_names(self, **kwargs):
+        return self.post(get_field_names(kwargs))
+    
+    
