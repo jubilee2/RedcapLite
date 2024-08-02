@@ -10,6 +10,7 @@ def import_arms(data):
     new_data = {
         'content': 'arm',
         'action': 'import',
+        'format': 'json',
         'data': json.dumps(data['data'])
     }
     return(new_data)
