@@ -32,21 +32,21 @@ r = RedcapLite.RedcapLite('https://redcap.vumc.org/api/', 'your_token')
 
 ### Methods
 
-#### `get_arm()`
+#### `get_arms()`
 
 Retrieve the list of arms from the REDCap API.
 
 ```python
-arms = r.get_arm()
+arms = r.get_arms()
 print(arms)
 ```
 
-#### `delete_arm(arms)`
+#### `delete_arms(arms)`
 
 Delete the specified arms. Provide a list of arm IDs to delete.
 
 ```python
-r.delete_arm(arms=[3])
+r.delete_arms(arms=[3])
 ```
 
 ### Example
@@ -60,11 +60,11 @@ import RedcapLite
 r = RedcapLite.RedcapLite('https://redcap.vumc.org/api/', 'your_token')
 
 # Get arms
-arms = r.get_arm()
+arms = r.get_arms()
 print("Arms:", arms)
 
 # Delete specific arms
-r.delete_arm(arms=[3])
+r.delete_arms(arms=[3])
 print("Arm 3 deleted successfully.")
 ```
 
