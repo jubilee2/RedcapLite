@@ -1,5 +1,6 @@
 import requests
 from .api.arm import get_arms, import_arms, delete_arms
+from .api.dag import get_dags, import_dags, delete_dags
 from .http.handler import response_error_handler, csv_handler, json_handler
 
 class RedcapLite:
@@ -31,3 +32,13 @@ class RedcapLite:
     
     def delete_arms(self, **kwargs):
         return delete_arms(self, kwargs)
+
+    # dags
+    def get_dags(self, **kwargs):
+        return get_dags(self, kwargs)
+    
+    def import_dags(self, **kwargs):
+        return import_dags(self, kwargs)
+    
+    def delete_dags(self, **kwargs):
+        return delete_dags(self, kwargs)
