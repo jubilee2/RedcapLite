@@ -18,18 +18,18 @@ class RedcapClient(Client):
 
     # dags
     def get_dags(self, **kwargs):
-        return get_dags(self, kwargs)
+        return self.post(get_dags(kwargs))
     
     def import_dags(self, **kwargs):
-        return import_dags(self, kwargs)
+        return self.post(import_dags(kwargs))
     
     def delete_dags(self, **kwargs):
-        return delete_dags(self, kwargs)
+        return self.post(delete_dags(kwargs))
     
     # user_dag_mapping
     def get_user_dag_mappings(self, **kwargs):
-        return get_user_dag_mappings(self, kwargs)
+        return self.post(get_user_dag_mappings(kwargs))
     
     def import_user_dag_mappings(self, **kwargs):
-        return import_user_dag_mappings(self, kwargs)
+        return self.post(import_user_dag_mappings(kwargs))
     
