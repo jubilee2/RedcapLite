@@ -21,4 +21,16 @@ def response_error_handler(func):
             raise Exception("Unkown issue.")
     return wrapper
 
+def csv_handler(func):
+    def wrapper(obj, data):
+        data['format'] = 'csv'
+        response = func(obj, data)
+        return response.text
+    return wrapper
 
+def json_handler(func):
+    def wrapper(obj, data):
+        data['format'] = 'json'
+        response = func(obj, data)
+        return response.json()
+    return wrapper

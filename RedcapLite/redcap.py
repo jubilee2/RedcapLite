@@ -1,6 +1,6 @@
 import requests
 from .api.arm import get_arm
-from .http.handler import response_error_handler
+from .http.handler import response_error_handler, csv_handler, json_handler
 
 class RedcapLite:
     def __init__(self, url, token):
@@ -14,15 +14,13 @@ class RedcapLite:
         print('HTTP Status: ' + str(response.status_code))
         return response
     
+    @csv_handler
     def _csv_api(self, data):
-        data['format'] = 'csv'
-        response = self._post_request(data)
-        return response.text
+        return self._post_request(data)
 
+    @json_handler
     def _json_api(self, data):
-        data['format'] = 'json'
-        response = self._post_request(data)
-        return response.json()
+        return self._post_request(data)
 
     def get_arm(self, **kwargs):
         return get_arm(self, kwargs)
