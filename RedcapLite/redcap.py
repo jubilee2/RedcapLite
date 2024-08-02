@@ -1,5 +1,5 @@
 import requests
-from .api.arm import get_arm, import_arm, delete_arm
+from .api.arm import get_arms, import_arms, delete_arms
 from .http.handler import response_error_handler, csv_handler, json_handler
 
 class RedcapLite:
@@ -23,11 +23,11 @@ class RedcapLite:
         return self._post_request(data)
 
     # arms
-    def get_arm(self, **kwargs):
-        return get_arm(self, kwargs)
+    def get_arms(self, **kwargs):
+        return get_arms(self, kwargs)
     
-    def import_arm(self, **kwargs):
-        return import_arm(self, kwargs)
+    def import_arms(self, **kwargs):
+        return import_arms(self, kwargs)
     
-    def delete_arm(self, **kwargs):
-        return delete_arm(self, kwargs)
+    def delete_arms(self, **kwargs):
+        return delete_arms(self, kwargs)

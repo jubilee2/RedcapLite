@@ -1,12 +1,12 @@
 import json
 
-def get_arm(redcap_lite, data):
+def get_arms(redcap_lite, data):
     new_data = {
         'content': 'arm'
     }
     return redcap_lite._json_api(new_data)
 
-def import_arm(redcap_lite, data):
+def import_arms(redcap_lite, data):
     new_data = {
         'content': 'arm',
         'action': 'import',
@@ -14,7 +14,7 @@ def import_arm(redcap_lite, data):
     }
     return redcap_lite._json_api(new_data)
 
-def delete_arm(redcap_lite, data):
+def delete_arms(redcap_lite, data):
     new_data = {
         'content': 'arm',
         'action': 'delete'
