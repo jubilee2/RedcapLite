@@ -1,11 +1,13 @@
 import requests
 from .api.arm import get_arm
+from .http.handler import response_error_handler
 
 class RedcapLite:
     def __init__(self, url, token):
         self.url = url
         self.token = token
 
+    @response_error_handler
     def _post_request(self, data):
         data['token'] = self.token
         response = requests.post(self.url, data=data)
