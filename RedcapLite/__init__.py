@@ -1,1 +1,1 @@
-from .redcap import RedcapLite
+from .redcap import RedcapClient

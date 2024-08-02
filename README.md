@@ -24,10 +24,10 @@ import RedcapLite
 
 ### Creating an Instance
 
-Create an instance of the `RedcapLite` class by providing the API URL and token:
+Create an instance of the `RedcapClient` class by providing the API URL and token:
 
 ```python
-r = RedcapLite.RedcapLite('https://redcap.vumc.org/api/', 'your_token')
+r = RedcapLite.RedcapClient('https://redcap.vumc.org/api/', 'your_token')
 ```
 
 ### Methods
@@ -56,8 +56,8 @@ Here’s a complete example of how to use the `RedcapLite` package:
 ```python
 import RedcapLite
 
-# Create an instance of RedcapLite
-r = RedcapLite.RedcapLite('https://redcap.vumc.org/api/', 'your_token')
+# Create an instance of RedcapClient
+r = RedcapLite.RedcapClient('https://redcap.vumc.org/api/', 'your_token')
 
 # Get arms
 arms = r.get_arms()
