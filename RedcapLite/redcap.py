@@ -32,4 +32,14 @@ class RedcapClient(Client):
     
     def import_user_dag_mappings(self, **kwargs):
         return self.post(import_user_dag_mappings(kwargs))
+
+    # events
+    def get_events(self, **kwargs):
+        return self.post(get_events(kwargs))
+    
+    def import_events(self, **kwargs):
+        return self.post(import_events(kwargs))
+    
+    def delete_events(self, **kwargs):
+        return self.post(delete_events(kwargs))
     

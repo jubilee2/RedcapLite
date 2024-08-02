@@ -10,6 +10,7 @@ def import_dags(data):
     new_data = {
         'content': 'dag',
         'action': 'import',
+        'format': 'json',
         'data': json.dumps(data['data'])
     }
     return(new_data)
