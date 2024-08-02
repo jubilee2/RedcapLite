@@ -1,5 +1,5 @@
 import requests
-from .api.arm import get_arm
+from .api.arm import get_arm, import_arm
 from .http.handler import response_error_handler, csv_handler, json_handler
 
 class RedcapLite:
@@ -24,3 +24,6 @@ class RedcapLite:
 
     def get_arm(self, **kwargs):
         return get_arm(self, kwargs)
+    
+    def import_arm(self, **kwargs):
+        return import_arm(self, kwargs)

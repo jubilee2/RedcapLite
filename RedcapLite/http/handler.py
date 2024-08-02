@@ -1,5 +1,6 @@
 def response_error_handler(func):
     def wrapper(obj, data):
+        data['returnFormat'] = 'json'
         response = func(obj, data)
         if response.status_code == 200:
             return response
