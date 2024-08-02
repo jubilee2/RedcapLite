@@ -41,3 +41,11 @@ class RedcapLite:
     
     def delete_dags(self, **kwargs):
         return delete_dags(self, kwargs)
+    
+    # user_dag_mapping
+    def get_user_dag_mappings(self, **kwargs):
+        return get_user_dag_mappings(self, kwargs)
+    
+    def import_user_dag_mappings(self, **kwargs):
+        return import_user_dag_mappings(self, kwargs)
+    
