@@ -47,4 +47,13 @@ class RedcapClient(Client):
     def get_field_names(self, **kwargs):
         return self.post(get_field_names(kwargs))
     
+    # file
+    def get_file(self, **kwargs):
+        return self.__file_download_api(get_file(**kwargs))
+    
+    def import_file(self, **kwargs):
+        return self.__file_upload_api(import_file(**kwargs))
+    
+    def delete_file(self, **kwargs):
+        return self.post(delete_file(kwargs))
     

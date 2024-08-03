@@ -37,3 +37,18 @@ def json_handler(func):
         response = func(obj, data)
         return response.json()
     return wrapper
+
+def file_download_handler(func):
+    def wrapper(obj, file_path=None, **data):
+        response = func(obj, data)
+        with open(file_path, 'wb') as f:
+            f.write(response.content)
+        return response
+    return wrapper
+
+def file_upload_handler(func):
+    def wrapper(obj, file_path=None, **data):
+        with open(file_path, 'rb') as file_obj:
+            response = func(obj, files={'file':file_obj}, **data)
+        return response
+    return wrapper
