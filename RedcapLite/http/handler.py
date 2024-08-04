@@ -65,8 +65,8 @@ def file_download_handler(func):
     return wrapper
 
 def file_upload_handler(func):
-    def wrapper(obj, data, file_path=None):
+    def wrapper(obj, file_path, data):
         with open(file_path, 'rb') as file_obj:
-            response = func(obj, files={'file':file_obj}, **data)
+            response = func(obj, data, files={'file': file_obj})
         return response
     return wrapper

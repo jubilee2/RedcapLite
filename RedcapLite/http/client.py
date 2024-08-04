@@ -34,5 +34,5 @@ class Client:
         return self.__post(data)
     
     @file_upload_handler
-    def file_upload_api(self, data):
-        return self.__post(data)
+    def file_upload_api(self, data, files):
+        return self.__post(data, files=files)
