@@ -29,11 +29,9 @@ class Client:
     def __json_api(self, data):
         return self.__post(data)
     
-    def file_download_api(self, data, file_path=None):
-        response = self.__post(data)
-        with open(file_path, 'wb') as f:
-            f.write(response.content)
-        return response
+    @file_download_handler
+    def file_download_api(self, data):
+        return self.__post(data)
     
     @file_upload_handler
     def file_upload_api(self, data):
