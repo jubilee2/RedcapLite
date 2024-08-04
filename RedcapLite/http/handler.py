@@ -1,4 +1,5 @@
 from .error import APIException
+import os
 
 def response_error_handler(func):
     def wrapper(obj, data):
@@ -39,16 +40,33 @@ def json_handler(func):
     return wrapper
 
 def file_download_handler(func):
-    def wrapper(obj, file_path=None, **data):
+    def wrapper(obj, data, file_dictionary=''):
         response = func(obj, data)
-        with open(file_path, 'wb') as f:
+        try:
+            # Extract and clean the content-type header, splitting by semicolon and stripping spaces
+            content_type = response.headers["content-type"]
+            splat = [item.strip() for item in content_type.split(";")]
+
+            # Create a dictionary of key-value pairs from the cleaned content-type
+            content_dict = {
+                key: value.replace('"', "") 
+                for item in splat 
+                if "=" in item 
+                for key, value in [item.split("=")]
+            }
+            file_name = content_dict['name']
+
+        except:
+            file_name = 'download.raw'
+            
+        with open(os.path.join(file_dictionary, file_name), 'wb') as f:
             f.write(response.content)
         return response
     return wrapper
 
 def file_upload_handler(func):
-    def wrapper(obj, file_path=None, **data):
+    def wrapper(obj, file_path, data):
         with open(file_path, 'rb') as file_obj:
-            response = func(obj, files={'file':file_obj}, **data)
+            response = func(obj, data, files={'file': file_obj})
         return response
     return wrapper

@@ -15,7 +15,7 @@ class Client:
         return response
 
     @response_error_handler
-    def __post(self, files = None, **data):
+    def __post(self, data, files = None):
         data['token'] = self.token
         response = requests.post(self.url, data=data, files = files)
         print('HTTP Status: ' + str(response.status_code))
@@ -30,9 +30,9 @@ class Client:
         return self.__post(data)
     
     @file_download_handler
-    def __file_download_api(self, data):
+    def file_download_api(self, data):
         return self.__post(data)
     
     @file_upload_handler
-    def __file_upload_api(self, data):
-        return self.__post(data)
+    def file_upload_api(self, data, files):
+        return self.__post(data, files=files)
