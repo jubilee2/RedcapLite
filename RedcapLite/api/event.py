@@ -5,7 +5,7 @@ def get_events(data):
         'content': 'event'
     }
     for index, arm in enumerate(data["arms"]):
-        new_data[ f"arms[{index}]"] = arm
+        new_data[ f"arms[{index}]"] = str(arm)
     return(new_data)
 
 def import_events(data):
