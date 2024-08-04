@@ -6,7 +6,6 @@ def get_file(data):
         'field': data['field'],
         'event': data.get('event', ''),
         'repeat_instance': data.get('repeat_instance', '1'),
-        'file_path': data['file_path']
     }
     return(new_data)
 
@@ -18,7 +17,6 @@ def import_file(data):
         'field': data['field'],
         'event': data.get('event', ''),
         'repeat_instance': data.get('repeat_instance', '1'),
-        'file_path': data['file_path']
     }
     return(new_data)
 
