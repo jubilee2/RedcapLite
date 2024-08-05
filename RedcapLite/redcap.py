@@ -55,4 +55,20 @@ class RedcapClient(Client):
     
     def delete_file(self, **kwargs):
         return self.post(delete_file(kwargs))
+
+    # file_repository
+    def create_folder_file_repository(self, **kwargs):
+        return self.post(create_folder_file_repository(kwargs))
+    
+    def list_file_repository(self, **kwargs):
+        return self.post(list_file_repository(kwargs))
+    
+    def export_file_repository(self, file_dictionary='', **kwargs):
+        return self.file_download_api(export_file_repository(kwargs), file_dictionary=file_dictionary)
+    
+    def import_file_repository(self, file_path, **kwargs):
+        return self.file_upload_api(file_path, import_file_repository(kwargs))
+    
+    def delete_file_repository(self, **kwargs):
+        return self.post(delete_file_repository(kwargs))
     
