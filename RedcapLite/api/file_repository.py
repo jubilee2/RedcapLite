@@ -28,6 +28,8 @@ def import_file_repository(data):
         'content': 'fileRepository',
         'action': 'import'
     }
+    if 'folder_id' in data:
+        new_data['folder_id'] = data['folder_id']
     return(new_data)
 
 def delete_file_repository(data):
