@@ -2,9 +2,9 @@ from .error import APIException
 import os
 
 def response_error_handler(func):
-    def wrapper(obj, data):
+    def wrapper(obj, data, files=None):
         data['returnFormat'] = 'json'
-        response = func(obj, data)
+        response = func(obj, data, files=files)
         if response.status_code == 200:
             return response
         elif response.status_code == 400:
