@@ -1,6 +1,8 @@
 import pytest
 from unittest.mock import Mock, patch, mock_open
 from RedcapLite import RedcapClient
+import pandas as pd
+from pandas.testing import assert_frame_equal
 
 @pytest.fixture
 def client():
@@ -341,3 +343,64 @@ def test_redcap_client_get_logs_with_kwargs(client):
             'https://example.com', 
             data={'content': 'log', 'user':'foo', 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
             files=None)
+
+def test_redcap_client_get_metadata_csv(client):
+    """Test RedcapClient get_metadata method"""
+    mock_response = mock_response_factory()
+    mock_response.text = "field_name,form_name\nfoo,bar\n"
+    with patch('requests.post', return_value=mock_response) as mock_post:
+        response = client.get_metadata()
+        expected_df = pd.DataFrame({'field_name': ['foo'], 'form_name': ['bar']})
+        assert_frame_equal(response, expected_df)
+        mock_post.assert_called_once_with(
+            'https://example.com', 
+            data={'content': 'metadata', 'format': 'csv', 'returnFormat': 'json', 'token': 'token'},
+            files=None)
+
+def test_redcap_client_get_metadata_json(client):
+    """Test RedcapClient get_metadata method"""
+    mock_response = mock_response_factory()
+    with patch('requests.post', return_value=mock_response) as mock_post:
+        response = client.get_metadata(format='json')
+        assert response == {"foo": "bar"}
+        mock_post.assert_called_once_with(
+            'https://example.com', 
+            data={'content': 'metadata', 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
+            files=None)
+        
+def test_redcap_client_get_metadata_with_kwargs(client):
+    """Test RedcapClient get_metadata method with kwargs"""
+    mock_response = mock_response_factory()
+    mock_response.text = "field_name,form_name\nfoo,bar\n"
+    with patch('requests.post', return_value=mock_response) as mock_post:
+        response = client.get_metadata(fields=['abc','def'])
+        expected_df = pd.DataFrame({'field_name': ['foo'], 'form_name': ['bar']})
+        assert_frame_equal(response, expected_df)
+        mock_post.assert_called_once_with(
+            'https://example.com', 
+            data={'content': 'metadata', 'format': 'csv', 'fields[0]':'abc', 'fields[1]':'def','returnFormat': 'json', 'token': 'token'},
+            files=None)
+
+def test_redcap_client_import_metadata_json(client):
+    """Test RedcapClient import_metadata method"""
+    mock_response = mock_response_factory()
+    with patch('requests.post', return_value=mock_response) as mock_post:
+        response = client.import_metadata(format='json', data=[{"abc":"def"}])
+        assert response == {"foo": "bar"}
+        mock_post.assert_called_once_with(
+            'https://example.com', 
+            data={'content': 'metadata', 'format': 'json', 'data': '[{"abc": "def"}]', 'returnFormat': 'json', 'token': 'token'},
+            files=None)
+
+def test_redcap_client_import_metadata_csv(client):
+    """Test RedcapClient import_metadata method"""
+    mock_response = mock_response_factory()
+    mock_response.text = "5"
+    with patch('requests.post', return_value=mock_response) as mock_post:
+        response = client.import_metadata(format='csv', data='a,c\n4,5\n')
+        assert response == '5'
+        mock_post.assert_called_once_with(
+            'https://example.com', 
+            data={'content': 'metadata', 'format': 'csv', 'data': 'a,c\n4,5\n', 'returnFormat': 'json', 'token': 'token'},
+            files=None)
+        
