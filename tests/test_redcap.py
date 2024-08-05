@@ -271,3 +271,18 @@ def test_redcap_client_get_instruments(client):
             'https://example.com', 
             data={'content': 'instrument', 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
             files=None)
+
+def test_redcap_client_export_pdf(client):
+    """Test RedcapClient export_pdf method"""
+    mock_response = mock_response_factory()
+    mock_response.content = b'Hello, world!'
+    with patch('requests.post', return_value=mock_response) as mock_post:
+        with patch('builtins.open', new=mock_open()) as mock_file:
+            response = client.export_pdf()
+            assert response == mock_response
+            mock_post.assert_called_once_with(
+                'https://example.com', 
+                data={'content': 'pdf', 'returnFormat': 'json', 'token': 'token'},
+                files=None)
+            mock_file.assert_called_once_with('download.raw', 'wb')
+            mock_file.return_value.write.assert_called_once_with(b'Hello, world!')

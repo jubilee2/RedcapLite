@@ -75,3 +75,7 @@ class RedcapClient(Client):
     # instrument
     def get_instruments(self, **kwargs):
         return self.post(get_instruments(kwargs))
+    
+    # pdf
+    def export_pdf(self, file_dictionary='', **kwargs):
+        return self.file_download_api(export_pdf(kwargs), file_dictionary=file_dictionary)
