@@ -32,6 +32,8 @@ def csv_handler(func):
         data['format'] = 'csv'
         response = func(obj, data)
         df = pd.read_csv(io.StringIO(response.text))
+        if df.shape == (0, 1):
+            return response.text
         return df
     return wrapper
 

@@ -82,6 +82,14 @@ def test_csv_handler():
     mock_func = Mock(return_value=Mock(text='csv data'))
     decorated_func = csv_handler(mock_func)
     response = decorated_func(None, {})
+    assert response == 'csv data'
+    assert mock_func.call_args[0][1]['format'] == 'csv'
+
+def test_csv_handler2():
+    """Test csv_handler decorator"""
+    mock_func = Mock(return_value=Mock(text='csv data,date\n'))
+    decorated_func = csv_handler(mock_func)
+    response = decorated_func(None, {})
     assert isinstance(response, pd.DataFrame)
     assert mock_func.call_args[0][1]['format'] == 'csv'
 
