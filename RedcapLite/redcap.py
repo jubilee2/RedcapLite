@@ -1,4 +1,3 @@
-import requests
 from .api import *
 from .http import *
 
@@ -52,7 +51,7 @@ class RedcapClient(Client):
         return self.file_download_api(get_file(kwargs), file_dictionary=file_dictionary)
     
     def import_file(self, file_path, **kwargs):
-        return self.file_upload_api(file_path, import_file(**kwargs))
+        return self.file_upload_api(file_path, import_file(kwargs))
     
     def delete_file(self, **kwargs):
         return self.post(delete_file(kwargs))
