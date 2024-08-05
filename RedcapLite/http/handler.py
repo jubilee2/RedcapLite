@@ -1,5 +1,7 @@
 from .error import APIException
 import os
+import io
+import pandas as pd
 
 def response_error_handler(func):
     def wrapper(obj, data, files=None):
@@ -29,7 +31,8 @@ def csv_handler(func):
     def wrapper(obj, data):
         data['format'] = 'csv'
         response = func(obj, data)
-        return response.text
+        df = pd.read_csv(io.StringIO(response.text))
+        return df
     return wrapper
 
 def json_handler(func):

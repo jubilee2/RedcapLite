@@ -3,6 +3,7 @@ from unittest.mock import Mock, patch, mock_open
 from RedcapLite.http.error import APIException
 from RedcapLite.http import response_error_handler, csv_handler, json_handler, file_download_handler, file_upload_handler
 import os
+import pandas as pd
 import tempfile
 
 def test_response_error_handler_200():
@@ -81,7 +82,7 @@ def test_csv_handler():
     mock_func = Mock(return_value=Mock(text='csv data'))
     decorated_func = csv_handler(mock_func)
     response = decorated_func(None, {})
-    assert response == 'csv data'
+    assert isinstance(response, pd.DataFrame)
     assert mock_func.call_args[0][1]['format'] == 'csv'
 
 def test_json_handler():

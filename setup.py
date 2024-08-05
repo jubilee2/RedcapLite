@@ -6,6 +6,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'requests',
+        'pandas',
     ],
     description='A Python package for interacting with the REDCap API',
     author='Jubilee Tan',
