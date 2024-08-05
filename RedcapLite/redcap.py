@@ -87,3 +87,6 @@ class RedcapClient(Client):
     def import_form_event_mappings(self, **kwargs):
         return self.post(import_form_event_mappings(kwargs))
     
+    def get_logs(self, **kwargs):
+        return self.post(get_logs(kwargs))
+    
