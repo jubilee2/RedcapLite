@@ -9,3 +9,4 @@ from .instrument import get_instruments
 from .pdf import export_pdf
 from .form_event_mapping import get_form_event_mappings, import_form_event_mappings
 from .log import get_logs
+from .metadata import get_metadata, import_metadata

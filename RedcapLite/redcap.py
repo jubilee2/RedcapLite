@@ -90,3 +90,10 @@ class RedcapClient(Client):
     def get_logs(self, **kwargs):
         return self.post(get_logs(kwargs))
     
+    # metadata
+    def get_metadata(self, **kwargs):
+        return self.post(get_metadata(kwargs))
+    
+    def import_metadata(self, **kwargs):
+        return self.post(import_metadata(kwargs))
+    
