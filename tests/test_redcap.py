@@ -286,3 +286,36 @@ def test_redcap_client_export_pdf(client):
                 files=None)
             mock_file.assert_called_once_with('download.raw', 'wb')
             mock_file.return_value.write.assert_called_once_with(b'Hello, world!')
+
+def test_redcap_client_get_form_event_mappings(client):
+    """Test RedcapClient get_form_event_mappings method"""
+    mock_response = mock_response_factory()
+    with patch('requests.post', return_value=mock_response) as mock_post:
+        response = client.get_form_event_mappings()
+        assert response == {"foo": "bar"}
+        mock_post.assert_called_once_with(
+            'https://example.com', 
+            data={'content': 'formEventMapping', 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
+            files=None)
+
+def test_redcap_client_get_form_event_mappings_with_kwargs(client):
+    """Test RedcapClient get_form_event_mappings method with kwargs"""
+    mock_response = mock_response_factory()
+    with patch('requests.post', return_value=mock_response) as mock_post:
+        response = client.get_form_event_mappings(arms=[1,2])
+        assert response == {"foo": "bar"}
+        mock_post.assert_called_once_with(
+            'https://example.com', 
+            data={'content': 'formEventMapping', 'arms[0]':'1', 'arms[1]':'2', 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
+            files=None)
+        
+def test_redcap_client_import_form_event_mappings(client):
+    """Test RedcapClient import_form_event_mappings method"""
+    mock_response = mock_response_factory()
+    with patch('requests.post', return_value=mock_response) as mock_post:
+        response = client.import_form_event_mappings(data=[{"arm_num":2,"unique_event_name":"screen_arm_2","form":"form_1"}])
+        assert response == {"foo": "bar"}
+        mock_post.assert_called_once_with(
+            'https://example.com', 
+            data={'content': 'formEventMapping', 'action': 'import', 'format': 'json', 'data': '[{"arm_num": 2, "unique_event_name": "screen_arm_2", "form": ''"form_1"}]', 'returnFormat': 'json', 'token': 'token'},
+            files=None)

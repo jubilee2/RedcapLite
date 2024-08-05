@@ -79,3 +79,11 @@ class RedcapClient(Client):
     # pdf
     def export_pdf(self, file_dictionary='', **kwargs):
         return self.file_download_api(export_pdf(kwargs), file_dictionary=file_dictionary)
+
+    # form_event_mapping
+    def get_form_event_mappings(self, **kwargs):
+        return self.post(get_form_event_mappings(kwargs))
+    
+    def import_form_event_mappings(self, **kwargs):
+        return self.post(import_form_event_mappings(kwargs))
+    
