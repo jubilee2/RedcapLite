@@ -319,3 +319,25 @@ def test_redcap_client_import_form_event_mappings(client):
             'https://example.com', 
             data={'content': 'formEventMapping', 'action': 'import', 'format': 'json', 'data': '[{"arm_num": 2, "unique_event_name": "screen_arm_2", "form": ''"form_1"}]', 'returnFormat': 'json', 'token': 'token'},
             files=None)
+
+def test_redcap_client_get_logs(client):
+    """Test RedcapClient get_logs method"""
+    mock_response = mock_response_factory()
+    with patch('requests.post', return_value=mock_response) as mock_post:
+        response = client.get_logs()
+        assert response == {"foo": "bar"}
+        mock_post.assert_called_once_with(
+            'https://example.com', 
+            data={'content': 'log', 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
+            files=None)
+        
+def test_redcap_client_get_logs_with_kwargs(client):
+    """Test RedcapClient get_logs method with kwargs"""
+    mock_response = mock_response_factory()
+    with patch('requests.post', return_value=mock_response) as mock_post:
+        response = client.get_logs(user='foo')
+        assert response == {"foo": "bar"}
+        mock_post.assert_called_once_with(
+            'https://example.com', 
+            data={'content': 'log', 'user':'foo', 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
+            files=None)
