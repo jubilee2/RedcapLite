@@ -72,3 +72,6 @@ class RedcapClient(Client):
     def delete_file_repository(self, **kwargs):
         return self.post(delete_file_repository(kwargs))
     
+    # instrument
+    def get_instruments(self, **kwargs):
+        return self.post(get_instruments(kwargs))

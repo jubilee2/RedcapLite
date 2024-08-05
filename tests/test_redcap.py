@@ -260,3 +260,14 @@ def test_redcap_client_delete_file_repository(client):
             'https://example.com', 
             data={'content': 'fileRepository', 'action': 'delete', 'doc_id': '34', 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
             files=None)
+
+def test_redcap_client_get_instruments(client):
+    """Test RedcapClient get_instruments method"""
+    mock_response = mock_response_factory()
+    with patch('requests.post', return_value=mock_response) as mock_post:
+        response = client.get_instruments()
+        assert response == {"foo": "bar"}
+        mock_post.assert_called_once_with(
+            'https://example.com', 
+            data={'content': 'instrument', 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
+            files=None)
