@@ -5,3 +5,5 @@ from .event import get_events, import_events, delete_events
 from .field_names import get_field_names
 from .file import get_file, import_file, delete_file
 from .file_repository import create_folder_file_repository, list_file_repository, export_file_repository, import_file_repository, delete_file_repository
+from .instrument import get_instruments
+
