@@ -1,6 +1,7 @@
 import requests
 from .handler import *
 
+
 class Client:
     def __init__(self, url, token):
         self.url = url
@@ -15,12 +16,12 @@ class Client:
         return response
 
     @response_error_handler
-    def __post(self, data, files = None):
+    def __post(self, data, files=None):
         data['token'] = self.token
-        response = requests.post(self.url, data=data, files = files)
+        response = requests.post(self.url, data=data, files=files)
         print('HTTP Status: ' + str(response.status_code))
         return response
-    
+
     @csv_handler
     def __csv_api(self, data):
         return self.__post(data)
@@ -28,11 +29,11 @@ class Client:
     @json_handler
     def __json_api(self, data):
         return self.__post(data)
-    
+
     @file_download_handler
     def file_download_api(self, data):
         return self.__post(data)
-    
+
     @file_upload_handler
     def file_upload_api(self, data, files):
         return self.__post(data, files=files)
