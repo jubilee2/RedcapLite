@@ -3,4 +3,4 @@ def get_field_names(data):
         'content': 'userDagMapping',
         'field': data.get('field', '') or ''
     }
-    return(new_data)
+    return (new_data)
