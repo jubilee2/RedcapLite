@@ -3,6 +3,7 @@ import os
 import io
 import pandas as pd
 
+
 def response_error_handler(func):
     def wrapper(obj, data, files=None):
         data['returnFormat'] = 'json'
@@ -10,22 +11,30 @@ def response_error_handler(func):
         if response.status_code == 200:
             return response
         elif response.status_code == 400:
-            raise APIException(f"Bad Request: {response.json().get('error', 'No message provided')}")
+            raise APIException(
+                f"Bad Request: {response.json().get('error', 'No message provided')}")
         elif response.status_code == 401:
-            raise APIException("Unauthorized: API token was missing or incorrect.")
+            raise APIException(
+                "Unauthorized: API token was missing or incorrect.")
         elif response.status_code == 403:
-            raise APIException("Forbidden: You do not have permissions to use the API.")
+            raise APIException(
+                "Forbidden: You do not have permissions to use the API.")
         elif response.status_code == 404:
-            raise APIException("Not Found: The URI requested is invalid or the resource does not exist.")
+            raise APIException(
+                "Not Found: The URI requested is invalid or the resource does not exist.")
         elif response.status_code == 406:
-            raise APIException("Not Acceptable: The data being imported was formatted incorrectly.")
+            raise APIException(
+                "Not Acceptable: The data being imported was formatted incorrectly.")
         elif response.status_code == 500:
-            raise APIException("Internal Server Error: The server encountered an error processing your request.")
+            raise APIException(
+                "Internal Server Error: The server encountered an error processing your request.")
         elif response.status_code == 501:
-            raise APIException("Not Implemented: The requested method is not implemented.")
+            raise APIException(
+                "Not Implemented: The requested method is not implemented.")
         else:
             raise Exception("Unkown issue.")
     return wrapper
+
 
 def csv_handler(func):
     def wrapper(obj, data):
@@ -37,12 +46,14 @@ def csv_handler(func):
         return df
     return wrapper
 
+
 def json_handler(func):
     def wrapper(obj, data):
         data['format'] = 'json'
         response = func(obj, data)
         return response.json()
     return wrapper
+
 
 def file_download_handler(func):
     def wrapper(obj, data, file_dictionary=''):
@@ -54,20 +65,21 @@ def file_download_handler(func):
 
             # Create a dictionary of key-value pairs from the cleaned content-type
             content_dict = {
-                key: value.replace('"', "") 
-                for item in splat 
-                if "=" in item 
+                key: value.replace('"', "")
+                for item in splat
+                if "=" in item
                 for key, value in [item.split("=")]
             }
             file_name = content_dict['name']
 
         except:
             file_name = 'download.raw'
-            
+
         with open(os.path.join(file_dictionary, file_name), 'wb') as f:
             f.write(response.content)
         return response
     return wrapper
+
 
 def file_upload_handler(func):
     def wrapper(obj, file_path, data):
