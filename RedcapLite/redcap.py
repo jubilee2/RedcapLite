@@ -1,5 +1,5 @@
 from .api import *
-from .http import *
+from .http import Client
 
 
 class RedcapClient(Client):
