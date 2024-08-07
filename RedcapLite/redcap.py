@@ -137,3 +137,8 @@ class RedcapClient(Client):
     # report
     def get_report(self, **kwargs):
         return self.post(get_report(kwargs))
+    
+    # version
+    def get_version(self, **kwargs):
+        return self.text_api(get_version(kwargs))
+    
