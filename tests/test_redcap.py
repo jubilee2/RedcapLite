@@ -359,3 +359,39 @@ def test_redcap_client_import_metadata_csv(client):
         expected_requests_data = {'content': 'metadata', 'format': 'csv', 'data': 'a,c\n4,5\n', 'returnFormat': 'json', 'token': 'token'},
         )
         
+
+# project
+def test_redcap_client_create_project_with_kwargs(client):
+    """Test RedcapClient create_project method"""
+    mock_redcap_client_post(
+        client, 'create_project', method_kwargs = {'data': {"project_title":"My New REDCap Project","purpose":"0"}},
+        expected_requests_data = {'content': 'project', 'format': 'json', 'data': '{"project_title": "My New REDCap Project", "purpose": "0"}', 'returnFormat': 'json', 'token': 'token'},
+        )
+
+def test_redcap_client_get_project(client):
+    """Test RedcapClient get_project method"""
+    mock_redcap_client_post(
+        client, 'get_project',
+        expected_requests_data = {'content': 'project', 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
+        )
+
+def test_redcap_client_get_project_xml(client):
+    """Test RedcapClient get_project_xml method"""
+    mock_redcap_client_post(
+        client, 'get_project_xml',
+        expected_requests_data = {'content': 'project_xml', 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
+        )
+
+def test_redcap_client_get_project_xml_with_kwargs(client):
+    """Test RedcapClient get_project_xml method with kwargs"""
+    mock_redcap_client_post(
+        client, 'get_project_xml', method_kwargs = {'returnMetadataOnly': True},
+        expected_requests_data = {'content': 'project_xml', 'returnMetadataOnly': True, 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
+        )
+
+def test_redcap_client_import_project_settings_with_kwargs(client):
+    """Test RedcapClient import_project_settings method with kwargs"""
+    mock_redcap_client_post(
+        client, 'import_project_settings', method_kwargs = {'data': {"project_id":1, "project_title":"test2"}},
+        expected_requests_data = {'content': 'project_settings', 'data': '{"project_id": 1, "project_title": "test2"}', 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
+        )
