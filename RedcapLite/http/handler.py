@@ -40,6 +40,8 @@ def csv_handler(func):
     def wrapper(obj, data):
         data['format'] = 'csv'
         response = func(obj, data)
+        if 'returnContent' in data and data['returnContent'] == 'ids':
+            return response.json()
         df = pd.read_csv(io.StringIO(response.text))
         if df.shape == (0, 1):
             return response.text

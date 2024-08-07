@@ -11,3 +11,4 @@ from .form_event_mapping import get_form_event_mappings, import_form_event_mappi
 from .log import get_logs
 from .metadata import get_metadata, import_metadata
 from .project import create_project, get_project, get_project_xml, import_project_settings
+from .record import export_records, import_records, delete_records, rename_records, generate_next_record_name

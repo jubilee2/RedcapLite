@@ -311,8 +311,7 @@ def test_redcap_client_get_logs_with_kwargs(client):
 # metadata
 def test_redcap_client_get_metadata_csv(client):
     """Test RedcapClient get_metadata method"""
-    mock_response = mock_response_factory()
-    mock_response.text = "field_name,form_name\nfoo,bar\n"
+    mock_response = mock_response_factory(return_text = "field_name,form_name\nfoo,bar\n")
     mock_redcap_client_post(
         client, 'get_metadata', method_kwargs = {},
         mock_response= mock_response,
@@ -330,8 +329,7 @@ def test_redcap_client_get_metadata_json(client):
         
 def test_redcap_client_get_metadata_with_kwargs(client):
     """Test RedcapClient get_metadata method with kwargs"""
-    mock_response = mock_response_factory()
-    mock_response.text = "field_name,form_name\nfoo,bar\n"
+    mock_response = mock_response_factory(return_text = "field_name,form_name\nfoo,bar\n")
     mock_redcap_client_post(
         client, 'get_metadata', method_kwargs = {'fields':['abc','def']},
         mock_response= mock_response,
@@ -349,12 +347,11 @@ def test_redcap_client_import_metadata_json(client):
 
 def test_redcap_client_import_metadata_csv(client):
     """Test RedcapClient import_metadata method"""
-    mock_response = mock_response_factory()
-    mock_response.text = "5"
+    mock_response = mock_response_factory(return_text = '5')
     mock_redcap_client_post(
         client, 'import_metadata', method_kwargs = {'format': 'csv', 'data': 'a,c\n4,5\n'},
         mock_response= mock_response,
-        expected_json = None,
+        expected_json = '5',
         expected_text = '5',
         expected_requests_data = {'content': 'metadata', 'format': 'csv', 'data': 'a,c\n4,5\n', 'returnFormat': 'json', 'token': 'token'},
         )
@@ -397,3 +394,53 @@ def test_redcap_client_import_project_settings_with_kwargs(client):
         client, 'import_project_settings', method_kwargs = {'data': {"project_id":1, "project_title":"test2"}},
         expected_requests_data = {'content': 'project_settings', 'data': '{"project_id": 1, "project_title": "test2"}', 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
         )
+
+def test_export_records(client):
+    mock_redcap_client_post(
+        client, 'export_records',
+        expected_json = None,
+        expected_requests_data={'content': 'record', 'action': 'export', 'type': 'flat', 'format': 'csv', 'returnFormat': 'json', 'token': 'token'}
+    )
+
+def test_export_records_with_kwargs(client):
+    mock_redcap_client_post(
+        client, 'export_records', method_kwargs={'fields': ['foo', 'bar']},
+        expected_json = None,
+        expected_requests_data={'content': 'record', 'action': 'export', 'type': 'flat', 'format': 'csv', 'fields[0]': 'foo', 'fields[1]': 'bar', 'returnFormat': 'json', 'token': 'token'}
+    )
+
+def test_import_records_with_kwargs(client):
+    mock_response = mock_response_factory(return_text = '["5"]')
+    mock_redcap_client_post(
+        client, 'import_records', method_kwargs={'data': [{'foo': 'bar'}], 'format': 'json'},
+        mock_response = mock_response,
+        expected_json = ['5'],
+        expected_requests_data={'content': 'record', 'action': 'import', 'format': 'json', 'type': 'flat', 'returnContent': 'ids', 'data': '[{"foo": "bar"}]', 'backgroundProcess': '0', 'forceAutoNumber': 'false', 'overwriteBehavior': 'normal', 'returnFormat': 'json', 'token': 'token'}
+    )
+
+def test_import_records_with_2records(client):
+    mock_response = mock_response_factory(return_text = '["bar1","bar2"]')
+    mock_redcap_client_post(
+        client, 'import_records', method_kwargs={'data': [{'foo': 'bar1'},{'foo': 'bar2'}], 'format': 'json'},
+        mock_response = mock_response,
+        expected_json = ['bar1','bar2'],
+        expected_requests_data={'content': 'record', 'action': 'import', 'format': 'json', 'type': 'flat', 'returnContent': 'ids', 'data': '[{"foo": "bar1"}, {"foo": "bar2"}]', 'backgroundProcess': '0', 'forceAutoNumber': 'false', 'overwriteBehavior': 'normal', 'returnFormat': 'json', 'token': 'token'}
+    )
+
+def test_delete_records_with_kwargs(client):
+    mock_redcap_client_post(
+        client, 'delete_records', method_kwargs={'records': [1, 2, 3]},
+        expected_requests_data={'content': 'record', 'action': 'delete', 'records[0]': '1', 'records[1]': '2', 'records[2]': '3', 'format': 'json', 'returnFormat': 'json', 'token': 'token'}
+    )
+
+def test_rename_records_with_kwargs(client):
+    mock_redcap_client_post(
+        client, 'rename_records', method_kwargs={'record': "old_name", "new_record_name": "new_nema"},
+        expected_requests_data={'content': 'record', 'action': 'rename', 'new_record_name': 'new_nema', 'record': 'old_name', 'format': 'json', 'returnFormat': 'json', 'token': 'token'}
+    )
+
+def test_generate_next_record_name(client):
+    mock_redcap_client_post(
+        client, 'generate_next_record_name',
+        expected_requests_data={'content': 'generateNextRecordName', 'format': 'json', 'returnFormat': 'json', 'token': 'token'}
+    )
