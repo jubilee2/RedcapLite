@@ -110,4 +110,20 @@ class RedcapClient(Client):
 
     def import_project_settings(self, **kwargs):
         return self.post(import_project_settings(kwargs))
+   
+    # record
+    def export_records(self, **kwargs):
+        return self.post(export_records(kwargs))
+    
+    def import_records(self, **kwargs):
+        return self.post(import_records(kwargs))
+    
+    def delete_records(self, **kwargs):
+        return self.post(delete_records(kwargs))
+    
+    def rename_records(self, **kwargs):
+        return self.post(rename_records(kwargs))
+    
+    def generate_next_record_name(self, **kwargs):
+        return self.post(generate_next_record_name(kwargs))
     
