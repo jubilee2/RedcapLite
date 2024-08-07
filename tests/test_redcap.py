@@ -562,3 +562,18 @@ def test_delete_user_roles_with_kwargs(client):
         method_kwargs={'roles': [123]},
         expected_requests_data={'content': 'userRole', 'action': 'delete', 'roles[0]': '123', 'format': 'json', 'returnFormat': 'json', 'token': 'token'}
     )
+
+# User Role Mappings
+def test_redcap_client_get_user_role_mappings(client):
+    """Test RedcapClient get_user_role_mappings method"""
+    mock_redcap_client_post(
+        client, 'get_user_role_mappings', method_kwargs = {},
+        expected_requests_data = {'content': 'userRoleMapping', 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
+        )
+
+def test_redcap_client_import_user_role_mappings(client):
+    """Test RedcapClient import_user_role_mappings method"""
+    mock_redcap_client_post(
+        client, 'import_user_role_mappings', method_kwargs = {'data': [{"username":"foo","unique_role_name":""}]},
+        expected_requests_data = {'content': 'userRoleMapping', 'action': 'import', 'format': 'json', 'data': '[{"username": "foo", "unique_role_name": ""}]', 'returnFormat': 'json', 'token': 'token'},
+        )
