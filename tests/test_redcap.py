@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import Mock, patch, mock_open
 from RedcapLite import RedcapClient
 import pandas as pd
+import numpy as np
 from pandas.testing import assert_frame_equal
 import json
 
@@ -333,7 +334,7 @@ def test_redcap_client_get_metadata_with_kwargs(client):
     mock_redcap_client_post(
         client, 'get_metadata', method_kwargs = {'fields':['abc','def']},
         mock_response= mock_response,
-        expected_df =  pd.DataFrame({'field_name': ['foo'], 'form_name': ['bar']}),
+        expected_df = pd.DataFrame({'field_name': ['foo'], 'form_name': ['bar']}),
         expected_json = None,
         expected_requests_data = {'content': 'metadata', 'format': 'csv', 'fields[0]':'abc', 'fields[1]':'def','returnFormat': 'json', 'token': 'token'},
         )
@@ -459,3 +460,20 @@ def test_import_repeating_forms_events_with_kwargs(client):
         expected_requests_data={'content': 'repeatingFormsEvents', 'format': 'json', 'data': '[{"event_name": "event_1_arm_1", "form_name": "form2", "custom_form_label": ""}]', 'returnFormat': 'json', 'token': 'token'}
     )
 
+# report
+def test_get_report_with_kwargs(client):
+    mock_redcap_client_post(
+        client, 'get_report', method_kwargs={'report_id': 123, 'format': 'json'},
+        mock_response = mock_response_factory(return_text = '[{"name":"13","redcap_event_name":"event_1_arm_1","redcap_repeat_instrument":"","redcap_repeat_instance":""}]'),
+        expected_json= [{"name":"13","redcap_event_name":"event_1_arm_1","redcap_repeat_instrument":"","redcap_repeat_instance":""}],
+        expected_requests_data={'content': 'report', 'exportCheckboxLabel': 'false', 'rawOrLabelHeaders': 'raw', 'rawOrLabel': 'raw', 'csvDelimiter': ',', 'report_id': 123, 'format': 'json', 'returnFormat': 'json', 'token': 'token'}
+    )
+
+    # csv output
+    mock_redcap_client_post(
+        client, 'get_report', method_kwargs={'report_id': 123, 'format': 'csv'},
+        mock_response = mock_response_factory(return_text = 'name,redcap_event_name,redcap_repeat_instrument,redcap_repeat_instance\n13,event_1_arm_1,,'),
+        expected_json= None,
+        expected_df= pd.DataFrame({'name': [13], 'redcap_event_name': ['event_1_arm_1'], 'redcap_repeat_instrument': [np.float64(np.nan)], 'redcap_repeat_instance': [np.float64(np.nan)]}),
+        expected_requests_data={'content': 'report', 'exportCheckboxLabel': 'false', 'rawOrLabelHeaders': 'raw', 'rawOrLabel': 'raw', 'csvDelimiter': ',', 'report_id': 123, 'format': 'csv', 'returnFormat': 'json', 'token': 'token'}
+    )
