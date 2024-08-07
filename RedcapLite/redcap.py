@@ -133,3 +133,7 @@ class RedcapClient(Client):
     
     def import_repeating_forms_events(self, **kwargs):
         return self.post(import_repeating_forms_events(kwargs))
+
+    # report
+    def get_report(self, **kwargs):
+        return self.post(get_report(kwargs))

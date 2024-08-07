@@ -13,4 +13,4 @@ from .metadata import get_metadata, import_metadata
 from .project import create_project, get_project, get_project_xml, import_project_settings
 from .record import export_records, import_records, delete_records, rename_records, generate_next_record_name
 from .repeating_forms_events import get_repeating_forms_events, import_repeating_forms_events
-
+from .report import get_report
