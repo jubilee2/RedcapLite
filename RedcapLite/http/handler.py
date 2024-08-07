@@ -57,6 +57,13 @@ def json_handler(func):
     return wrapper
 
 
+def text_handler(func):
+    def wrapper(obj, data):
+        response = func(obj, data)
+        return response.text
+    return wrapper
+
+
 def file_download_handler(func):
     def wrapper(obj, data, file_dictionary=''):
         response = func(obj, data)

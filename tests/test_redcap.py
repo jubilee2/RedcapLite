@@ -477,3 +477,13 @@ def test_get_report_with_kwargs(client):
         expected_df= pd.DataFrame({'name': [13], 'redcap_event_name': ['event_1_arm_1'], 'redcap_repeat_instrument': [np.float64(np.nan)], 'redcap_repeat_instance': [np.float64(np.nan)]}),
         expected_requests_data={'content': 'report', 'exportCheckboxLabel': 'false', 'rawOrLabelHeaders': 'raw', 'rawOrLabel': 'raw', 'csvDelimiter': ',', 'report_id': 123, 'format': 'csv', 'returnFormat': 'json', 'token': 'token'}
     )
+
+# version
+def test_get_version(client):
+    mock_redcap_client_post(
+        client, 'get_version',
+        mock_response = mock_response_factory(return_text = '14.6.0'),
+        expected_json=None,
+        expected_text='14.6.0',
+        expected_requests_data={'content': 'version', 'returnFormat': 'json', 'token': 'token'}
+    )
