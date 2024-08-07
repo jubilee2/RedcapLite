@@ -127,3 +127,9 @@ class RedcapClient(Client):
     def generate_next_record_name(self, **kwargs):
         return self.post(generate_next_record_name(kwargs))
     
+    # repeating_forms_events
+    def get_repeating_forms_events(self, **kwargs):
+        return self.post(get_repeating_forms_events(kwargs))
+    
+    def import_repeating_forms_events(self, **kwargs):
+        return self.post(import_repeating_forms_events(kwargs))

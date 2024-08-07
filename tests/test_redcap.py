@@ -444,3 +444,18 @@ def test_generate_next_record_name(client):
         client, 'generate_next_record_name',
         expected_requests_data={'content': 'generateNextRecordName', 'format': 'json', 'returnFormat': 'json', 'token': 'token'}
     )
+
+# repeating_forms_events
+def test_get_repeating_forms_events(client):
+    mock_redcap_client_post(
+        client, 'get_repeating_forms_events',
+        expected_requests_data={'content': 'repeatingFormsEvents', 'format': 'json', 'returnFormat': 'json','token': 'token'}
+    )
+
+def test_import_repeating_forms_events_with_kwargs(client):
+    mock_redcap_client_post(
+        client, 'import_repeating_forms_events',
+        method_kwargs={'data': [{"event_name":"event_1_arm_1","form_name":"form2","custom_form_label":""}]},
+        expected_requests_data={'content': 'repeatingFormsEvents', 'format': 'json', 'data': '[{"event_name": "event_1_arm_1", "form_name": "form2", "custom_form_label": ""}]', 'returnFormat': 'json', 'token': 'token'}
+    )
+
