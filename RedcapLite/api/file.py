@@ -1,34 +1,37 @@
+from .utils import optional_field, require_field
+
+
+@require_field('record')
+@require_field('field')
+@optional_field('event')
+@optional_field('repeat_instance')
 def get_file(data):
     new_data = {
         'content': 'file',
         'action': 'export',
-        'record': data['record'],
-        'field': data['field'],
-        'event': data.get('event', ''),
-        'repeat_instance': data.get('repeat_instance', '1'),
     }
     return (new_data)
 
 
+@require_field('record')
+@require_field('field')
+@optional_field('event')
+@optional_field('repeat_instance')
 def import_file(data):
     new_data = {
         'content': 'file',
         'action': 'import',
-        'record': data['record'],
-        'field': data['field'],
-        'event': data.get('event', ''),
-        'repeat_instance': data.get('repeat_instance', '1'),
     }
     return (new_data)
 
 
+@require_field('record')
+@require_field('field')
+@optional_field('event')
+@optional_field('repeat_instance')
 def delete_file(data):
     new_data = {
         'content': 'file',
         'action': 'delete',
-        'record': data['record'],
-        'field': data['field'],
-        'event': data.get('event', ''),
-        'repeat_instance': data.get('repeat_instance', '1')
     }
     return (new_data)

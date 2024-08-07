@@ -1,6 +1,7 @@
-import json
+from .utils import json_data_formatter, field_to_index
 
 
+@field_to_index('arms')
 def get_arms(data):
     new_data = {
         'content': 'arm'
@@ -8,21 +9,19 @@ def get_arms(data):
     return (new_data)
 
 
+@json_data_formatter
 def import_arms(data):
     new_data = {
         'content': 'arm',
         'action': 'import',
-        'format': 'json',
-        'data': json.dumps(data['data'])
     }
     return (new_data)
 
 
+@field_to_index('arms', True)
 def delete_arms(data):
     new_data = {
         'content': 'arm',
         'action': 'delete'
     }
-    for index, arm in enumerate(data["arms"]):
-        new_data[f"arms[{index}]"] = arm
     return (new_data)

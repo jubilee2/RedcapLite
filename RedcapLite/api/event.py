@@ -1,30 +1,27 @@
-import json
+from .utils import json_data_formatter, field_to_index
 
 
+@field_to_index('arms')
 def get_events(data):
     new_data = {
         'content': 'event'
     }
-    for index, arm in enumerate(data.get("arms", [])):
-        new_data[f"arms[{index}]"] = str(arm)
     return (new_data)
 
 
+@json_data_formatter
 def import_events(data):
     new_data = {
         'content': 'event',
         'action': 'import',
-        'format': 'json',
-        'data': json.dumps(data['data'])
     }
     return (new_data)
 
 
+@field_to_index('events', True)
 def delete_events(data):
     new_data = {
         'content': 'event',
         'action': 'delete'
     }
-    for index, event in enumerate(data["events"]):
-        new_data[f"events[{index}]"] = event
     return (new_data)

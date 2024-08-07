@@ -30,7 +30,8 @@ def test_file_functions(func, action):
     # Test with optional fields missing
     data_missing_optional = {
         'record': '123',
-        'field': 'file_field'
+        'field': 'file_field',
+        'repeat_instance': '1'
     }
     
     expected_output_missing_optional = {
@@ -38,7 +39,6 @@ def test_file_functions(func, action):
         'action': action,
         'record': data_missing_optional['record'],
         'field': data_missing_optional['field'],
-        'event': '',
         'repeat_instance': '1'
     }
     

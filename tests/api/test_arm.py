@@ -32,8 +32,8 @@ def test_delete_arms():
     expected = {
         'content': 'arm',
         'action': 'delete',
-        'arms[0]': 1,
-        'arms[1]': 2,
-        'arms[2]': 3
+        'arms[0]': '1',
+        'arms[1]': '2',
+        'arms[2]': '3'
     }
     assert result == expected

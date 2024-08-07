@@ -1,4 +1,4 @@
-import json
+from .utils import json_data_formatter
 
 
 def get_user_dag_mappings(data):
@@ -8,10 +8,10 @@ def get_user_dag_mappings(data):
     return (new_data)
 
 
+@json_data_formatter
 def import_user_dag_mappings(data):
     new_data = {
         'content': 'userDagMapping',
         'action': 'import',
-        'data': json.dumps(data['data'])
     }
     return (new_data)

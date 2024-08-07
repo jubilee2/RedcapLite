@@ -11,6 +11,11 @@ class Client:
         format = data.get("format", "json")
         if format == 'csv':
             response = self.__csv_api(data)
+        elif format == 'json':
+            response = self.__json_api(data)
+        elif format == 'xml':
+            response = self.__post(data)
+            response = response.text
         else:
             response = self.__json_api(data)
         return response

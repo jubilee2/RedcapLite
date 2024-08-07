@@ -1,4 +1,4 @@
-import json
+from .utils import json_data_formatter, field_to_index, require_field
 
 
 def get_dags(data):
@@ -8,21 +8,28 @@ def get_dags(data):
     return (new_data)
 
 
+@json_data_formatter
 def import_dags(data):
     new_data = {
         'content': 'dag',
         'action': 'import',
-        'format': 'json',
-        'data': json.dumps(data['data'])
     }
     return (new_data)
 
 
+@field_to_index('dags', True)
 def delete_dags(data):
     new_data = {
         'content': 'dag',
         'action': 'delete'
     }
-    for index, dag in enumerate(data["dags"]):
-        new_data[f"dags[{index}]"] = dag
+    return (new_data)
+
+
+@require_field('dag')
+def switch_dags(data):
+    new_data = {
+        'content': 'dag',
+        'action': 'switch',
+    }
     return (new_data)
