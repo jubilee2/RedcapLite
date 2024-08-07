@@ -165,3 +165,13 @@ class RedcapClient(Client):
     def delete_users(self, **kwargs):
         return self.post(delete_users(kwargs))
     
+    # user_role
+    def get_user_roles(self, **kwargs):
+        return self.post(get_user_roles(kwargs))
+    
+    def import_user_roles(self, **kwargs):
+        return self.post(import_user_roles(kwargs))
+    
+    def delete_user_roles(self, **kwargs):
+        return self.post(delete_user_roles(kwargs))
+    
