@@ -97,3 +97,17 @@ class RedcapClient(Client):
 
     def import_metadata(self, **kwargs):
         return self.post(import_metadata(kwargs))
+    
+    # project
+    def create_project(self, **kwargs):
+        return self.post(create_project(kwargs))
+
+    def get_project(self, **kwargs):
+        return self.post(get_project(kwargs))
+    
+    def get_project_xml(self, **kwargs):
+        return self.post(get_project_xml(kwargs))
+
+    def import_project_settings(self, **kwargs):
+        return self.post(import_project_settings(kwargs))
+    
