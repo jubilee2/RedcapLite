@@ -521,3 +521,24 @@ def test_get_survey_return_code_with_kwargs(client):
         expected_text='fbar123',
         expected_requests_data={'content': 'surveyReturnCode', 'record': '123', 'instrument': 'foo',  'returnFormat': 'json', 'token': 'token'}
     )
+
+# user
+def test_get_users(client):
+    mock_redcap_client_post(
+        client, 'get_users',
+        expected_requests_data={'content': 'user', 'format': 'json', 'returnFormat': 'json', 'token': 'token'}
+    )
+
+def test_import_users_with_kwargs(client):
+    mock_redcap_client_post(
+        client, 'import_users', method_kwargs={'data': [{'username': 'foo', 'email': 'bar@example.com'}]},
+        expected_requests_data={'content': 'user', 'format': 'json', 'data': '[{"username": "foo", "email": "bar@example.com"}]', 'returnFormat': 'json', 'token': 'token'}
+    )
+
+def test_delete_users_with_kwargs(client):
+    mock_redcap_client_post(
+        client, 'delete_users', method_kwargs={'users': ['foo']},
+        mock_response = mock_response_factory(return_text = '1'),
+        expected_json=1,
+        expected_requests_data={'content': 'user', 'action': 'delete', 'users[0]': 'foo', 'format': 'json', 'returnFormat': 'json', 'token': 'token'}
+    )

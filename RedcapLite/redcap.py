@@ -155,3 +155,13 @@ class RedcapClient(Client):
     def get_survey_return_code(self, **kwargs):
         return self.text_api(get_survey_return_code(kwargs))
     
+    # user
+    def get_users(self, **kwargs):
+        return self.post(get_users(kwargs))
+    
+    def import_users(self, **kwargs):
+        return self.post(import_users(kwargs))
+    
+    def delete_users(self, **kwargs):
+        return self.post(delete_users(kwargs))
+    
