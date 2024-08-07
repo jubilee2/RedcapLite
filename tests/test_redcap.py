@@ -487,3 +487,37 @@ def test_get_version(client):
         expected_text='14.6.0',
         expected_requests_data={'content': 'version', 'returnFormat': 'json', 'token': 'token'}
     )
+
+# syrvey
+def test_get_survey_link_with_kwargs(client):
+    mock_redcap_client_post(
+        client, 'get_survey_link', method_kwargs={'record': 123, 'instrument': 'demo'},
+        mock_response = mock_response_factory(return_text = 'https://redcap.org/abc'),
+        expected_json=None,
+        expected_text='https://redcap.org/abc',
+        expected_requests_data={'content': 'surveyLink', 'instrument': 'demo', 'record': 123, 'returnFormat': 'json', 'token': 'token'}
+    )
+
+def test_get_participant_list_with_kwargs(client):
+    mock_redcap_client_post(
+        client, 'get_participant_list', method_kwargs={'instrument': 'foo', 'format': 'json'},
+        expected_requests_data={'content': 'participantList', 'format': 'json', 'instrument': 'foo', 'returnFormat': 'json', 'token': 'token'}
+    )
+
+def test_get_survey_queue_link_with_kwargs(client):
+    mock_redcap_client_post(
+        client, 'get_survey_queue_link', method_kwargs={'record': '123'},
+        mock_response = mock_response_factory(return_text = 'https://redcap.org/abc'),
+        expected_json=None,
+        expected_text='https://redcap.org/abc',
+        expected_requests_data={'content': 'surveyQueueLink', 'record': '123', 'returnFormat': 'json', 'token': 'token'}
+    )
+
+def test_get_survey_return_code_with_kwargs(client):
+    mock_redcap_client_post(
+        client, 'get_survey_return_code', method_kwargs={'record': '123', 'instrument': 'foo'},
+        mock_response = mock_response_factory(return_text = 'fbar123'),
+        expected_json=None,
+        expected_text='fbar123',
+        expected_requests_data={'content': 'surveyReturnCode', 'record': '123', 'instrument': 'foo',  'returnFormat': 'json', 'token': 'token'}
+    )

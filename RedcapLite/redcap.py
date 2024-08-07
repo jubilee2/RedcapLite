@@ -142,3 +142,16 @@ class RedcapClient(Client):
     def get_version(self, **kwargs):
         return self.text_api(get_version(kwargs))
     
+    # survey
+    def get_survey_link(self, **kwargs):
+        return self.text_api(get_survey_link(kwargs))
+    
+    def get_participant_list(self, **kwargs):
+        return self.post(get_participant_list(kwargs))
+
+    def get_survey_queue_link(self, **kwargs):
+        return self.text_api(get_survey_queue_link(kwargs))
+
+    def get_survey_return_code(self, **kwargs):
+        return self.text_api(get_survey_return_code(kwargs))
+    
