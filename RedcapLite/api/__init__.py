@@ -17,3 +17,4 @@ from .report import get_report
 from .version import get_version
 from .survey import get_survey_link, get_participant_list, get_survey_queue_link, get_survey_return_code
 from .user import get_users, import_users, delete_users
+from .user_role import get_user_roles, import_user_roles, delete_user_roles
