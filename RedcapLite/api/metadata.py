@@ -1,16 +1,15 @@
 import json
 import pandas as pd
+from .utils import field_to_index, optional_field
 
 
+@optional_field('format', 'csv')
+@field_to_index('fields')
+@field_to_index('forms')
 def get_metadata(data):
     new_data = {
         'content': 'metadata',
-        'format': data.get('format', 'csv'),
     }
-    for index, field in enumerate(data.get("fields", [])):
-        new_data[f"fields[{index}]"] = str(field)
-    for index, form in enumerate(data.get("forms", [])):
-        new_data[f"forms[{index}]"] = str(form)
     return (new_data)
 
 

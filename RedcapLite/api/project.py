@@ -1,20 +1,18 @@
-import json
+from .utils import json_data_formatter, field_to_index, optional_field
 
 
+@json_data_formatter
 def create_project(data):
     new_data = {
         'content': 'project',
-        'format': 'json',
-        'data': json.dumps(data['data'])
     }
     return (new_data)
 
 
+@json_data_formatter
 def import_project_settings(data):
     new_data = {
         'content': 'project_settings',
-        'format': 'json',
-        'data': json.dumps(data['data'])
     }
     return (new_data)
 
@@ -26,11 +24,17 @@ def get_project(data):
     return (new_data)
 
 
+@optional_field('returnMetadataOnly')
+@field_to_index('records')
+@field_to_index('fields')
+@field_to_index('events')
+@optional_field('exportSurveyFields')
+@optional_field('exportDataAccessGroups')
+@optional_field('filterLogic')
+@optional_field('exportFiles')
 def get_project_xml(data):
     new_data = {
         'content': 'project_xml',
+        'format': 'xml',
     }
-    for k in ['returnMetadataOnly', 'records', 'fields', 'events', 'exportSurveyFields', 'exportDataAccessGroups', 'filterLogic', 'exportFiles']:
-        if k in data:
-            new_data[k] = data[k]
     return (new_data)

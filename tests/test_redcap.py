@@ -73,7 +73,7 @@ def test_redcap_client_delete_arms(client):
         mock_response = mock_response_factory(return_text='2'),
         expected_json = 2,
         expected_text = 2,
-        expected_requests_data = {'content': 'arm', 'action': 'delete', 'format': 'json', 'arms[0]': 2, 'arms[1]': 3, 'returnFormat': 'json', 'token': 'token'},
+        expected_requests_data = {'content': 'arm', 'action': 'delete', 'format': 'json', 'arms[0]': '2', 'arms[1]': '3', 'returnFormat': 'json', 'token': 'token'},
         )
     
 
@@ -96,7 +96,7 @@ def test_redcap_client_delete_dags(client):
     """Test RedcapClient delete_dags method"""
     mock_redcap_client_post(
         client, 'delete_dags', method_kwargs = {'dags': [2,3]},
-        expected_requests_data = {'content': 'dag', 'action': 'delete', 'format': 'json', 'dags[0]': 2, 'dags[1]': 3, 'returnFormat': 'json', 'token': 'token'},
+        expected_requests_data = {'content': 'dag', 'action': 'delete', 'format': 'json', 'dags[0]': '2', 'dags[1]': '3', 'returnFormat': 'json', 'token': 'token'},
         )
 
 
@@ -135,7 +135,7 @@ def test_redcap_client_delete_events(client):
     """Test RedcapClient delete_events method"""
     mock_redcap_client_post(
         client, 'delete_events', method_kwargs = {'events': [2,3]},
-        expected_requests_data = {'content': 'event', 'action': 'delete', 'format': 'json', 'events[0]': 2, 'events[1]': 3, 'returnFormat': 'json', 'token': 'token'},
+        expected_requests_data = {'content': 'event', 'action': 'delete', 'format': 'json', 'events[0]': '2', 'events[1]': '3', 'returnFormat': 'json', 'token': 'token'},
         )
 
         
@@ -144,7 +144,7 @@ def test_redcap_client_get_field_names(client):
     """Test RedcapClient get_field_names method"""
     mock_redcap_client_post(
         client, 'get_field_names', method_kwargs = {},
-        expected_requests_data = {'content': 'userDagMapping', 'field': '', 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
+        expected_requests_data = {'content': 'userDagMapping', 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
         )
 
 
@@ -159,7 +159,7 @@ def test_redcap_client_get_file(client):
             assert response == mock_response
             mock_post.assert_called_once_with(
                 'https://example.com', 
-                data={'content': 'file', 'action': 'export', 'record': '2', 'field': 'pdf', 'event': '', 'repeat_instance': '1', 'returnFormat': 'json', 'token': 'token'},
+                data={'content': 'file', 'action': 'export', 'record': '2', 'field': 'pdf', 'returnFormat': 'json', 'token': 'token'},
                 files=None)
             mock_file.assert_called_once_with('download.raw', 'wb')
             mock_file.return_value.write.assert_called_once_with(b'Hello, world!')
@@ -175,7 +175,7 @@ def test_redcap_client_import_file(client):
             assert response == mock_response
             mock_post.assert_called_once_with(
                 'https://example.com', 
-                data={'content': 'file', 'action': 'import', 'record': '2', 'field': 'pdf', 'event': '', 'repeat_instance': '1', 'returnFormat': 'json', 'token': 'token'},
+                data={'content': 'file', 'action': 'import', 'record': '2', 'field': 'pdf', 'returnFormat': 'json', 'token': 'token'},
                 files={'file': mock_file.return_value})
             mock_file.assert_called_once_with('file.txt', 'rb')
 
@@ -183,7 +183,7 @@ def test_redcap_client_delete_file(client):
     """Test RedcapClient delete_file method"""
     mock_redcap_client_post(
         client, 'delete_file', method_kwargs = {'record': '3', 'field': 'pdf'},
-        expected_requests_data = {'content': 'file', 'action': 'delete', 'record': '3', 'field': 'pdf', 'event': '', 'repeat_instance': '1', 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
+        expected_requests_data = {'content': 'file', 'action': 'delete', 'record': '3', 'field': 'pdf', 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
         )
 
 
@@ -296,14 +296,14 @@ def test_redcap_client_get_logs(client):
         expected_df = None,
         expected_json = None,
         expected_text = None,
-        expected_requests_data = {'content': 'log', 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
+        expected_requests_data = {'content': 'log', 'format': 'csv', 'returnFormat': 'json', 'token': 'token'},
         expected_requests_files = None
         )
         
 def test_redcap_client_get_logs_with_kwargs(client):
     """Test RedcapClient get_logs method with kwargs"""
     mock_redcap_client_post(
-        client, 'get_logs', method_kwargs = {'user': 'foo'},
+        client, 'get_logs', method_kwargs = {'user': 'foo', 'format': 'json'},
         expected_requests_data = {'content': 'log', 'user':'foo', 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
         )
 
@@ -379,14 +379,16 @@ def test_redcap_client_get_project_xml(client):
     """Test RedcapClient get_project_xml method"""
     mock_redcap_client_post(
         client, 'get_project_xml',
-        expected_requests_data = {'content': 'project_xml', 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
+        expected_json = None,
+        expected_requests_data = {'content': 'project_xml', 'format': 'xml', 'returnFormat': 'json', 'token': 'token'},
         )
 
 def test_redcap_client_get_project_xml_with_kwargs(client):
     """Test RedcapClient get_project_xml method with kwargs"""
     mock_redcap_client_post(
         client, 'get_project_xml', method_kwargs = {'returnMetadataOnly': True},
-        expected_requests_data = {'content': 'project_xml', 'returnMetadataOnly': True, 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
+        expected_json = None,
+        expected_requests_data = {'content': 'project_xml', 'returnMetadataOnly': True, 'format': 'xml', 'returnFormat': 'json', 'token': 'token'},
         )
 
 def test_redcap_client_import_project_settings_with_kwargs(client):

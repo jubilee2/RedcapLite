@@ -14,6 +14,7 @@ def test_import_user_dag_mappings():
     expected_result = {
         'content': 'userDagMapping',
         'action': 'import',
+        'format': 'json',
         'data': json.dumps(data['data'])
     }
     assert import_user_dag_mappings(data) == expected_result

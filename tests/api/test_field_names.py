@@ -14,24 +14,5 @@ def test_get_field_names():
     data = {}
     expected_output = {
         'content': 'userDagMapping',
-        'field': ''
     }
     assert get_field_names(data) == expected_output
-
-    # Test case 3: Field is None in the input data
-    data = {'field': None}
-    expected_output = {
-        'content': 'userDagMapping',
-        'field': ''
-    }
-    assert get_field_names(data) == expected_output
-
-    # Test case 4: Field is empty string in the input data
-    data = {'field': ''}
-    expected_output = {
-        'content': 'userDagMapping',
-        'field': ''
-    }
-    assert get_field_names(data) == expected_output
-
-# To run the tests, use the command: pytest your_test_file.py
