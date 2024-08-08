@@ -1,4 +1,3 @@
-import pytest
 from redcaplite.api import get_field_names
 
 

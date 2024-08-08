@@ -302,7 +302,10 @@ def test_redcap_client_export_pdf(client):
             assert response == mock_response
             mock_post.assert_called_once_with(
                 'https://example.com',
-                data={'content': 'pdf', 'returnFormat': 'json', 'token': 'token'},
+                data={
+                    'content': 'pdf',
+                    'returnFormat': 'json',
+                    'token': 'token'},
                 files=None)
             mock_file.assert_called_once_with('download.raw', 'wb')
             mock_file.return_value.write.assert_called_once_with(
@@ -635,7 +638,7 @@ def test_get_survey_return_code_with_kwargs(client):
         expected_json=None,
         expected_text='fbar123',
         expected_requests_data={'content': 'surveyReturnCode', 'record': '123',
-                                'instrument': 'foo',  'returnFormat': 'json', 'token': 'token'}
+                                'instrument': 'foo', 'returnFormat': 'json', 'token': 'token'}
     )
 
 # user

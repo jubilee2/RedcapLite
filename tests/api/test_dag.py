@@ -1,4 +1,3 @@
-import pytest
 import json
 from redcaplite.api import get_dags, import_dags, delete_dags
 

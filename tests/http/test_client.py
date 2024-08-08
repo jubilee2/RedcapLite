@@ -1,4 +1,3 @@
-import pytest
 import os
 from unittest.mock import Mock, patch, mock_open
 from redcaplite.http import Client

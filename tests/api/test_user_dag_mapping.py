@@ -1,4 +1,3 @@
-import pytest
 import json
 from redcaplite.api import get_user_dag_mappings, import_user_dag_mappings
 

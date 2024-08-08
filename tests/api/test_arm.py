@@ -1,4 +1,3 @@
-import pytest
 import json
 from redcaplite.api import get_arms, import_arms, delete_arms
 

@@ -1,5 +1,5 @@
 import requests
-from .handler import *
+import redcaplite.http.handler as hd
 
 
 class Client:
@@ -20,29 +20,29 @@ class Client:
             response = self.__json_api(data)
         return response
 
-    @response_error_handler
+    @hd.response_error_handler
     def __post(self, data, files=None):
         data['token'] = self.token
         response = requests.post(self.url, data=data, files=files)
         print('HTTP Status: ' + str(response.status_code))
         return response
 
-    @csv_handler
+    @hd.csv_handler
     def __csv_api(self, data):
         return self.__post(data)
 
-    @json_handler
+    @hd.json_handler
     def __json_api(self, data):
         return self.__post(data)
 
-    @text_handler
+    @hd.text_handler
     def text_api(self, data):
         return self.__post(data)
 
-    @file_download_handler
+    @hd.file_download_handler
     def file_download_api(self, data):
         return self.__post(data)
 
-    @file_upload_handler
+    @hd.file_upload_handler
     def file_upload_api(self, data, files):
         return self.__post(data, files=files)
