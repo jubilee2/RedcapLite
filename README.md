@@ -30,22 +30,30 @@ r = redcaplite.RedcapClient('https://redcap.vumc.org/api/', 'your_token')
 
 ### Methods
 
-#### `get_arms()`
 
-Retrieve the list of arms from the REDCap API.
+| API Name | Export | Import | Delete | Other |
+|---|---|---|---|---|
+| Arms | get_arms() | import_arms() | delete_arms() |  |
+| DAGs | get_dags() | import_dags() | delete_dags() |  |
+| User DAG Mapping | get_user_dag_mappings() | import_user_dag_mappings() |  |  |
+| Events | get_events() | import_events() | delete_events() |  |
+| Field Names | get_field_names() |  |  |  |
+| File | get_file() | import_file() | delete_file() |  |
+| File Repository | export_file_repository() | import_file_repository() | delete_file_repository() | create_folder_file_repository()<br>list_file_repository() |
+| Instrument | get_instruments() |  |  | export_pdf() |
+| Form Event Mapping | get_form_event_mappings() | import_form_event_mappings() |  |  |
+| Log | get_logs() |  |  |  |
+| Metadata | get_metadata() | import_metadata() |  |  |
+| Project | get_project()<br>get_project_xml() | import_project_settings() |  | create_project() |
+| Record | export_records() | import_records() | delete_records() | rename_records()<br>generate_next_record_name() |
+| Repeating Forms Events | get_repeating_forms_events() | import_repeating_forms_events() |  |  |
+| Report | get_report() |  |  |  |
+| Version | get_version() |  |  |  |
+| Survey | get_survey_link()<br>get_survey_queue_link()<br>get_survey_return_code() |  |  | get_participant_list() |
+| Users | get_users() | import_users() | delete_users() |  |
+| User Role | get_user_roles() | import_user_roles() | delete_user_roles() |  |
+| User Role Mapping | get_user_role_mappings() | import_user_role_mappings() |  |  |
 
-```python
-arms = r.get_arms()
-print(arms)
-```
-
-#### `delete_arms(arms)`
-
-Delete the specified arms. Provide a list of arm IDs to delete.
-
-```python
-r.delete_arms(arms=[3])
-```
 
 ### Example
 
