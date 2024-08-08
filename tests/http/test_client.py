@@ -70,3 +70,4 @@ def test_client_file_upload_api():
         with patch.object(client, '_Client__post', return_value=mock_response):
             response = client.file_upload_api('file.txt', {})
             assert response == mock_response
+            mock_file.assert_called_once_with('file.txt', 'rb')
