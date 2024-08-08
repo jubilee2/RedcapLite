@@ -1,6 +1,6 @@
 import pytest
 import json
-from RedcapLite.api import get_events, import_events, delete_events
+from redcaplite.api import get_events, import_events, delete_events
 
 def test_get_events():
     data = {"arms": [1, 2, 3]}

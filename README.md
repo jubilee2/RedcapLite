@@ -1,25 +1,23 @@
-# RedcapLite
+# redcaplite
 
-`RedcapLite` is a Python package for interacting with the REDCap API. This package provides methods to interact with different API endpoints in a straightforward way.
+`redcaplite` is a Python package for interacting with the REDCap API. This package provides methods to interact with different API endpoints in a straightforward way.
 
 ## Installation
 
 To install the package, clone the repository and install it using `pip`:
 
 ```sh
-git clone https://github.com/jubilee2/RedcapLite.git
-cd RedcapLite
-pip install .
+pip install redcaplite
 ```
 
 ## Usage
 
 ### Importing the Package
 
-To use the `RedcapLite` package, import it in your Python script:
+To use the `redcaplite` package, import it in your Python script:
 
 ```python
-import RedcapLite
+import redcaplite
 ```
 
 ### Creating an Instance
@@ -27,7 +25,7 @@ import RedcapLite
 Create an instance of the `RedcapClient` class by providing the API URL and token:
 
 ```python
-r = RedcapLite.RedcapClient('https://redcap.vumc.org/api/', 'your_token')
+r = redcaplite.RedcapClient('https://redcap.vumc.org/api/', 'your_token')
 ```
 
 ### Methods
@@ -51,13 +49,13 @@ r.delete_arms(arms=[3])
 
 ### Example
 
-Here’s a complete example of how to use the `RedcapLite` package:
+Here’s a complete example of how to use the `redcaplite` package:
 
 ```python
-import RedcapLite
+import redcaplite
 
 # Create an instance of RedcapClient
-r = RedcapLite.RedcapClient('https://redcap.vumc.org/api/', 'your_token')
+r = redcaplite.RedcapClient('https://redcap.vumc.org/api/', 'your_token')
 
 # Get arms
 arms = r.get_arms()

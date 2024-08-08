@@ -1,6 +1,6 @@
 import pytest
 import json
-from RedcapLite.api import get_user_dag_mappings, import_user_dag_mappings
+from redcaplite.api import get_user_dag_mappings, import_user_dag_mappings
 
 def test_get_user_dag_mappings():
     data = {}
