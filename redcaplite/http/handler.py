@@ -68,11 +68,13 @@ def file_download_handler(func):
     def wrapper(obj, data, file_dictionary=''):
         response = func(obj, data)
         try:
-            # Extract and clean the content-type header, splitting by semicolon and stripping spaces
+            # Extract and clean the content-type header, splitting by semicolon
+            # and stripping spaces
             content_type = response.headers["content-type"]
             splat = [item.strip() for item in content_type.split(";")]
 
-            # Create a dictionary of key-value pairs from the cleaned content-type
+            # Create a dictionary of key-value pairs from the cleaned
+            # content-type
             content_dict = {
                 key: value.replace('"', "")
                 for item in splat
@@ -81,7 +83,7 @@ def file_download_handler(func):
             }
             file_name = content_dict['name']
 
-        except:
+        except:  # noqa: E722
             file_name = 'download.raw'
 
         with open(os.path.join(file_dictionary, file_name), 'wb') as f:

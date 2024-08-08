@@ -1,12 +1,13 @@
-import pytest
 import json
-from redcaplite.api import  get_arms, import_arms, delete_arms
+from redcaplite.api import get_arms, import_arms, delete_arms
+
 
 def test_get_arms():
     data = {}  # Any necessary input data for the function
     result = get_arms(data)
     expected = {'content': 'arm'}
     assert result == expected
+
 
 def test_import_arms():
     data = {
@@ -23,6 +24,7 @@ def test_import_arms():
         'data': json.dumps(data['data'])
     }
     assert result == expected
+
 
 def test_delete_arms():
     data = {

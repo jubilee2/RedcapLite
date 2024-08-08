@@ -1,5 +1,5 @@
-import pytest
-from redcaplite.api import get_field_names  # Replace `your_module` with the actual module name
+from redcaplite.api import get_field_names
+
 
 def test_get_field_names():
     # Test case 1: Field is present in the input data
