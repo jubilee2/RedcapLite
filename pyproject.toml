@@ -12,6 +12,9 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+dependencies = [
+    "pandas", 
+    "requests"]
 
 [project.urls]
 Homepage = "https://github.com/jubilee2/RedcapLite"
