@@ -97,55 +97,55 @@ class RedcapClient(Client):
 
     def import_metadata(self, **kwargs):
         return self.post(import_metadata(kwargs))
-    
+
     # project
     def create_project(self, **kwargs):
         return self.post(create_project(kwargs))
 
     def get_project(self, **kwargs):
         return self.post(get_project(kwargs))
-    
+
     def get_project_xml(self, **kwargs):
         return self.post(get_project_xml(kwargs))
 
     def import_project_settings(self, **kwargs):
         return self.post(import_project_settings(kwargs))
-   
+
     # record
     def export_records(self, **kwargs):
         return self.post(export_records(kwargs))
-    
+
     def import_records(self, **kwargs):
         return self.post(import_records(kwargs))
-    
+
     def delete_records(self, **kwargs):
         return self.post(delete_records(kwargs))
-    
+
     def rename_records(self, **kwargs):
         return self.post(rename_records(kwargs))
-    
+
     def generate_next_record_name(self, **kwargs):
         return self.post(generate_next_record_name(kwargs))
-    
+
     # repeating_forms_events
     def get_repeating_forms_events(self, **kwargs):
         return self.post(get_repeating_forms_events(kwargs))
-    
+
     def import_repeating_forms_events(self, **kwargs):
         return self.post(import_repeating_forms_events(kwargs))
 
     # report
     def get_report(self, **kwargs):
         return self.post(get_report(kwargs))
-    
+
     # version
     def get_version(self, **kwargs):
         return self.text_api(get_version(kwargs))
-    
+
     # survey
     def get_survey_link(self, **kwargs):
         return self.text_api(get_survey_link(kwargs))
-    
+
     def get_participant_list(self, **kwargs):
         return self.post(get_participant_list(kwargs))
 
@@ -154,31 +154,30 @@ class RedcapClient(Client):
 
     def get_survey_return_code(self, **kwargs):
         return self.text_api(get_survey_return_code(kwargs))
-    
+
     # user
     def get_users(self, **kwargs):
         return self.post(get_users(kwargs))
-    
+
     def import_users(self, **kwargs):
         return self.post(import_users(kwargs))
-    
+
     def delete_users(self, **kwargs):
         return self.post(delete_users(kwargs))
-    
+
     # user_role
     def get_user_roles(self, **kwargs):
         return self.post(get_user_roles(kwargs))
-    
+
     def import_user_roles(self, **kwargs):
         return self.post(import_user_roles(kwargs))
-    
+
     def delete_user_roles(self, **kwargs):
         return self.post(delete_user_roles(kwargs))
-    
+
     #  user_role_mappings
     def get_user_role_mappings(self, **kwargs):
         return self.post(get_user_role_mappings(kwargs))
-    
+
     def import_user_role_mappings(self, **kwargs):
         return self.post(import_user_role_mappings(kwargs))
-    

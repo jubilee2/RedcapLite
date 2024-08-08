@@ -3,11 +3,13 @@ import os
 from unittest.mock import Mock, patch, mock_open
 from redcaplite.http import Client
 
+
 def test_client_init():
     """Test Client initialization"""
     client = Client('https://example.com', 'token')
     assert client.url == 'https://example.com'
     assert client.token == 'token'
+
 
 def test_client_post_json():
     """Test Client post method with JSON format"""
@@ -17,6 +19,7 @@ def test_client_post_json():
         response = client.post({'format': 'json'})
         assert response == mock_response
 
+
 def test_client_post_csv():
     """Test Client post method with CSV format"""
     client = Client('https://example.com', 'token')
@@ -24,6 +27,7 @@ def test_client_post_csv():
     with patch.object(client, '_Client__csv_api', return_value=mock_response):
         response = client.post({'format': 'csv'})
         assert response == mock_response
+
 
 def test_client_post_default_format():
     """Test Client post method with default format"""
@@ -33,6 +37,7 @@ def test_client_post_default_format():
         response = client.post({})
         assert response == mock_response
 
+
 def test_client__post():
     """Test Client _post method"""
     client = Client('https://example.com', 'token')
@@ -41,7 +46,9 @@ def test_client__post():
     with patch('requests.post', return_value=mock_response) as mock_post:
         response = client._Client__post({})
         assert response == mock_response
-        mock_post.assert_called_once_with('https://example.com', data={'token': 'token', 'returnFormat': 'json'}, files=None)
+        mock_post.assert_called_once_with(
+            'https://example.com', data={'token': 'token', 'returnFormat': 'json'}, files=None)
+
 
 def test_client_file_download_api():
     """Test Client file_download_api method"""
@@ -53,6 +60,7 @@ def test_client_file_download_api():
         response = client.file_download_api({})
         assert response == mock_response
     os.remove('download.raw')
+
 
 def test_client_file_upload_api():
     """Test Client file_upload_api method"""

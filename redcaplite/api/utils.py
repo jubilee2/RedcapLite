@@ -3,9 +3,9 @@ import json
 
 def json_data_formatter(func):
     def wrapper(data):
-        
+
         result = func(data)
-        
+
         result['format'] = 'json'
         result['data'] = json.dumps(data['data'])
         return result
@@ -15,9 +15,9 @@ def json_data_formatter(func):
 def field_to_index(field: str, required: bool = False):
     def decorator(func):
         def wrapper(data):
-            
+
             result = func(data)
-            
+
             for index, item in enumerate(data[field] if required else data.get(field, [])):
                 result[f"{field}[{index}]"] = str(item)
             return result
@@ -28,9 +28,9 @@ def field_to_index(field: str, required: bool = False):
 def require_field(field: str):
     def decorator(func):
         def wrapper(data):
-            
+
             result = func(data)
-        
+
             result[field] = data[field]
             return result
         return wrapper

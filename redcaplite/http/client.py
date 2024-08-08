@@ -34,11 +34,11 @@ class Client:
     @json_handler
     def __json_api(self, data):
         return self.__post(data)
-    
+
     @text_handler
     def text_api(self, data):
         return self.__post(data)
-    
+
     @file_download_handler
     def file_download_api(self, data):
         return self.__post(data)
