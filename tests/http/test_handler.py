@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import Mock, patch, mock_open
-from RedcapLite.http.error import APIException
-from RedcapLite.http import response_error_handler, csv_handler, json_handler, file_download_handler, file_upload_handler
+from redcaplite.http.error import APIException
+from redcaplite.http import response_error_handler, csv_handler, json_handler, file_download_handler, file_upload_handler
 import os
 import pandas as pd
 import tempfile

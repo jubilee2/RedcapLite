@@ -1,6 +1,6 @@
 import pytest
 import json
-from RedcapLite.api import  get_arms, import_arms, delete_arms
+from redcaplite.api import  get_arms, import_arms, delete_arms
 
 def test_get_arms():
     data = {}  # Any necessary input data for the function

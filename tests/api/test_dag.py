@@ -1,6 +1,6 @@
 import pytest
 import json
-from RedcapLite.api import get_dags, import_dags, delete_dags
+from redcaplite.api import get_dags, import_dags, delete_dags
 
 def test_get_dags():
     data = {}  # Sample input data, modify as needed

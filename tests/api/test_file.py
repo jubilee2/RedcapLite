@@ -1,7 +1,7 @@
 import pytest
 
 # Assuming the functions are imported from the module where they are defined
-from RedcapLite.api import get_file, import_file, delete_file
+from redcaplite.api import get_file, import_file, delete_file
 
 @pytest.mark.parametrize("func, action", [
     (get_file, 'export'),

@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import Mock, patch, mock_open
-from RedcapLite import RedcapClient
+from redcaplite import RedcapClient
 import pandas as pd
 import numpy as np
 from pandas.testing import assert_frame_equal

@@ -1,7 +1,7 @@
 import pytest
 import os
 from unittest.mock import Mock, patch, mock_open
-from RedcapLite.http import Client
+from redcaplite.http import Client
 
 def test_client_init():
     """Test Client initialization"""
