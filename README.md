@@ -1,6 +1,9 @@
 # redcaplite
 
 ![pytest](https://github.com/jubilee2/RedcapLite/actions/workflows/python-app.yml/badge.svg?branch=main)
+![PyPI - Version](https://img.shields.io/pypi/v/redcaplite)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/redcaplite)
+
 
 `redcaplite` is a Python package for interacting with the REDCap API. This package provides methods to interact with different API endpoints in a straightforward way.
 
