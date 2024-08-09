@@ -43,7 +43,8 @@ r = redcaplite.RedcapClient('https://redcap.vumc.org/api/', 'your_token')
 | File | get_file() | import_file() | delete_file() | 
 | File Repository (File) | export_file_repository() | import_file_repository() | delete_file_repository() |
 | File Repository (Folder)| list_file_repository() | create_folder_file_repository() |  | 
-| Instrument | get_instruments()<br>export_pdf() |  |  |
+| Instrument | get_instruments() |  |  |
+| Instrument (PDF)| export_pdf() |  |  |
 | Form Event Mapping | get_form_event_mappings() | import_form_event_mappings() |  |
 | Log | get_logs() |  |  |
 | Metadata | get_metadata() | import_metadata() |  |
@@ -53,7 +54,7 @@ r = redcaplite.RedcapClient('https://redcap.vumc.org/api/', 'your_token')
 | Repeating Forms Events | get_repeating_forms_events() | import_repeating_forms_events() |  |
 | Report | get_report() |  |  |
 | Version | get_version() |  |  |
-| Survey | get_survey_link()<br>get_survey_queue_link()<br>get_survey_return_code() | get_participant_list() |  |
+| Survey | get_survey_link()<br>get_survey_queue_link()<br>get_survey_return_code()<br>get_participant_list() |  |  |
 | Users | get_users() | import_users() | delete_users() |
 | User Role | get_user_roles() | import_user_roles() | delete_user_roles() |
 | User Role Mapping | get_user_role_mappings() | import_user_role_mappings() |  |
