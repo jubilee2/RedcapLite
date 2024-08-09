@@ -3,7 +3,8 @@ from .utils import json_data_formatter, field_to_index, require_field
 
 def get_dags(data):
     new_data = {
-        'content': 'dag'
+        'content': 'dag',
+        'format': 'json'
     }
     return (new_data)
 
@@ -21,7 +22,8 @@ def import_dags(data):
 def delete_dags(data):
     new_data = {
         'content': 'dag',
-        'action': 'delete'
+        'action': 'delete',
+        'format': 'json'
     }
     return (new_data)
 

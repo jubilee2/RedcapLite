@@ -6,6 +6,7 @@ def test_get_events():
     data = {"arms": [1, 2, 3]}
     expected_output = {
         'content': 'event',
+        'format': 'json',
         'arms[0]': '1',
         'arms[1]': '2',
         'arms[2]': '3'
@@ -32,6 +33,7 @@ def test_delete_events():
     expected_output = {
         'content': 'event',
         'action': 'delete',
+        'format': 'json',
         'events[0]': 'event1',
         'events[1]': 'event2'
     }

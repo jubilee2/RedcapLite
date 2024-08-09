@@ -1,46 +1,63 @@
 import pytest
-
-# Assuming the functions are imported from the module where they are defined
 from redcaplite.api import get_file, import_file, delete_file
 
 
-@pytest.mark.parametrize("func, action", [
-    (get_file, 'export'),
-    (import_file, 'import'),
-    (delete_file, 'delete'),
-])
-def test_file_functions(func, action):
-    data = {
-        'record': '123',
-        'field': 'file_field',
-        'event': 'file_event',
-        'repeat_instance': '2'
-    }
+def test_get_file_required_fields():
+    data = {'record': '123', 'field': 'file_field'}
+    result = get_file(data)
+    assert result == {'content': 'file', 'action': 'export', 'field': 'file_field', 'record': '123'}
 
-    expected_output = {
-        'content': 'file',
-        'action': action,
-        'record': data['record'],
-        'field': data['field'],
-        'event': data['event'],
-        'repeat_instance': data['repeat_instance']
-    }
+def test_get_file_optional_fields():
+    data = {'record': '123', 'field': 'file_field', 'event': 'event_name', 'repeat_instance': 1}
+    result = get_file(data)
+    assert result == {'content': 'file', 'action': 'export', 'record': '123', 'field': 'file_field', 'event': 'event_name', 'repeat_instance': 1}
 
-    assert func(data) == expected_output
+def test_get_file_missing_required_field():
+    data = {'field': 'file_field'}
+    with pytest.raises(KeyError):
+        get_file(data)
 
-    # Test with optional fields missing
-    data_missing_optional = {
-        'record': '123',
-        'field': 'file_field',
-        'repeat_instance': '1'
-    }
+def test_import_file_required_fields():
+    data = {'record': '123', 'field': 'file_field'}
+    result = import_file(data)
+    assert result == {'content': 'file', 'action': 'import', 'record': '123', 'field': 'file_field'}
 
-    expected_output_missing_optional = {
-        'content': 'file',
-        'action': action,
-        'record': data_missing_optional['record'],
-        'field': data_missing_optional['field'],
-        'repeat_instance': '1'
-    }
+def test_import_file_optional_fields():
+    data = {'record': '123', 'field': 'file_field', 'event': 'event_name', 'repeat_instance': 1}
+    result = import_file(data)
+    assert result == {'content': 'file', 'action': 'import', 'record': '123', 'field': 'file_field', 'event': 'event_name', 'repeat_instance': 1}
 
-    assert func(data_missing_optional) == expected_output_missing_optional
+def test_import_file_missing_required_field():
+    data = {'field': 'file_field'}
+    with pytest.raises(KeyError):
+        import_file(data)
+
+def test_delete_file_required_fields():
+    data = {'record': '123', 'field': 'file_field'}
+    result = delete_file(data)
+    assert result == {'content': 'file', 'action': 'delete', 'format': 'json', 'record': '123', 'field': 'file_field'}
+
+def test_delete_file_optional_fields():
+    data = {'record': '123', 'field': 'file_field', 'event': 'event_name', 'repeat_instance': 1}
+    result = delete_file(data)
+    assert result == {'content': 'file', 'action': 'delete', 'format': 'json', 'record': '123', 'field': 'file_field', 'event': 'event_name', 'repeat_instance': 1}
+
+def test_delete_file_missing_required_field():
+    data = {'field': 'file_field'}
+    with pytest.raises(KeyError):
+        delete_file(data)
+
+def test_get_file_invalid_input():
+    data = 'invalid_input'
+    with pytest.raises(TypeError):
+        get_file(data)
+
+def test_import_file_invalid_input():
+    data = 'invalid_input'
+    with pytest.raises(TypeError):
+        import_file(data)
+
+def test_delete_file_invalid_input():
+    data = 'invalid_input'
+    with pytest.raises(TypeError):
+        delete_file(data)

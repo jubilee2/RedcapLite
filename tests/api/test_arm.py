@@ -5,7 +5,7 @@ from redcaplite.api import get_arms, import_arms, delete_arms
 def test_get_arms():
     data = {}  # Any necessary input data for the function
     result = get_arms(data)
-    expected = {'content': 'arm'}
+    expected = {'content': 'arm', 'format': 'json'}
     assert result == expected
 
 
@@ -34,6 +34,7 @@ def test_delete_arms():
     expected = {
         'content': 'arm',
         'action': 'delete',
+        'format': 'json',
         'arms[0]': '1',
         'arms[1]': '2',
         'arms[2]': '3'

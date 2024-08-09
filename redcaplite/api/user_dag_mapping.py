@@ -3,7 +3,8 @@ from .utils import json_data_formatter
 
 def get_user_dag_mappings(data):
     new_data = {
-        'content': 'userDagMapping'
+        'content': 'userDagMapping',
+        'format': 'json'
     }
     return (new_data)
 

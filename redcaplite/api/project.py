@@ -20,6 +20,7 @@ def import_project_settings(data):
 def get_project(data):
     new_data = {
         'content': 'project',
+        'format': 'json'
     }
     return (new_data)
 

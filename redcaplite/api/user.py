@@ -21,6 +21,7 @@ def import_users(data):
 def delete_users(data):
     new_data = {
         'content': 'user',
-        'action': 'delete'
+        'action': 'delete',
+        'format': 'json'
     }
     return (new_data)
