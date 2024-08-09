@@ -3,7 +3,8 @@ from .utils import json_data_formatter
 
 def get_user_role_mappings(data):
     new_data = {
-        'content': 'userRoleMapping'
+        'content': 'userRoleMapping',
+        'format': 'json'
     }
     return (new_data)
 

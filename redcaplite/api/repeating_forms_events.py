@@ -3,7 +3,8 @@ from .utils import json_data_formatter
 
 def get_repeating_forms_events(data):
     new_data = {
-        'content': 'repeatingFormsEvents'
+        'content': 'repeatingFormsEvents',
+        'format': 'json'
     }
     return (new_data)
 

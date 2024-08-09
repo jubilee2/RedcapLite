@@ -33,5 +33,6 @@ def delete_file(data):
     new_data = {
         'content': 'file',
         'action': 'delete',
+        'format': 'json'
     }
     return (new_data)

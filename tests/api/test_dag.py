@@ -4,7 +4,7 @@ from redcaplite.api import get_dags, import_dags, delete_dags
 
 def test_get_dags():
     data = {}  # Sample input data, modify as needed
-    expected_output = {'content': 'dag'}
+    expected_output = {'content': 'dag', 'format': 'json'}
     assert get_dags(data) == expected_output
 
 
@@ -27,6 +27,7 @@ def test_delete_dags():
     expected_output = {
         'content': 'dag',
         'action': 'delete',
+        'format': 'json',
         'dags[0]': 'dag1',
         'dags[1]': 'dag2'
     }

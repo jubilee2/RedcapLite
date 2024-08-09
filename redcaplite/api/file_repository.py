@@ -9,6 +9,7 @@ def create_folder_file_repository(data):
     new_data = {
         'content': 'fileRepository',
         'action': 'createFolder',
+        'format': 'json'
     }
     return (new_data)
 
@@ -18,6 +19,7 @@ def list_file_repository(data):
     new_data = {
         'content': 'fileRepository',
         'action': 'list',
+        'format': 'json'
     }
     return (new_data)
 
@@ -45,5 +47,6 @@ def delete_file_repository(data):
     new_data = {
         'content': 'fileRepository',
         'action': 'delete',
+        'format': 'json'
     }
     return (new_data)

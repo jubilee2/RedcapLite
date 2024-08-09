@@ -21,6 +21,7 @@ def import_user_roles(data):
 def delete_user_roles(data):
     new_data = {
         'content': 'userRole',
-        'action': 'delete'
+        'action': 'delete',
+        'format': 'json'
     }
     return (new_data)

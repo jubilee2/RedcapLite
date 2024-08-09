@@ -8,16 +8,15 @@ class Client:
         self.token = token
 
     def post(self, data):
-        format = data.get("format", "json")
+        format = data.get("format", None)
         if format == 'csv':
             response = self.__csv_api(data)
         elif format == 'json':
             response = self.__json_api(data)
         elif format == 'xml':
-            response = self.__post(data)
-            response = response.text
+            response = self.text_api(data)
         else:
-            response = self.__json_api(data)
+            response = self.text_api(data)
         return response
 
     @hd.response_error_handler

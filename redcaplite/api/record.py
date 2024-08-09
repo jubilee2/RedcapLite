@@ -59,7 +59,8 @@ def import_records(data):
 def delete_records(data):
     new_data = {
         'content': 'record',
-        'action': 'delete'
+        'action': 'delete',
+        'format': 'json'
     }
     return (new_data)
 
@@ -70,7 +71,8 @@ def delete_records(data):
 def rename_records(data):
     new_data = {
         'content': 'record',
-        'action': 'rename'
+        'action': 'rename',
+        'format': 'json'
     }
     return (new_data)
 
@@ -78,5 +80,6 @@ def rename_records(data):
 def generate_next_record_name(data):
     new_data = {
         'content': 'generateNextRecordName',
+        'format': 'json'
     }
     return (new_data)

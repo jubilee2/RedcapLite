@@ -32,7 +32,7 @@ def test_client_post_default_format():
     """Test Client post method with default format"""
     client = Client('https://example.com', 'token')
     mock_response = Mock()
-    with patch.object(client, '_Client__json_api', return_value=mock_response):
+    with patch.object(client, 'text_api', return_value=mock_response):
         response = client.post({})
         assert response == mock_response
 

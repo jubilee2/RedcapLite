@@ -4,7 +4,8 @@ from .utils import json_data_formatter, field_to_index
 @field_to_index('arms')
 def get_events(data):
     new_data = {
-        'content': 'event'
+        'content': 'event',
+        'format': 'json'
     }
     return (new_data)
 
@@ -22,6 +23,7 @@ def import_events(data):
 def delete_events(data):
     new_data = {
         'content': 'event',
-        'action': 'delete'
+        'action': 'delete',
+        'format': 'json'
     }
     return (new_data)
