@@ -10,7 +10,8 @@ class RedcapClient(Client):
     def get_arms(self, **kwargs):
         return self.post(api.get_arms(kwargs))
 
-    def import_arms(self, **kwargs):
+    def import_arms(self, data, **kwargs):
+        kwargs['data'] = data
         return self.post(api.import_arms(kwargs))
 
     def delete_arms(self, **kwargs):
@@ -20,7 +21,8 @@ class RedcapClient(Client):
     def get_dags(self, **kwargs):
         return self.post(api.get_dags(kwargs))
 
-    def import_dags(self, **kwargs):
+    def import_dags(self, data, **kwargs):
+        kwargs['data'] = data
         return self.post(api.import_dags(kwargs))
 
     def delete_dags(self, **kwargs):
@@ -30,14 +32,16 @@ class RedcapClient(Client):
     def get_user_dag_mappings(self, **kwargs):
         return self.post(api.get_user_dag_mappings(kwargs))
 
-    def import_user_dag_mappings(self, **kwargs):
+    def import_user_dag_mappings(self, data, **kwargs):
+        kwargs['data'] = data
         return self.post(api.import_user_dag_mappings(kwargs))
 
     # events
     def get_events(self, **kwargs):
         return self.post(api.get_events(kwargs))
 
-    def import_events(self, **kwargs):
+    def import_events(self, data, **kwargs):
+        kwargs['data'] = data
         return self.post(api.import_events(kwargs))
 
     def delete_events(self, **kwargs):
@@ -85,7 +89,8 @@ class RedcapClient(Client):
     def get_form_event_mappings(self, **kwargs):
         return self.post(api.get_form_event_mappings(kwargs))
 
-    def import_form_event_mappings(self, **kwargs):
+    def import_form_event_mappings(self, data, **kwargs):
+        kwargs['data'] = data
         return self.post(api.import_form_event_mappings(kwargs))
 
     def get_logs(self, **kwargs):
@@ -99,7 +104,8 @@ class RedcapClient(Client):
         return self.post(api.import_metadata(kwargs))
 
     # project
-    def create_project(self, **kwargs):
+    def create_project(self, data, **kwargs):
+        kwargs['data'] = data
         return self.post(api.create_project(kwargs))
 
     def get_project(self, **kwargs):
@@ -108,7 +114,8 @@ class RedcapClient(Client):
     def get_project_xml(self, **kwargs):
         return self.post(api.get_project_xml(kwargs))
 
-    def import_project_settings(self, **kwargs):
+    def import_project_settings(self, data, **kwargs):
+        kwargs['data'] = data
         return self.post(api.import_project_settings(kwargs))
 
     # record
@@ -131,7 +138,8 @@ class RedcapClient(Client):
     def get_repeating_forms_events(self, **kwargs):
         return self.post(api.get_repeating_forms_events(kwargs))
 
-    def import_repeating_forms_events(self, **kwargs):
+    def import_repeating_forms_events(self, data, **kwargs):
+        kwargs['data'] = data
         return self.post(api.import_repeating_forms_events(kwargs))
 
     # report
@@ -159,7 +167,8 @@ class RedcapClient(Client):
     def get_users(self, **kwargs):
         return self.post(api.get_users(kwargs))
 
-    def import_users(self, **kwargs):
+    def import_users(self, data, **kwargs):
+        kwargs['data'] = data
         return self.post(api.import_users(kwargs))
 
     def delete_users(self, **kwargs):
@@ -169,7 +178,8 @@ class RedcapClient(Client):
     def get_user_roles(self, **kwargs):
         return self.post(api.get_user_roles(kwargs))
 
-    def import_user_roles(self, **kwargs):
+    def import_user_roles(self, data, **kwargs):
+        kwargs['data'] = data
         return self.post(api.import_user_roles(kwargs))
 
     def delete_user_roles(self, **kwargs):
@@ -179,5 +189,6 @@ class RedcapClient(Client):
     def get_user_role_mappings(self, **kwargs):
         return self.post(api.get_user_role_mappings(kwargs))
 
-    def import_user_role_mappings(self, **kwargs):
+    def import_user_role_mappings(self, data, **kwargs):
+        kwargs['data'] = data
         return self.post(api.import_user_role_mappings(kwargs))
