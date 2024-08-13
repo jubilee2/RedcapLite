@@ -1,10 +1,10 @@
-from .utils import json_data_formatter, optional_field, field_to_index
+from .utils import json_data_formatter, field_to_index
 
 
-@optional_field('format', 'json')
 def get_user_roles(data):
     new_data = {
-        'content': 'userRole'
+        'content': 'userRole',
+        'format': 'json'
     }
     return (new_data)
 

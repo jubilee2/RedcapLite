@@ -29,7 +29,7 @@ def delete_dags(data):
 
 
 @require_field('dag')
-def switch_dags(data):
+def switch_dag(data):
     new_data = {
         'content': 'dag',
         'action': 'switch',

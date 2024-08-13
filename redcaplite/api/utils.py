@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 
 def json_data_formatter(func):
@@ -42,8 +43,12 @@ def optional_field(field: str, default=None):
         def wrapper(data):
 
             result = func(data)
-            if field in data or default is not None:
+            if (field in data and data[field] is not None) or default is not None:
                 result[field] = data.get(field, default)
+                if isinstance(result[field], datetime):
+                    result[field] = result[field].strftime("%Y-%m-%d %H:%M:%S")
+                elif isinstance(result[field], bool):
+                    result[field] = "true" if result[field] else "false"
             return result
         return wrapper
     return decorator

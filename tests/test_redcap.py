@@ -450,7 +450,7 @@ def test_redcap_client_get_project_xml(client):
     mock_redcap_client_post(
         client, 'get_project_xml',
         expected_json=None,
-        expected_requests_data={'content': 'project_xml',
+        expected_requests_data={'content': 'project_xml', 'returnMetadataOnly': 'false', 'exportFiles': 'false', 'exportDataAccessGroups': 'false', 'exportSurveyFields': 'false',
                                 'format': 'xml', 'returnFormat': 'json', 'token': 'token'},
     )
 
@@ -460,7 +460,7 @@ def test_redcap_client_get_project_xml_with_kwargs(client):
     mock_redcap_client_post(
         client, 'get_project_xml', method_kwargs={'returnMetadataOnly': True},
         expected_json=None,
-        expected_requests_data={'content': 'project_xml', 'returnMetadataOnly': True,
+        expected_requests_data={'content': 'project_xml', 'returnMetadataOnly': 'true', 'exportFiles': 'false', 'exportDataAccessGroups': 'false', 'exportSurveyFields': 'false',
                                 'format': 'xml', 'returnFormat': 'json', 'token': 'token'},
     )
 
@@ -478,7 +478,7 @@ def test_export_records(client):
     mock_redcap_client_post(
         client, 'export_records',
         expected_json=None,
-        expected_requests_data={'content': 'record', 'action': 'export',
+        expected_requests_data={'content': 'record', 'action': 'export', 'rawOrLabel': 'raw',
                                 'type': 'flat', 'format': 'csv', 'returnFormat': 'json', 'token': 'token'}
     )
 
@@ -487,7 +487,7 @@ def test_export_records_with_kwargs(client):
     mock_redcap_client_post(
         client, 'export_records', method_kwargs={'fields': ['foo', 'bar']},
         expected_json=None,
-        expected_requests_data={'content': 'record', 'action': 'export', 'type': 'flat', 'format': 'csv',
+        expected_requests_data={'content': 'record', 'action': 'export', 'type': 'flat', 'format': 'csv', 'rawOrLabel': 'raw',
                                 'fields[0]': 'foo', 'fields[1]': 'bar', 'returnFormat': 'json', 'token': 'token'}
     )
 
@@ -499,7 +499,7 @@ def test_import_records_with_kwargs(client):
         mock_response=mock_response,
         expected_json=['5'],
         expected_requests_data={'content': 'record', 'action': 'import', 'format': 'json', 'type': 'flat', 'returnContent': 'ids',
-                                'data': '[{"foo": "bar"}]', 'backgroundProcess': '0', 'forceAutoNumber': 'false', 'overwriteBehavior': 'normal', 'returnFormat': 'json', 'token': 'token'}
+                                'data': '[{"foo": "bar"}]', 'forceAutoNumber': 'false', 'overwriteBehavior': 'normal', 'returnFormat': 'json', 'token': 'token'}
     )
 
 
@@ -510,7 +510,7 @@ def test_import_records_with_2records(client):
         mock_response=mock_response,
         expected_json=['bar1', 'bar2'],
         expected_requests_data={'content': 'record', 'action': 'import', 'format': 'json', 'type': 'flat', 'returnContent': 'ids',
-                                'data': '[{"foo": "bar1"}, {"foo": "bar2"}]', 'backgroundProcess': '0', 'forceAutoNumber': 'false', 'overwriteBehavior': 'normal', 'returnFormat': 'json', 'token': 'token'}
+                                'data': '[{"foo": "bar1"}, {"foo": "bar2"}]', 'forceAutoNumber': 'false', 'overwriteBehavior': 'normal', 'returnFormat': 'json', 'token': 'token'}
     )
 
 
@@ -524,7 +524,7 @@ def test_delete_records_with_kwargs(client):
 
 def test_rename_records_with_kwargs(client):
     mock_redcap_client_post(
-        client, 'rename_records', method_kwargs={'record': "old_name", "new_record_name": "new_nema"},
+        client, 'rename_record', method_kwargs={'record': "old_name", "new_record_name": "new_nema"},
         expected_requests_data={'content': 'record', 'action': 'rename', 'new_record_name': 'new_nema',
                                 'record': 'old_name', 'format': 'json', 'returnFormat': 'json', 'token': 'token'}
     )
