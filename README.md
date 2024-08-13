@@ -53,7 +53,7 @@ r = redcaplite.RedcapClient('https://redcap.vumc.org/api/', 'your_token')
 | Metadata | get_metadata() | import_metadata() |  |
 | Project | get_project()<br>get_project_xml() | import_project_settings() |  |
 | Project (super user) |  | create_project() |  |
-| Record | export_records()<br>generate_next_record_name() | import_records()<br>rename_records() | delete_records() |
+| Record | export_records()<br>generate_next_record_name() | import_records()<br>rename_record() | delete_records() |
 | Repeating Forms Events | get_repeating_forms_events() | import_repeating_forms_events() |  |
 | Report | get_report() |  |  |
 | Version | get_version() |  |  |

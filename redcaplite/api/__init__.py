@@ -1,5 +1,5 @@
 from .arm import get_arms, import_arms, delete_arms  # noqa: F401
-from .dag import get_dags, import_dags, delete_dags, switch_dags  # noqa: F401
+from .dag import get_dags, import_dags, delete_dags, switch_dag  # noqa: F401
 from .user_dag_mapping import get_user_dag_mappings, import_user_dag_mappings  # noqa: F401
 from .event import get_events, import_events, delete_events  # noqa: F401
 from .field_names import get_field_names  # noqa: F401
@@ -11,7 +11,7 @@ from .form_event_mapping import get_form_event_mappings, import_form_event_mappi
 from .log import get_logs  # noqa: F401
 from .metadata import get_metadata, import_metadata  # noqa: F401
 from .project import create_project, get_project, get_project_xml, import_project_settings  # noqa: F401
-from .record import export_records, import_records, delete_records, rename_records, generate_next_record_name  # noqa: F401
+from .record import export_records, import_records, delete_records, rename_record, generate_next_record_name  # noqa: F401
 from .repeating_forms_events import get_repeating_forms_events, import_repeating_forms_events  # noqa: F401
 from .report import get_report  # noqa: F401
 from .version import get_version  # noqa: F401

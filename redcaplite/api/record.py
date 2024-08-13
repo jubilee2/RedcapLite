@@ -30,16 +30,16 @@ def export_records(data):
 
 @optional_field('overwriteBehavior', 'normal')
 @optional_field('forceAutoNumber', 'false')
-@optional_field('backgroundProcess', '0')
+@optional_field('backgroundProcess')
 @optional_field('dateFormat')
 @optional_field('csvDelimiter')
+@optional_field('returnContent', 'ids')
 def import_records(data):
     new_data = {
         'content': 'record',
         'action': 'import',
         'format': data['format'],
         'type': 'flat',
-        'returnContent': 'ids',
     }
     if data['format'] == 'csv' and isinstance(data['data'], pd.DataFrame):
         new_data['data'] = data['data'].to_csv(index=False)
@@ -68,7 +68,7 @@ def delete_records(data):
 @require_field('record')
 @require_field('new_record_name')
 @optional_field('arm')
-def rename_records(data):
+def rename_record(data):
     new_data = {
         'content': 'record',
         'action': 'rename',
