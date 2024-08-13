@@ -3,7 +3,7 @@ from .http import Client
 
 
 class RedcapClient(Client):
-    def __init__(self, url, token):
+    def __init__(self, url: str, token: str):
         super().__init__(url, token)
 
     # arms
