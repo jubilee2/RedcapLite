@@ -475,6 +475,7 @@ class RedcapClient(Client):
             dag (Optional[str]): Filter logs by Data Access Group.
             beginTime (Optional[datetime]): Filter logs by start time.
             endTime (Optional[datetime]): Filter logs by end time.
+            pd_read_csv_kwargs (Optional[Dict[str, Any]]): Additional keyword arguments to pass to pandas' `read_csv` function when format is 'csv'. Defaults to {}.
 
         Returns:
             The response from the API containing the log data.
@@ -509,6 +510,7 @@ class RedcapClient(Client):
             fields (List[str]): Specific fields to export metadata for.
             forms (List[str]): Specific forms to export metadata for.
             format (Literal["json", "csv"]): The format of the exported data.
+            pd_read_csv_kwargs (Optional[Dict[str, Any]]): Additional keyword arguments to pass to pandas' `read_csv` function when format is 'csv'. Defaults to {}.
 
         Returns:
             The response from the API containing the metadata.
@@ -653,6 +655,7 @@ class RedcapClient(Client):
             csvDelimiter (Optional[str]): Delimiter for CSV export.
             decimalCharacter (Optional[str]): Decimal character for number fields.
             exportBlankForGrayFormStatus (Optional[bool]): Whether to export blank for gray form status.
+            pd_read_csv_kwargs (Optional[Dict[str, Any]]): Additional keyword arguments to pass to pandas' `read_csv` function when format is 'csv'. Defaults to {}.
 
         Returns:
             The response from the API containing the exported records.
@@ -840,6 +843,7 @@ class RedcapClient(Client):
             exportCheckboxLabel (bool, optional): Whether to export checkbox labels. Defaults to False.
             csvDelimiter (str, optional): The delimiter for CSV format. Defaults to ",".
             decimalCharacter (Optional[str], optional): The decimal character for numeric data. Defaults to None.
+            pd_read_csv_kwargs (Optional[Dict[str, Any]]): Additional keyword arguments to pass to pandas' `read_csv` function when format is 'csv'. Defaults to {}.
 
         Returns:
             The report data in the specified format.
@@ -914,6 +918,7 @@ class RedcapClient(Client):
             instrument (str): The name of the instrument (form).
             event (Optional[str], optional): The unique event name. Defaults to None.
             format (Literal["json", "csv"], optional): The format of the returned data. Defaults to "csv".
+            pd_read_csv_kwargs (Optional[Dict[str, Any]]): Additional keyword arguments to pass to pandas' `read_csv` function when format is 'csv'. Defaults to {}.
 
         Returns:
             The participant list in the specified format.
