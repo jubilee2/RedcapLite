@@ -42,7 +42,9 @@ def csv_handler(func):
         response = func(obj, data)
         if 'returnContent' in data and data['returnContent'] == 'ids':
             return response.json()
-        df = pd.read_csv(io.StringIO(response.text))
+        io_string = io.StringIO(response.text)
+        df = pd.read_csv(io_string)
+        io_string.close()
         if df.shape == (0, 1):
             return response.text
         return df
