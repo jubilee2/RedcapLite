@@ -23,9 +23,15 @@ def test_client_post_csv():
     """Test Client post method with CSV format"""
     client = Client('https://example.com', 'token')
     mock_response = Mock()
-    with patch.object(client, '_Client__csv_api', return_value=mock_response):
+    with patch.object(client, '_Client__csv_api', return_value=mock_response) as mock_csv_api:
         response = client.post({'format': 'csv'})
         assert response == mock_response
+        mock_csv_api.assert_called_once_with({'format': 'csv'}, pd_read_csv_kwargs={})
+    
+    with patch.object(client, '_Client__csv_api', return_value=mock_response) as mock_csv_api:
+        response = client.post({'format': 'csv'}, pd_read_csv_kwargs = {"foo": []})
+        assert response == mock_response
+        mock_csv_api.assert_called_once_with({'format': 'csv'}, pd_read_csv_kwargs={"foo": []})
 
 
 def test_client_post_default_format():

@@ -7,10 +7,10 @@ class Client:
         self.url = url
         self.token = token
 
-    def post(self, data):
+    def post(self, data, pd_read_csv_kwargs = {}):
         format = data.get("format", None)
         if format == 'csv':
-            response = self.__csv_api(data)
+            response = self.__csv_api(data, pd_read_csv_kwargs = pd_read_csv_kwargs)
         elif format == 'json':
             response = self.__json_api(data)
         elif format == 'xml':

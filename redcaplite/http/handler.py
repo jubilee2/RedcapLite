@@ -37,13 +37,13 @@ def response_error_handler(func):
 
 
 def csv_handler(func):
-    def wrapper(obj, data):
+    def wrapper(obj, data, pd_read_csv_kwargs = {}):
         data['format'] = 'csv'
         response = func(obj, data)
         if 'returnContent' in data and data['returnContent'] == 'ids':
             return response.json()
         io_string = io.StringIO(response.text)
-        df = pd.read_csv(io_string)
+        df = pd.read_csv(io_string, **pd_read_csv_kwargs)
         io_string.close()
         if df.shape == (0, 1):
             return response.text

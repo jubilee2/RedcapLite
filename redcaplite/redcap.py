@@ -462,6 +462,7 @@ class RedcapClient(Client):
         dag: Optional[str] = None,
         beginTime: Optional[datetime] = None,
         endTime: Optional[datetime] = None,
+        pd_read_csv_kwargs: Optional[Dict[str, Any]] = {},
     ):
         """
         Export logs from the project.
@@ -489,7 +490,8 @@ class RedcapClient(Client):
                     "beginTime": beginTime,
                     "endTime": endTime,
                 }
-            )
+            ),
+            pd_read_csv_kwargs = pd_read_csv_kwargs,
         )
 
     # metadata
@@ -498,6 +500,7 @@ class RedcapClient(Client):
         fields: List[str] = [],
         forms: List[str] = [],
         format: Literal["json", "csv"] = "csv",
+        pd_read_csv_kwargs: Optional[Dict[str, Any]] = {},
     ):
         """
         Export metadata (data dictionary) from the project.
@@ -512,7 +515,8 @@ class RedcapClient(Client):
         """
         return self.post(
             api.get_metadata(
-                {"fields": fields, "forms": forms, "format": format})
+                {"fields": fields, "forms": forms, "format": format}),
+                pd_read_csv_kwargs = pd_read_csv_kwargs,
         )
 
     def import_metadata(
@@ -627,6 +631,7 @@ class RedcapClient(Client):
         csvDelimiter: Optional[str] = None,
         decimalCharacter: Optional[str] = None,
         exportBlankForGrayFormStatus: Optional[bool] = None,
+        pd_read_csv_kwargs: Optional[Dict[str, Any]] = {},
     ):
         """
         Export records from the project.
@@ -672,7 +677,8 @@ class RedcapClient(Client):
                     "decimalCharacter": decimalCharacter,
                     "exportBlankForGrayFormStatus": exportBlankForGrayFormStatus,
                 }
-            )
+            ),
+            pd_read_csv_kwargs = pd_read_csv_kwargs,
         )
 
     def import_records(
@@ -821,6 +827,7 @@ class RedcapClient(Client):
         exportCheckboxLabel: bool = False,
         csvDelimiter: str = ",",
         decimalCharacter: Optional[str] = None,
+        pd_read_csv_kwargs: Optional[Dict[str, Any]] = {},
     ):
         """
         Retrieve a report from REDCap.
@@ -848,7 +855,8 @@ class RedcapClient(Client):
                     "csvDelimiter": csvDelimiter,
                     "decimalCharacter": decimalCharacter,
                 }
-            )
+            ),
+            pd_read_csv_kwargs = pd_read_csv_kwargs,
         )
 
     # version
@@ -897,6 +905,7 @@ class RedcapClient(Client):
         instrument: str,
         event: Optional[str] = None,
         format: Literal["json", "csv"] = "csv",
+        pd_read_csv_kwargs: Optional[Dict[str, Any]] = {},
     ):
         """
         Get the participant list for a specific instrument.
@@ -916,7 +925,8 @@ class RedcapClient(Client):
                     "event": event,
                     "format": format,
                 }
-            )
+            ),
+            pd_read_csv_kwargs = pd_read_csv_kwargs,
         )
 
     def get_survey_queue_link(
