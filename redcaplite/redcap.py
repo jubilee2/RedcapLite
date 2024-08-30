@@ -491,7 +491,7 @@ class RedcapClient(Client):
                     "endTime": endTime,
                 }
             ),
-            pd_read_csv_kwargs = pd_read_csv_kwargs,
+            pd_read_csv_kwargs=pd_read_csv_kwargs,
         )
 
     # metadata
@@ -516,7 +516,7 @@ class RedcapClient(Client):
         return self.post(
             api.get_metadata(
                 {"fields": fields, "forms": forms, "format": format}),
-                pd_read_csv_kwargs = pd_read_csv_kwargs,
+            pd_read_csv_kwargs=pd_read_csv_kwargs,
         )
 
     def import_metadata(
@@ -678,7 +678,7 @@ class RedcapClient(Client):
                     "exportBlankForGrayFormStatus": exportBlankForGrayFormStatus,
                 }
             ),
-            pd_read_csv_kwargs = pd_read_csv_kwargs,
+            pd_read_csv_kwargs=pd_read_csv_kwargs,
         )
 
     def import_records(
@@ -856,7 +856,7 @@ class RedcapClient(Client):
                     "decimalCharacter": decimalCharacter,
                 }
             ),
-            pd_read_csv_kwargs = pd_read_csv_kwargs,
+            pd_read_csv_kwargs=pd_read_csv_kwargs,
         )
 
     # version
@@ -926,7 +926,7 @@ class RedcapClient(Client):
                     "format": format,
                 }
             ),
-            pd_read_csv_kwargs = pd_read_csv_kwargs,
+            pd_read_csv_kwargs=pd_read_csv_kwargs,
         )
 
     def get_survey_queue_link(

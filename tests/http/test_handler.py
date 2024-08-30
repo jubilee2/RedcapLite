@@ -105,11 +105,13 @@ def test_csv_handler():
 
 def test_csv_handler_return_ids():
     """Test csv_handler decorator"""
-    mock_func = Mock(return_value=Mock(json=lambda: [5,6,7]))
+    mock_func = Mock(return_value=Mock(json=lambda: [5, 6, 7]))
     decorated_func = csv_handler(mock_func)
     response = decorated_func(None, {'returnContent': 'ids'})
-    assert response == [5,6,7]
-    assert mock_func.call_args[0][1] == {'format': 'csv', 'returnContent': 'ids'}
+    assert response == [5, 6, 7]
+    assert mock_func.call_args[0][1] == {
+        'format': 'csv', 'returnContent': 'ids'}
+
 
 def test_csv_handler_csv_reader():
     """Test csv_handler decorator"""
@@ -118,15 +120,18 @@ def test_csv_handler_csv_reader():
     response = decorated_func(None, {})
     assert isinstance(response, pd.DataFrame)
     assert mock_func.call_args[0][1]['format'] == 'csv'
-    pd.testing.assert_frame_equal(response, pd.DataFrame({'csv data': [4], 'date': [5]}))
+    pd.testing.assert_frame_equal(
+        response, pd.DataFrame({'csv data': [4], 'date': [5]}))
+
 
 def test_csv_handler_with_pd_read_csv_kwargs():
     mock_func = Mock(return_value=Mock(text='csv data,date\n04,005'))
     decorated_func = csv_handler(mock_func)
-    response = decorated_func(None, {}, pd_read_csv_kwargs = {"dtype": str})
+    response = decorated_func(None, {}, pd_read_csv_kwargs={"dtype": str})
     assert isinstance(response, pd.DataFrame)
     assert mock_func.call_args[0][1] == {"format": "csv"}
-    pd.testing.assert_frame_equal(response, pd.DataFrame({'csv data': ['04'], 'date': ['005']}))
+    pd.testing.assert_frame_equal(response, pd.DataFrame(
+        {'csv data': ['04'], 'date': ['005']}))
 
 
 def test_json_handler():

@@ -37,7 +37,7 @@ def response_error_handler(func):
 
 
 def csv_handler(func):
-    def wrapper(obj, data, pd_read_csv_kwargs = {}):
+    def wrapper(obj, data, pd_read_csv_kwargs={}):
         data['format'] = 'csv'
         response = func(obj, data)
         if 'returnContent' in data and data['returnContent'] == 'ids':
