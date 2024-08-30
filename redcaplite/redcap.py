@@ -1,6 +1,6 @@
 from redcaplite import api
 from .http import Client
-from typing import List, Optional, TypedDict, Dict, Any, Union, Literal
+from typing import List, Optional, Dict, Any, Union, Literal
 from datetime import datetime
 import pandas as pd
 
@@ -462,6 +462,7 @@ class RedcapClient(Client):
         dag: Optional[str] = None,
         beginTime: Optional[datetime] = None,
         endTime: Optional[datetime] = None,
+        pd_read_csv_kwargs: Optional[Dict[str, Any]] = {},
     ):
         """
         Export logs from the project.
@@ -474,6 +475,7 @@ class RedcapClient(Client):
             dag (Optional[str]): Filter logs by Data Access Group.
             beginTime (Optional[datetime]): Filter logs by start time.
             endTime (Optional[datetime]): Filter logs by end time.
+            pd_read_csv_kwargs (Optional[Dict[str, Any]]): Additional keyword arguments to pass to pandas' `read_csv` function when format is 'csv'. Defaults to {}.
 
         Returns:
             The response from the API containing the log data.
@@ -489,7 +491,8 @@ class RedcapClient(Client):
                     "beginTime": beginTime,
                     "endTime": endTime,
                 }
-            )
+            ),
+            pd_read_csv_kwargs=pd_read_csv_kwargs,
         )
 
     # metadata
@@ -498,6 +501,7 @@ class RedcapClient(Client):
         fields: List[str] = [],
         forms: List[str] = [],
         format: Literal["json", "csv"] = "csv",
+        pd_read_csv_kwargs: Optional[Dict[str, Any]] = {},
     ):
         """
         Export metadata (data dictionary) from the project.
@@ -506,13 +510,15 @@ class RedcapClient(Client):
             fields (List[str]): Specific fields to export metadata for.
             forms (List[str]): Specific forms to export metadata for.
             format (Literal["json", "csv"]): The format of the exported data.
+            pd_read_csv_kwargs (Optional[Dict[str, Any]]): Additional keyword arguments to pass to pandas' `read_csv` function when format is 'csv'. Defaults to {}.
 
         Returns:
             The response from the API containing the metadata.
         """
         return self.post(
             api.get_metadata(
-                {"fields": fields, "forms": forms, "format": format})
+                {"fields": fields, "forms": forms, "format": format}),
+            pd_read_csv_kwargs=pd_read_csv_kwargs,
         )
 
     def import_metadata(
@@ -627,6 +633,7 @@ class RedcapClient(Client):
         csvDelimiter: Optional[str] = None,
         decimalCharacter: Optional[str] = None,
         exportBlankForGrayFormStatus: Optional[bool] = None,
+        pd_read_csv_kwargs: Optional[Dict[str, Any]] = {},
     ):
         """
         Export records from the project.
@@ -648,6 +655,7 @@ class RedcapClient(Client):
             csvDelimiter (Optional[str]): Delimiter for CSV export.
             decimalCharacter (Optional[str]): Decimal character for number fields.
             exportBlankForGrayFormStatus (Optional[bool]): Whether to export blank for gray form status.
+            pd_read_csv_kwargs (Optional[Dict[str, Any]]): Additional keyword arguments to pass to pandas' `read_csv` function when format is 'csv'. Defaults to {}.
 
         Returns:
             The response from the API containing the exported records.
@@ -672,7 +680,8 @@ class RedcapClient(Client):
                     "decimalCharacter": decimalCharacter,
                     "exportBlankForGrayFormStatus": exportBlankForGrayFormStatus,
                 }
-            )
+            ),
+            pd_read_csv_kwargs=pd_read_csv_kwargs,
         )
 
     def import_records(
@@ -821,6 +830,7 @@ class RedcapClient(Client):
         exportCheckboxLabel: bool = False,
         csvDelimiter: str = ",",
         decimalCharacter: Optional[str] = None,
+        pd_read_csv_kwargs: Optional[Dict[str, Any]] = {},
     ):
         """
         Retrieve a report from REDCap.
@@ -833,6 +843,7 @@ class RedcapClient(Client):
             exportCheckboxLabel (bool, optional): Whether to export checkbox labels. Defaults to False.
             csvDelimiter (str, optional): The delimiter for CSV format. Defaults to ",".
             decimalCharacter (Optional[str], optional): The decimal character for numeric data. Defaults to None.
+            pd_read_csv_kwargs (Optional[Dict[str, Any]]): Additional keyword arguments to pass to pandas' `read_csv` function when format is 'csv'. Defaults to {}.
 
         Returns:
             The report data in the specified format.
@@ -848,7 +859,8 @@ class RedcapClient(Client):
                     "csvDelimiter": csvDelimiter,
                     "decimalCharacter": decimalCharacter,
                 }
-            )
+            ),
+            pd_read_csv_kwargs=pd_read_csv_kwargs,
         )
 
     # version
@@ -897,6 +909,7 @@ class RedcapClient(Client):
         instrument: str,
         event: Optional[str] = None,
         format: Literal["json", "csv"] = "csv",
+        pd_read_csv_kwargs: Optional[Dict[str, Any]] = {},
     ):
         """
         Get the participant list for a specific instrument.
@@ -905,6 +918,7 @@ class RedcapClient(Client):
             instrument (str): The name of the instrument (form).
             event (Optional[str], optional): The unique event name. Defaults to None.
             format (Literal["json", "csv"], optional): The format of the returned data. Defaults to "csv".
+            pd_read_csv_kwargs (Optional[Dict[str, Any]]): Additional keyword arguments to pass to pandas' `read_csv` function when format is 'csv'. Defaults to {}.
 
         Returns:
             The participant list in the specified format.
@@ -916,7 +930,8 @@ class RedcapClient(Client):
                     "event": event,
                     "format": format,
                 }
-            )
+            ),
+            pd_read_csv_kwargs=pd_read_csv_kwargs,
         )
 
     def get_survey_queue_link(
