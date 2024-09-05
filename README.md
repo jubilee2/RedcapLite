@@ -82,6 +82,30 @@ r.delete_arms(arms=[3])
 print("Arm 3 deleted successfully.")
 ```
 
+### Improved CSV Export with `pd_read_csv_kwargs`
+
+We've added a new feature to our export_records and get_report methods to give you more control over the CSV export process. With the pd_read_csv_kwargs parameter, you can now specify additional keyword arguments to pass to pandas.read_csv, allowing you to customize the data types of your exported data.
+
+#### Handling Data Types with `dtype`
+
+One common use case for `pd_read_csv_kwargs` is to specify the data type of specific columns in your exported data. For example, you may want to ensure that a column like `participant_study_id` is exported as a string, rather than being automatically converted to a numeric type.
+Here's an example of how you can use pd_read_csv_kwargs to achieve this:
+
+```python
+export_records(pd_read_csv_kwargs={'dtype':{'participant_study_id': str}})
+```
+
+In this example, we're passing a dictionary to pd_read_csv_kwargs with a single key-value pair: dtype. The value of dtype is another dictionary that specifies the data type for the participant_study_id column. By setting this to str, we ensure that the values in this column are exported as strings, rather than being converted to a numeric type.
+
+#### Benefits of using pd_read_csv_kwargs
+
+By using pd_read_csv_kwargs to customize the CSV export process, you can:
+ - Ensure that sensitive data, like participant IDs, are exported in a format that preserves their original data type
+ - Avoid issues with automatic data type conversion, which can lead to errors or unexpected behavior downstream
+ - Take advantage of pandas' robust data type handling capabilities to fine-tune your exported data
+
+We hope this new feature helps you to work more efficiently and effectively with your REDCap data!
+
 ### Contributing
 
 If you would like to contribute to the project, please fork the repository, make your changes, and submit a pull request.
