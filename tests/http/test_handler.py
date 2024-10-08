@@ -113,6 +113,16 @@ def test_csv_handler_return_ids():
         'format': 'csv', 'returnContent': 'ids'}
 
 
+def test_csv_handler_return_empty():
+    """Test csv_handler decorator"""
+    mock_func = Mock(return_value=Mock(text=''))
+    decorated_func = csv_handler(mock_func)
+    response = decorated_func(None, {})
+    assert isinstance(response, pd.DataFrame)
+    pd.testing.assert_frame_equal(
+        response, pd.DataFrame())
+
+
 def test_csv_handler_csv_reader():
     """Test csv_handler decorator"""
     mock_func = Mock(return_value=Mock(text='csv data,date\n04,005'))
