@@ -115,7 +115,7 @@ def test_csv_handler_return_ids():
 
 def test_csv_handler_return_empty():
     """Test csv_handler decorator"""
-    mock_func = Mock(return_value=Mock(text=''))
+    mock_func = Mock(return_value=Mock(text='\n'))
     decorated_func = csv_handler(mock_func)
     response = decorated_func(None, {})
     assert isinstance(response, pd.DataFrame)
