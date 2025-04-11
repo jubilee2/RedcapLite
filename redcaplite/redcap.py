@@ -444,7 +444,7 @@ class RedcapClient(Client):
     def get_logs(
         self,
         format: Literal["json", "csv"] = "csv",
-        log_type: Optional[
+        logtype: Optional[
             Literal[
                 "export",
                 "manage",
@@ -469,7 +469,7 @@ class RedcapClient(Client):
 
         Args:
             format (Literal["json", "csv"]): The format of the exported data.
-            log_type (Optional[Literal]): The type of log to export.
+            logtype (Optional[Literal]): The type of log to export.
             user (Optional[str]): Filter logs by username.
             record (Optional[str]): Filter logs by record ID.
             dag (Optional[str]): Filter logs by Data Access Group.
@@ -484,7 +484,7 @@ class RedcapClient(Client):
             api.get_logs(
                 {
                     "format": format,
-                    "log_type": log_type,
+                    "logtype": logtype,
                     "user": user,
                     "record": record,
                     "dag": dag,
