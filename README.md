@@ -151,20 +151,7 @@ try:
 
     # Get arms
     arms = client.get_arms() # Returns a list of arm dictionaries or an error dictionary
-    if isinstance(arms, list): # Successful response is a list
-        print("Arms retrieved:", arms)
-        # Example: Delete specific arms if they exist
-        # This is a conceptual example. You'll need to know the arm_num to delete.
-        # arm_to_delete_num = '2' # Example arm number to delete
-        # if any(arm.get('arm_num') == arm_to_delete_num for arm in arms):
-        #     print(f"Attempting to delete arm number: {arm_to_delete_num}")
-        #     # The delete_arms method expects a list of arm numbers as strings
-        #     response = client.delete_arms(arms=[arm_to_delete_num]) 
-        #     print("Deletion response (count of arms deleted):", response)
-        # else:
-        #     print(f"Arm number '{arm_to_delete_num}' not found, skipping deletion example.")
-    else: # An error or unexpected response (often a dictionary with an 'error' key)
-        print("Failed to retrieve arms or unexpected response:", arms)
+    print("Arms retrieved:", arms)
 
 except Exception as e:
     print(f"An error occurred while managing arms: {e}")
@@ -175,8 +162,6 @@ This example demonstrates exporting records from your project. You can specify t
 
 ```python
 from redcaplite import RedcapClient
-import csv 
-import io # For treating the CSV string as a file
 
 # Replace with your actual API URL and token
 API_URL = 'YOUR_REDCAP_API_URL'
@@ -187,34 +172,10 @@ try:
 
     # Export records in CSV format, specifying particular fields
     # Replace 'record_id', 'field_of_interest_1', 'another_field' with actual field names from your project.
-    records_csv_string = client.export_records(
-        format='csv',
+    records = client.export_records(
         fields=['record_id', 'field_of_interest_1', 'another_field'] # Example field names
     )
-
-    if isinstance(records_csv_string, str): # Successful response is a string (CSV data)
-        print("Records exported successfully (CSV format). First 5 rows:")
-        # Process the CSV data (e.g., load into pandas or print rows)
-        # Example: Print first 5 rows using the csv module
-        csv_file = io.StringIO(records_csv_string)
-        reader = csv.reader(csv_file)
-        for i, row in enumerate(reader):
-            if i < 5: # Print header and first 4 data rows
-                print(row)
-            else:
-                break
-        # For use with pandas:
-        # import pandas as pd
-        # try:
-        #     df = pd.read_csv(io.StringIO(records_csv_string))
-        #     print("\nPandas DataFrame head:")
-        #     print(df.head())
-        # except pd.errors.EmptyDataError:
-        #     print("\nNote: The record export was successful but returned no data (empty CSV).")
-        # except Exception as pd_e:
-        #     print(f"\nError processing CSV with pandas: {pd_e}")
-    else: # An error or unexpected response
-        print("Failed to export records or unexpected response:", records_csv_string)
+    print(records)
 
 except Exception as e:
     print(f"An error occurred while exporting records: {e}")
@@ -225,8 +186,6 @@ This example shows how to retrieve the project's metadata, also known as the dat
 
 ```python
 from redcaplite import RedcapClient
-import csv
-import io
 
 # Replace with your actual API URL and token
 API_URL = 'YOUR_REDCAP_API_URL'
@@ -236,31 +195,8 @@ try:
     client = RedcapClient(API_URL, API_TOKEN)
 
     # Get metadata in CSV format
-    metadata_csv_string = client.get_metadata(format='csv')
-
-    if isinstance(metadata_csv_string, str): # Successful response is a string (CSV data)
-        print("Metadata retrieved successfully (CSV format). First 5 rows of data dictionary:")
-        # Process the CSV data
-        # Example: Print first 5 rows (header and 4 fields)
-        csv_file = io.StringIO(metadata_csv_string)
-        reader = csv.reader(csv_file)
-        for i, row in enumerate(reader):
-            if i < 5:
-                print(row)
-            else:
-                break
-        # For use with pandas:
-        # import pandas as pd
-        # try:
-        #     metadata_df = pd.read_csv(io.StringIO(metadata_csv_string))
-        #     print("\nPandas DataFrame head of metadata:")
-        #     print(metadata_df.head())
-        # except pd.errors.EmptyDataError:
-        #     print("\nNote: Metadata export was successful but returned no data (empty CSV). Should not happen for metadata.")
-        # except Exception as pd_e:
-        #     print(f"\nError processing metadata CSV with pandas: {pd_e}")
-    else: # An error or unexpected response
-        print("Failed to retrieve metadata or unexpected response:", metadata_csv_string)
+    metadata = client.get_metadata()
+    print(metadata)
 
 except Exception as e:
     print(f"An error occurred while fetching metadata: {e}")
