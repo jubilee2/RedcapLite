@@ -132,74 +132,23 @@ The `RedcapClient` provides a wide range of methods to interact with the REDCap 
 
 </details>
 
-### Examples
+### Example
 
-Below are practical examples demonstrating common operations. Remember to replace `'YOUR_REDCAP_API_URL'` and `'YOUR_REDCAP_API_TOKEN'` with your project's specific REDCap API URL and token. Robust applications should incorporate error handling, such as `try-except` blocks (see the Quick Start for an example).
-
-#### Managing Arms
-This example shows how to retrieve project arms. It also includes commented-out code for deleting specific arms, which you can adapt.
+Here’s a complete example of how to use the `redcaplite` package:
 
 ```python
-from redcaplite import RedcapClient
+import redcaplite
 
-# Replace with your actual API URL and token
-API_URL = 'YOUR_REDCAP_API_URL'
-API_TOKEN = 'YOUR_REDCAP_API_TOKEN'
+# Create an instance of RedcapClient
+r = redcaplite.RedcapClient('https://redcap.vumc.org/api/', 'your_token')
 
-try:
-    client = RedcapClient(API_URL, API_TOKEN)
+# Get arms
+arms = r.get_arms()
+print("Arms:", arms)
 
-    # Get arms
-    arms = client.get_arms() # Returns a list of arm dictionaries or an error dictionary
-    print("Arms retrieved:", arms)
-
-except Exception as e:
-    print(f"An error occurred while managing arms: {e}")
-```
-
-#### Exporting Records
-This example demonstrates exporting records from your project. You can specify the format (e.g., `csv`, `json`, `xml`) and the specific fields to retrieve.
-
-```python
-from redcaplite import RedcapClient
-
-# Replace with your actual API URL and token
-API_URL = 'YOUR_REDCAP_API_URL'
-API_TOKEN = 'YOUR_REDCAP_API_TOKEN'
-
-try:
-    client = RedcapClient(API_URL, API_TOKEN)
-
-    # Export records in CSV format, specifying particular fields
-    # Replace 'record_id', 'field_of_interest_1', 'another_field' with actual field names from your project.
-    records = client.export_records(
-        fields=['record_id', 'field_of_interest_1', 'another_field'] # Example field names
-    )
-    print(records)
-
-except Exception as e:
-    print(f"An error occurred while exporting records: {e}")
-```
-
-#### Fetching Metadata (Data Dictionary)
-This example shows how to retrieve the project's metadata, also known as the data dictionary. The metadata describes all the fields in your project.
-
-```python
-from redcaplite import RedcapClient
-
-# Replace with your actual API URL and token
-API_URL = 'YOUR_REDCAP_API_URL'
-API_TOKEN = 'YOUR_REDCAP_API_TOKEN'
-
-try:
-    client = RedcapClient(API_URL, API_TOKEN)
-
-    # Get metadata in CSV format
-    metadata = client.get_metadata()
-    print(metadata)
-
-except Exception as e:
-    print(f"An error occurred while fetching metadata: {e}")
+# Delete specific arms
+r.delete_arms(arms=[3])
+print("Arm 3 deleted successfully.")
 ```
 
 ### Advanced: Customizing CSV Exports with `pd_read_csv_kwargs`
