@@ -1,5 +1,5 @@
 import os
-from unittest.mock import Mock, patch, mock_open
+from unittest.mock import Mock, patch, mock_open, call
 from redcaplite.http import Client
 
 
@@ -35,6 +35,21 @@ def test_client_post_csv():
         assert response == mock_response
         mock_csv_api.assert_called_once_with(
             {'format': 'csv'}, pd_read_csv_kwargs={"foo": []})
+
+
+def test_client_post_csv_no_shared_state():
+    """Ensure pd_read_csv_kwargs does not share state across calls"""
+    client = Client('https://example.com', 'token')
+    mock_response = Mock()
+    with patch.object(client, '_Client__csv_api', return_value=mock_response) as mock_csv_api:
+        client.post({'format': 'csv'}, pd_read_csv_kwargs={'a': 1})
+        client.post({'format': 'csv'}, pd_read_csv_kwargs={'b': 2})
+        client.post({'format': 'csv'})
+        assert mock_csv_api.call_args_list == [
+            call({'format': 'csv'}, pd_read_csv_kwargs={'a': 1}),
+            call({'format': 'csv'}, pd_read_csv_kwargs={'b': 2}),
+            call({'format': 'csv'}, pd_read_csv_kwargs={})
+        ]
 
 
 def test_client_post_default_format():

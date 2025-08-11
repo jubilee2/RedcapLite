@@ -1,5 +1,6 @@
 import requests
 import redcaplite.http.handler as hd
+from typing import Any, Dict, Optional
 
 
 class Client:
@@ -7,7 +8,9 @@ class Client:
         self.url = url
         self.token = token
 
-    def post(self, data, pd_read_csv_kwargs={}):
+    def post(self, data, pd_read_csv_kwargs: Optional[Dict[str, Any]] = None):
+        if pd_read_csv_kwargs is None:
+            pd_read_csv_kwargs = {}
         format = data.get("format", None)
         if format == 'csv':
             response = self.__csv_api(
