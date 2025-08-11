@@ -3,6 +3,8 @@
 ![pytest](https://github.com/jubilee2/RedcapLite/actions/workflows/python-app.yml/badge.svg?branch=main)
 ![PyPI - Version](https://img.shields.io/pypi/v/redcaplite)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/redcaplite)
+[![PyPI Downloads](https://static.pepy.tech/badge/redcaplite/month)](https://pepy.tech/projects/redcaplite)
+[![PyPI Downloads](https://static.pepy.tech/badge/redcaplite)](https://pepy.tech/projects/redcaplite)
 
 **Lightweight, user-friendly Python client for the REDCap API.**
 
