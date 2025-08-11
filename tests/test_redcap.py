@@ -169,7 +169,7 @@ def test_redcap_client_get_field_names(client):
     """Test RedcapClient get_field_names method"""
     mock_redcap_client_post(
         client, 'get_field_names', method_kwargs={},
-        expected_requests_data={'content': 'userDagMapping',
+        expected_requests_data={'content': 'exportFieldNames',
                                 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
     )
 
