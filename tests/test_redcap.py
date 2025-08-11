@@ -596,7 +596,7 @@ def test_get_version(client):
                                 'returnFormat': 'json', 'token': 'token'}
     )
 
-# syrvey
+# survey
 
 
 def test_get_survey_link_with_kwargs(client):
