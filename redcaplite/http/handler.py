@@ -32,7 +32,7 @@ def response_error_handler(func):
             raise APIException(
                 "Not Implemented: The requested method is not implemented.")
         else:
-            raise Exception("Unkown issue.")
+            raise Exception("Unknown issue.")
     return wrapper
 
 

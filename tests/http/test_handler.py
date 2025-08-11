@@ -91,7 +91,7 @@ def test_response_error_handler_unknown_status_code():
     decorated_func = response_error_handler(mock_func)
     with pytest.raises(Exception) as exc_info:
         decorated_func(None, {})
-    assert str(exc_info.value) == "Unkown issue."
+    assert str(exc_info.value) == "Unknown issue."
 
 
 def test_csv_handler():
