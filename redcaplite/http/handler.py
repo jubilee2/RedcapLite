@@ -1,6 +1,7 @@
 from .error import APIException
 import os
 import io
+from typing import Any, Dict, Optional
 import pandas as pd
 
 
@@ -37,7 +38,14 @@ def response_error_handler(func):
 
 
 def csv_handler(func):
-    def wrapper(obj, data, pd_read_csv_kwargs={}):
+    def wrapper(
+            obj,
+            data,
+            pd_read_csv_kwargs: Optional[Dict[str, Any]] = None,
+    ):
+        if pd_read_csv_kwargs is None:
+            pd_read_csv_kwargs = {}
+
         data['format'] = 'csv'
         response = func(obj, data)
         if 'returnContent' in data and data['returnContent'] == 'ids':

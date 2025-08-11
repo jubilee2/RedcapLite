@@ -37,6 +37,25 @@ def test_client_post_csv():
             {'format': 'csv'}, pd_read_csv_kwargs={"foo": []})
 
 
+def test_client_post_csv_kwargs_independent_between_calls():
+    """Ensure different pd_read_csv_kwargs do not share state across calls"""
+    client = Client('https://example.com', 'token')
+    mock_response = Mock()
+    with patch.object(client, '_Client__csv_api', return_value=mock_response) as mock_csv_api:
+        kwargs1 = {'foo': []}
+        kwargs2 = {'bar': []}
+
+        client.post({'format': 'csv'}, pd_read_csv_kwargs=kwargs1)
+        client.post({'format': 'csv'}, pd_read_csv_kwargs=kwargs2)
+
+        first_kwargs = mock_csv_api.call_args_list[0].kwargs['pd_read_csv_kwargs']
+        second_kwargs = mock_csv_api.call_args_list[1].kwargs['pd_read_csv_kwargs']
+
+        assert first_kwargs is kwargs1
+        assert second_kwargs is kwargs2
+        assert 'foo' in first_kwargs and 'foo' not in second_kwargs
+
+
 def test_client_post_default_format():
     """Test Client post method with default format"""
     client = Client('https://example.com', 'token')
