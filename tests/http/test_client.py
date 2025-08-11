@@ -64,10 +64,15 @@ def test_client_file_download_api():
     mock_response = Mock()
     mock_response.status_code = 200
     mock_response.content = b'test content'  # Specify the content attribute
+    file_path = 'download.raw'
     with patch.object(client, '_Client__post', return_value=mock_response):
         response = client.file_download_api({})
         assert response == mock_response
-    os.remove('download.raw')
+
+    assert os.path.exists(file_path)
+    with open(file_path, 'rb') as f:
+        assert f.read() == mock_response.content
+    os.remove(file_path)
 
 
 def test_client_file_upload_api():
