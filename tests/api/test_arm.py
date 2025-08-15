@@ -1,3 +1,5 @@
+# For integration tests, see the `tests/integration` directory.
+
 import json
 from redcaplite.api import get_arms, import_arms, delete_arms
 
