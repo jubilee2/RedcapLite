@@ -32,12 +32,14 @@ def response_error_handler(func):
             raise APIException(
                 "Not Implemented: The requested method is not implemented.")
         else:
-            raise Exception("Unkown issue.")
+            raise Exception("Unknown issue.")
     return wrapper
 
 
 def csv_handler(func):
-    def wrapper(obj, data, pd_read_csv_kwargs={}):
+    def wrapper(obj, data, pd_read_csv_kwargs=None):
+        if pd_read_csv_kwargs is None:
+            pd_read_csv_kwargs = {}
         data['format'] = 'csv'
         response = func(obj, data)
         if 'returnContent' in data and data['returnContent'] == 'ids':

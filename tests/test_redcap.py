@@ -169,7 +169,7 @@ def test_redcap_client_get_field_names(client):
     """Test RedcapClient get_field_names method"""
     mock_redcap_client_post(
         client, 'get_field_names', method_kwargs={},
-        expected_requests_data={'content': 'userDagMapping',
+        expected_requests_data={'content': 'exportFieldNames',
                                 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
     )
 
@@ -596,7 +596,7 @@ def test_get_version(client):
                                 'returnFormat': 'json', 'token': 'token'}
     )
 
-# syrvey
+# survey
 
 
 def test_get_survey_link_with_kwargs(client):

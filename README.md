@@ -3,8 +3,19 @@
 ![pytest](https://github.com/jubilee2/RedcapLite/actions/workflows/python-app.yml/badge.svg?branch=main)
 ![PyPI - Version](https://img.shields.io/pypi/v/redcaplite)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/redcaplite)
+[![PyPI Downloads](https://static.pepy.tech/badge/redcaplite/month)](https://pepy.tech/projects/redcaplite)
+[![PyPI Downloads](https://static.pepy.tech/badge/redcaplite)](https://pepy.tech/projects/redcaplite)
 
-`redcaplite` is a Python package designed for straightforward interaction with the REDCap (Research Electronic Data Capture) API. This package provides user-friendly methods to communicate with various API endpoints.
+**Lightweight, user-friendly Python client for the REDCap API.**
+
+`redcaplite` makes it easy to connect to your REDCap project and perform common operations with minimal code. Whether you're a researcher automating data pulls or a developer building integrations, `redcaplite` keeps things simple and efficient.
+
+## Key Features
+
+-   Intuitive interface for the most common REDCap API endpoints.
+-   Installable from PyPI and ready to use in seconds.
+-   Fully typed and tested for reliable data exchange.
+-   Minimal dependencies to keep your environment lean.
 
 ## Prerequisites
 Before using `redcaplite`, you need to obtain two key pieces of information from your REDCap project's API page:
