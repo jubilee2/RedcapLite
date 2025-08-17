@@ -1,5 +1,6 @@
 import pytest
 from redcaplite import RedcapClient
+import os
 
 # Note: To run these tests, you need to provide a valid REDCap API URL and token.
 # You can do this by setting the following environment variables:
@@ -8,8 +9,8 @@ from redcaplite import RedcapClient
 #
 # Alternatively, you can replace the placeholders below with your actual API URL and token.
 
-API_URL = "YOUR_REDCAP_API_URL"
-API_TOKEN = "YOUR_REDCAP_API_TOKEN"
+API_URL = os.environ.get("REDCAP_API_URL")
+API_TOKEN = os.environ.get("REDCAP_API_TOKEN")
 
 @pytest.fixture
 def client():
