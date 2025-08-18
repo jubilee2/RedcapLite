@@ -41,5 +41,5 @@ jobs:
       run: |
         pytest
       env:
-        REDCAP_API_URL: ${{ env.REDCAP_API_URL }}
+        REDCAP_API_URL: ${{ vars.REDCAP_API_URL }}
         REDCAP_API_TOKEN: ${{ secrets.REDCAP_API_TOKEN }}
