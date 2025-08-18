@@ -48,7 +48,7 @@ def test_import_and_delete_dags(client):
     new_dag_data = [
         {
             "data_access_group_name": "Integration Test DAG",
-            "unique_group_name": "integration_test_dag_1",
+            "unique_group_name": ""
         }
     ]
 
@@ -56,14 +56,12 @@ def test_import_and_delete_dags(client):
     response = client.import_dags(data=new_dag_data)
 
     # Assertion: Check if the import was successful
-    assert "count" in response
-    assert response["count"] == 1
+    assert response == 1
     print("Imported DAG response:", response)
 
     # Action: Delete the newly created DAG
-    delete_response = client.delete_dags(dags=["integration_test_dag_1"])
+    delete_response = client.delete_dags(dags=["integration_test_d"])
 
     # Assertion: Check if the deletion was successful
-    assert "count" in delete_response
-    assert delete_response["count"] == 1
+    assert delete_response == 1
     print("Deleted DAG response:", delete_response)
