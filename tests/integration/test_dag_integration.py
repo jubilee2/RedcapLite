@@ -1,5 +1,6 @@
 import pytest
 from redcaplite import RedcapClient
+import os
 
 # --- Integration Tests for DAG API ---
 # These tests are designed to run against a live REDCap project.
@@ -12,8 +13,8 @@ from redcaplite import RedcapClient
 # 3.  Remove the @pytest.mark.skip decorator from the tests you want to run.
 # 4.  Run pytest from the root of the repository.
 
-API_URL = "YOUR_REDCAP_API_URL"
-API_TOKEN = "YOUR_REDCAP_API_TOKEN"
+API_URL = os.environ.get("REDCAP_API_URL")
+API_TOKEN = os.environ.get("REDCAP_API_TOKEN")
 
 
 @pytest.fixture
@@ -22,12 +23,11 @@ def client():
     Pytest fixture to create a RedcapClient instance for integration tests.
     Skips the test if the API URL or token are placeholders.
     """
-    if API_URL == "YOUR_REDCAP_API_URL" or API_TOKEN == "YOUR_REDCAP_API_TOKEN":
+    if API_URL is None:
         pytest.skip("Integration test credentials not configured.")
     return RedcapClient(API_URL, API_TOKEN)
 
 
-@pytest.mark.skip(reason="Requires live REDCap project credentials.")
 def test_get_dags(client):
     """
     Tests the export of Data Access Groups (DAGs).
@@ -40,7 +40,6 @@ def test_get_dags(client):
     print("Exported DAGs:", dags)
 
 
-@pytest.mark.skip(reason="Requires live REDCap project credentials.")
 def test_import_and_delete_dags(client):
     """
     Tests the import and deletion of Data Access Groups (DAGs).
