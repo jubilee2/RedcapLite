@@ -1,7 +1,7 @@
 import pytest
 from redcaplite import RedcapClient
 import os
-from datetime import datetime, UTC
+from datetime import datetime, timezone
 
 
 # Note: To run these tests, you need to provide a valid REDCap API URL and token.
@@ -36,7 +36,7 @@ def test_arm_and_event_integration(client):
     7. Delete the arm.
     8. Export all arms and verify the arm is removed.
     """
-    timestamp = datetime.now(UTC).strftime("%Y%m%d%H%M")
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M")
     arm_num = "3"
     arm_name = f"Integration Test Arm {timestamp}"
     event_name = f"integration_event_{timestamp}"
