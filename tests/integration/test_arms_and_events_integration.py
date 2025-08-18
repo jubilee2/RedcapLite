@@ -19,6 +19,8 @@ def client():
     """
     Fixture to create a RedcapClient instance.
     """
+    if API_URL is None:
+        pytest.skip("Integration test credentials not configured.")
     return RedcapClient(API_URL, API_TOKEN)
 
 def test_arm_and_event_integration(client):
