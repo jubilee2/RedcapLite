@@ -23,6 +23,7 @@ def client():
         pytest.skip("Integration test credentials not configured.")
     return RedcapClient(API_URL, API_TOKEN)
 
+@pytest.mark.integration
 def test_arm_and_event_integration(client):
     """
     Integration test for the REDCap 'arm' and 'event' APIs.

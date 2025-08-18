@@ -28,6 +28,7 @@ def client():
     return RedcapClient(API_URL, API_TOKEN)
 
 
+@pytest.mark.integration
 def test_get_dags(client):
     """
     Tests the export of Data Access Groups (DAGs).
@@ -40,6 +41,7 @@ def test_get_dags(client):
     print("Exported DAGs:", dags)
 
 
+@pytest.mark.integration
 def test_import_and_delete_dags(client):
     """
     Tests the import and deletion of Data Access Groups (DAGs).
