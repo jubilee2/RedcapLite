@@ -133,7 +133,7 @@ def test_import_and_export_and_delete_user_role(client):
     assert all("role_label" in role for role in roles)
     assert any(role['role_label'] == 'Integration Test Role' for role in roles)
 
-    unique_role_name = (item.get('unique_role_name') for item in roles if item.get('role_label') == 'Integration Test Role')
+    unique_role_name = next(item.get('unique_role_name') for item in roles if item.get('role_label') == 'Integration Test Role')
 
     delete_response = client.delete_user_roles(roles=[unique_role_name])
     assert delete_response == 1
