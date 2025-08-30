@@ -121,7 +121,6 @@ def test_get_user_roles(client):
     assert all("unique_role_name" in role for role in roles)
 
 
-@pytest.mark.skip(reason="Requires valid role configuration; adjust before running.")
 def test_import_and_delete_user_role(client):
     """Import a temporary user role and then delete it."""
     new_role = [{
