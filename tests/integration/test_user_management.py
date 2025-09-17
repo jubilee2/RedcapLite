@@ -61,44 +61,51 @@ def ensure_test_user_absent(client):
 
 @pytest.fixture
 def temporary_role(client):
-    role_label = f"Integration Test Role {uuid4()}"
+    role_label = f"Integration Test Role {uuid4().hex[:8]}"
     role_payload = [{
         "unique_role_name": "",
         "role_label": role_label,
-        "data_export": 0,
-        "data_import": 0,
-        "data_logging": 0,
-        "manage": 0,
+        "api_export": 0,
+        "api_import": 0,
+        "logging": 0,
+        "design": 0,
+        "user_rights": 0,
     }]
 
     response = client.import_user_roles(data=role_payload)
-    _assert_successful_import(response)
+    assert response == 1
 
     roles = client.get_user_roles()
     role_entry = next((role for role in roles if role.get("role_label") == role_label), None)
     assert role_entry is not None, "Temporary role was not created"
     unique_role_name = role_entry.get("unique_role_name")
-    assert unique_role_name, "Temporary role missing unique role name"
+    assert unique_role_name != "", "Temporary role missing unique role name"
 
     try:
         yield unique_role_name
     finally:
         try:
-            client.delete_user_roles([unique_role_name])
+            client.delete_user_roles(roles=[unique_role_name])
         except Exception:
             pass
 
 
 @pytest.fixture
 def temporary_data_access_group(client):
-    unique_group_name = f"integration_test_dag_{uuid4().hex}"
+    data_access_group_name = f"Integration Test DAG {uuid4().hex[:8]}"
     dag_payload = [{
-        "data_access_group_name": f"Integration Test DAG {uuid4().hex[:8]}",
-        "unique_group_name": unique_group_name,
+        "data_access_group_name": data_access_group_name,
+        "unique_group_name": '',
     }]
 
     response = client.import_dags(data=dag_payload)
-    _assert_successful_import(response)
+    assert response == 1
+
+    dags = client.get_dags()  # Ensure DAGs are initialized in the project.
+    dag_entry = next((dag for dag in dags if dag.get("data_access_group_name") == data_access_group_name), None)
+    assert dag_entry is not None, "Temporary DAG was not created"
+    unique_group_name = dag_entry.get("data_access_group_name")
+    assert unique_group_name != "", "Temporary DAG missing unique group name"
 
     try:
         yield unique_group_name
