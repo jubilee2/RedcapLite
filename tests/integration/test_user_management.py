@@ -74,7 +74,7 @@ def temporary_data_access_group(client):
     dags = client.get_dags()  # Ensure DAGs are initialized in the project.
     dag_entry = next((dag for dag in dags if dag.get("data_access_group_name") == data_access_group_name), None)
     assert dag_entry is not None, "Temporary DAG was not created"
-    unique_group_name = dag_entry.get("data_access_group_name")
+    unique_group_name = dag_entry.get("unique_group_name", "")
     assert unique_group_name != "", "Temporary DAG missing unique group name"
 
     try:
