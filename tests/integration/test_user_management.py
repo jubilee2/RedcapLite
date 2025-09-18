@@ -161,6 +161,6 @@ def test_import_users_variations(
 
     if use_dag:
         dag_mappings = client.get_user_dag_mappings()
-        mapping = next(_username_entries(role_mappings, TEST_USERNAME), None)
+        mapping = next(_username_entries(dag_mappings, TEST_USERNAME), None)
         assert mapping is not None, "User DAG mapping did not persist"
         assert mapping.get("redcap_data_access_group") == dag_unique_name, "User DAG mapping not applied"
