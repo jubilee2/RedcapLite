@@ -1,21 +1,5 @@
-import os
 import re
 from datetime import datetime, timezone
-
-import pytest
-from redcaplite import RedcapClient
-
-API_URL = os.environ.get("REDCAP_API_URL")
-API_TOKEN = os.environ.get("REDCAP_API_TOKEN")
-
-
-@pytest.fixture
-def client():
-    """Create a RedcapClient for integration tests."""
-    if API_URL is None or API_TOKEN is None:
-        pytest.skip("Integration test credentials not configured.")
-    return RedcapClient(API_URL, API_TOKEN)
-
 
 def test_arm_and_event_integration(client):
     """Integration test for the REDCap 'arm' and 'event' APIs."""
