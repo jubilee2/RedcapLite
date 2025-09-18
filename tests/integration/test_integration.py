@@ -1,5 +1,6 @@
 import re
 from datetime import datetime, timezone
+import xml.etree.ElementTree as ET
 
 def test_arm_and_event_integration(client):
     """Integration test for the REDCap 'arm' and 'event' APIs."""
@@ -129,3 +130,20 @@ def test_version_matches_semver(client):
     assert isinstance(version, str)
     assert re.match(r"^\d+\.\d+\.\d+$", version)
 
+
+def test_get_project_info(client):
+    """Export project info and validate its basic structure."""
+    project_info = client.get_project()
+    assert isinstance(project_info, dict)
+    assert project_info
+    assert "project_id" in project_info
+    assert "project_title" in project_info
+
+
+def test_get_project_xml(client):
+    """Export project XML and ensure the response is non-empty."""
+    project_xml = client.get_project_xml()
+    assert isinstance(project_xml, str)
+    assert project_xml.strip()
+    root = ET.fromstring(project_xml)
+    assert root is not None
