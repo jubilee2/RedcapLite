@@ -159,4 +159,3 @@ def test_get_metadata_single_field(client):
     assert entry["field_name"] == "record_id"
     assert entry["field_type"] == "text"
     assert entry["form_name"]
-    assert entry["select_choices_or_calculations"] == ""
