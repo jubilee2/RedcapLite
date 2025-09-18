@@ -147,3 +147,16 @@ def test_get_project_xml(client):
     root = ET.fromstring(project_xml)
     assert root is not None
     assert "ODM" in root.tag
+
+
+def test_get_metadata_single_field(client):
+    """Export metadata for a single field and verify expected attributes."""
+    metadata = client.get_metadata(fields=["record_id"])
+
+    assert metadata.shape[0] == 1
+    entry = metadata.iloc[0]
+
+    assert entry["field_name"] == "record_id"
+    assert entry["field_type"] == "text"
+    assert entry["form_name"] != ""
+    assert entry["select_choices_or_calculations"] == ""
