@@ -516,8 +516,7 @@ class RedcapClient(Client):
             The response from the API containing the metadata.
         """
         read_csv_kwargs = pd_read_csv_kwargs.copy() if pd_read_csv_kwargs is not None else {}
-
-
+        
         default_dtypes = {
             'section_header': str,
             'field_label': str,
@@ -534,7 +533,7 @@ class RedcapClient(Client):
         return self.post(
             api.get_metadata(
                 {"fields": fields, "forms": forms, "format": format}),
-            pd_read_csv_kwargs=pd_read_csv_kwargs,
+            pd_read_csv_kwargs=read_csv_kwargs,
         )
 
     def import_metadata(
