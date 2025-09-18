@@ -146,7 +146,7 @@ def test_import_users_variations(
     users = client.get_users()
     user_entry = next(_username_entries(users, TEST_USERNAME), None)
     assert user_entry is not None, "User import did not persist"
-    assert user_entry.get("email") == TEST_USERNAME
+    assert user_entry.get("username") == TEST_USERNAME
 
     if use_expiration:
         user_expiration = user_entry.get("expiration")
