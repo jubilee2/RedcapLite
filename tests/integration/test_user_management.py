@@ -14,36 +14,6 @@ def _future_expiration() -> str:
     return (datetime.now(timezone.utc) + timedelta(days=30)).strftime("%Y-%m-%d")
 
 
-def _assert_successful_import(response) -> None:
-    """Ensure REDCap import responses indicate success."""
-    if isinstance(response, dict):
-        if response.get("errors"):
-            pytest.fail(f"Import reported errors: {response['errors']}")
-        if response.get("error"):
-            pytest.fail(f"Import reported error: {response['error']}")
-        count = response.get("count") or response.get("item_count")
-        if count is not None:
-            assert int(count) > 0
-        return
-
-    if isinstance(response, list):
-        assert response, "Import returned an empty list"
-        for entry in response:
-            if isinstance(entry, dict) and entry.get("error"):
-                pytest.fail(f"Import entry reported error: {entry['error']}")
-        return
-
-    if isinstance(response, (int, float)):
-        assert response > 0
-        return
-
-    if isinstance(response, str):
-        assert response.strip() not in {"", "0"}
-        return
-
-    assert response, f"Unexpected import response: {response!r}"
-
-
 @pytest.fixture
 def ensure_test_user_absent(client):
     """Remove the integration test user before and after execution."""
@@ -150,18 +120,28 @@ def test_import_users_variations(
         expiration_value = _future_expiration()
         payload["expiration"] = expiration_value
 
+    response = client.import_users(data=[payload])
+    assert response == 1
+
     role_name = None
     if use_role:
         role_name = request.getfixturevalue("temporary_role")
-        payload["role"] = role_name
+        payload_role = {
+            username: TEST_USERNAME,
+            unique_role_name: role_name,
+        }
+        response = client.import_user_role_mappings(data=[payload_role])
+        assert response == 1
 
     dag_unique_name = None
     if use_dag:
         dag_unique_name = request.getfixturevalue("temporary_data_access_group")
-        payload["redcap_data_access_group"] = dag_unique_name
-
-    response = client.import_users(data=[payload])
-    _assert_successful_import(response)
+        payload_dag = {
+            username: TEST_USERNAME,
+            redcap_data_access_group: dag_unique_name,
+        }
+        response = client.import_user_dag_mappings(data=[payload_dag])
+        assert response == 1
 
     users = client.get_users()
     user_entry = next(_username_entries(users, TEST_USERNAME), None)
@@ -171,22 +151,16 @@ def test_import_users_variations(
     if use_expiration:
         user_expiration = user_entry.get("expiration")
         assert user_expiration, "Expiration timestamp missing"
-        if expiration_value is not None and user_expiration:
-            expected_prefix = expiration_value[:16]
-            assert user_expiration.startswith(expected_prefix)
+        assert user_expiration == expiration_value
 
-    if use_role and role_name:
+    if use_role:
         role_mappings = client.get_user_role_mappings()
-        assert any(
-            mapping.get("username") == TEST_USERNAME
-            and mapping.get("unique_role_name") == role_name
-            for mapping in role_mappings
-        ), "User role mapping not applied"
+        mapping = next(_username_entries(role_mappings, TEST_USERNAME), None)
+        assert mapping is not None, "User role mapping did not persist"
+        assert mapping.get("unique_role_name") == role_name, "User role mapping not applied"
 
-    if use_dag and dag_unique_name:
+    if use_dag:
         dag_mappings = client.get_user_dag_mappings()
-        assert any(
-            mapping.get("username") == TEST_USERNAME
-            and mapping.get("redcap_data_access_group") == dag_unique_name
-            for mapping in dag_mappings
-        ), "User DAG mapping not applied"
+        mapping = next(_username_entries(role_mappings, TEST_USERNAME), None)
+        assert mapping is not None, "User DAG mapping did not persist"
+        assert mapping.get("redcap_data_access_group") == dag_unique_name, "User DAG mapping not applied"
