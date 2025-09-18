@@ -515,8 +515,8 @@ class RedcapClient(Client):
         Returns:
             The response from the API containing the metadata.
         """
-        if pd_read_csv_kwargs is None:
-            pd_read_csv_kwargs = {}
+        read_csv_kwargs = pd_read_csv_kwargs.copy() if pd_read_csv_kwargs is not None else {}
+
 
         default_dtypes = {
             'section_header': str,
