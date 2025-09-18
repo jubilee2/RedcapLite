@@ -135,7 +135,6 @@ def test_get_project_info(client):
     """Export project info and validate its basic structure."""
     project_info = client.get_project()
     assert isinstance(project_info, dict)
-    assert project_info
     assert "project_id" in project_info
     assert "project_title" in project_info
 
@@ -147,3 +146,4 @@ def test_get_project_xml(client):
     assert project_xml.strip()
     root = ET.fromstring(project_xml)
     assert root is not None
+    assert "ODM" in root.tag
