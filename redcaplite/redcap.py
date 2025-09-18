@@ -528,8 +528,8 @@ class RedcapClient(Client):
             'custom_alignment': str,
         }
         
-        user_dtypes = pd_read_csv_kwargs.get('dtype', {})
-        pd_read_csv_kwargs['dtype'] = {**default_dtypes, **user_dtypes}
+        user_dtypes = read_csv_kwargs.get('dtype', {})
+        read_csv_kwargs['dtype'] = {**default_dtypes, **user_dtypes}
         
         return self.post(
             api.get_metadata(
