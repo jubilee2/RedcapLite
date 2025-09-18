@@ -501,7 +501,7 @@ class RedcapClient(Client):
         fields: List[str] = [],
         forms: List[str] = [],
         format: Literal["json", "csv"] = "csv",
-        pd_read_csv_kwargs: Optional[Dict[str, Any]] = {},
+        pd_read_csv_kwargs: Optional[Dict[str, Any]] = None,
     ):
         """
         Export metadata (data dictionary) from the project.
@@ -515,10 +515,25 @@ class RedcapClient(Client):
         Returns:
             The response from the API containing the metadata.
         """
+        read_csv_kwargs = pd_read_csv_kwargs.copy() if pd_read_csv_kwargs is not None else {}
+        
+        default_dtypes = {
+            'section_header': str,
+            'field_label': str,
+            'select_choices_or_calculations': str,
+            'field_note': str,
+            'text_validation_type_or_show_slider_number': str,
+            'required_field': str,
+            'custom_alignment': str,
+        }
+        
+        user_dtypes = read_csv_kwargs.get('dtype', {})
+        read_csv_kwargs['dtype'] = {**default_dtypes, **user_dtypes}
+        
         return self.post(
             api.get_metadata(
                 {"fields": fields, "forms": forms, "format": format}),
-            pd_read_csv_kwargs=pd_read_csv_kwargs,
+            pd_read_csv_kwargs=read_csv_kwargs,
         )
 
     def import_metadata(
