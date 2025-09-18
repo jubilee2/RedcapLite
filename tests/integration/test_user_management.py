@@ -127,8 +127,8 @@ def test_import_users_variations(
     if use_role:
         role_name = request.getfixturevalue("temporary_role")
         payload_role = {
-            username: TEST_USERNAME,
-            unique_role_name: role_name,
+            "username": TEST_USERNAME,
+            "unique_role_name": role_name,
         }
         response = client.import_user_role_mappings(data=[payload_role])
         assert response == 1
@@ -137,8 +137,8 @@ def test_import_users_variations(
     if use_dag:
         dag_unique_name = request.getfixturevalue("temporary_data_access_group")
         payload_dag = {
-            username: TEST_USERNAME,
-            redcap_data_access_group: dag_unique_name,
+            "username": TEST_USERNAME,
+            "redcap_data_access_group": dag_unique_name,
         }
         response = client.import_user_dag_mappings(data=[payload_dag])
         assert response == 1
