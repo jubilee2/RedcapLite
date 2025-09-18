@@ -516,17 +516,21 @@ class RedcapClient(Client):
             The response from the API containing the metadata.
         """
         if pd_read_csv_kwargs is None:
-            pd_read_csv_kwargs = {
-                'dtype': {
-                    'section_header': str,
-                    'field_label': str,
-                    'select_choices_or_calculations': str,
-                    'field_note': str,
-                    'text_validation_type_or_show_slider_number': str,
-                    'required_field': str,
-                    'custom_alignment': str,
-                }
-            }
+            pd_read_csv_kwargs = {}
+
+        default_dtypes = {
+            'section_header': str,
+            'field_label': str,
+            'select_choices_or_calculations': str,
+            'field_note': str,
+            'text_validation_type_or_show_slider_number': str,
+            'required_field': str,
+            'custom_alignment': str,
+        }
+        
+        user_dtypes = pd_read_csv_kwargs.get('dtype', {})
+        pd_read_csv_kwargs['dtype'] = {**default_dtypes, **user_dtypes}
+        
         return self.post(
             api.get_metadata(
                 {"fields": fields, "forms": forms, "format": format}),
