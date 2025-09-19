@@ -517,19 +517,20 @@ class RedcapClient(Client):
         """
         read_csv_kwargs = pd_read_csv_kwargs.copy() if pd_read_csv_kwargs is not None else {}
         
-        default_dtypes = {
-            'section_header': str,
-            'field_label': str,
-            'select_choices_or_calculations': str,
-            'field_note': str,
-            'text_validation_type_or_show_slider_number': str,
-            'required_field': str,
-            'custom_alignment': str,
-        }
-        
         user_dtypes = read_csv_kwargs.get('dtype', {})
-        read_csv_kwargs['dtype'] = {**default_dtypes, **user_dtypes}
-        
+        if isinstance(user_dtypes, dict):
+            default_dtypes = {
+                'section_header': str,
+                'field_label': str,
+                'select_choices_or_calculations': str,
+                'field_note': str,
+                'text_validation_type_or_show_slider_number': str,
+                'required_field': str,
+                'custom_alignment': str,
+            }
+            read_csv_kwargs['dtype'] = {**default_dtypes, **user_dtypes}
+        read_csv_kwargs['keep_default_na'] = read_csv_kwargs.get('keep_default_na', False)
+
         return self.post(
             api.get_metadata(
                 {"fields": fields, "forms": forms, "format": format}),
