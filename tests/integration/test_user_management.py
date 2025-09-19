@@ -164,3 +164,60 @@ def test_import_users_variations(
         mapping = next(_username_entries(dag_mappings, TEST_USERNAME), None)
         assert mapping is not None, "User DAG mapping did not persist"
         assert mapping.get("redcap_data_access_group") == dag_unique_name, "User DAG mapping not applied"
+
+
+def test_update_user_attributes(
+    client,
+    ensure_test_user_absent,
+    temporary_role,
+    temporary_data_access_group,
+):
+    """Ensure a user can have expiration, role, and DAG updated after creation."""
+
+    creation_payload = {
+        "username": ensure_test_user_absent,
+        "email": TEST_USERNAME,
+    }
+    response = client.import_users(data=[creation_payload])
+    assert response == 1
+
+    new_expiration = _future_expiration()
+    expiration_update = {
+        "username": TEST_USERNAME,
+        "expiration": new_expiration,
+    }
+    response = client.import_users(data=[expiration_update])
+    assert response == 1
+
+    role_update = {
+        "username": TEST_USERNAME,
+        "unique_role_name": temporary_role,
+    }
+    response = client.import_user_role_mappings(data=[role_update])
+    assert response == 1
+
+    dag_update = {
+        "username": TEST_USERNAME,
+        "redcap_data_access_group": temporary_data_access_group,
+    }
+    response = client.import_user_dag_mappings(data=[dag_update])
+    assert response == 1
+
+    users = client.get_users()
+    user_entry = next(_username_entries(users, TEST_USERNAME), None)
+    assert user_entry is not None, "User should exist after creation"
+    assert user_entry.get("expiration") == new_expiration, "Expiration was not updated"
+
+    role_mappings = client.get_user_role_mappings()
+    role_mapping = next(_username_entries(role_mappings, TEST_USERNAME), None)
+    assert role_mapping is not None, "User role mapping missing after update"
+    assert (
+        role_mapping.get("unique_role_name") == temporary_role
+    ), "Updated unique role name not applied"
+
+    dag_mappings = client.get_user_dag_mappings()
+    dag_mapping = next(_username_entries(dag_mappings, TEST_USERNAME), None)
+    assert dag_mapping is not None, "User DAG mapping missing after update"
+    assert (
+        dag_mapping.get("redcap_data_access_group") == temporary_data_access_group
+    ), "Updated DAG not applied"
