@@ -164,3 +164,21 @@ def test_import_users_variations(
         mapping = next(_username_entries(dag_mappings, TEST_USERNAME), None)
         assert mapping is not None, "User DAG mapping did not persist"
         assert mapping.get("redcap_data_access_group") == dag_unique_name, "User DAG mapping not applied"
+
+    // switch dag
+    new_dag_unique_name = "first_group"
+    assert new_dag_unique_name != dag_unique_name, "Expected a distinct DAG for remapping"
+
+    update_payload_dag = {
+        "username": TEST_USERNAME,
+        "redcap_data_access_group": new_dag_unique_name,
+    }
+    response = client.import_user_dag_mappings(data=[update_payload_dag])
+    assert response == 1
+
+    updated_dag_mappings = client.get_user_dag_mappings()
+    updated_mapping = next(_username_entries(updated_dag_mappings, TEST_USERNAME), None)
+    assert updated_mapping is not None, "Updated user DAG mapping did not persist"
+    assert (
+        updated_mapping.get("redcap_data_access_group") == new_dag_unique_name
+    ), "User DAG mapping not updated"
