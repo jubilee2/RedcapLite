@@ -247,5 +247,5 @@ def test_update_user_dag_permissions_switch(client, ensure_test_user_absent):
         _username_entries(users_after_second, username), None
     )
     assert second_user_entry is not None, "User not present after DAG switch"
-    assert second_user_entry['data_access_group'] == second_group, "Unexpected initial user DAG permission"
+    assert second_user_entry['data_access_group'] == second_group, "Unexpected user DAG permission after switch"
     assertEqual(original_user_entry, first_user_entry)
