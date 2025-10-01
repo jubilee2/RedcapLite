@@ -226,7 +226,6 @@ def test_update_user_dag_permissions_switch(client, ensure_test_user_absent):
     first_user_entry['data_access_group'] = ""
     first_user_entry['data_access_group_id'] = ""
     assertEqual(original_user_entry, first_user_entry)
-    first_permission_group = _user_dag_identifier(first_user_entry)
 
     assign_second_payload = {
         "username": username,
