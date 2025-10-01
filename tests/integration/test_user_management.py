@@ -165,7 +165,7 @@ def test_import_users_variations(
         assert mapping is not None, "User DAG mapping did not persist"
         assert mapping.get("redcap_data_access_group") == dag_unique_name, "User DAG mapping not applied"
 
-    // switch dag
+    # switch dag
     new_dag_unique_name = "first_group"
     assert new_dag_unique_name != dag_unique_name, "Expected a distinct DAG for remapping"
 
