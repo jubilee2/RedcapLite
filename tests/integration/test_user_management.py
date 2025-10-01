@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
-from typing import Iterable
+from collections.abc import Callable, Iterable
 from uuid import uuid4
 
 import pytest
@@ -61,29 +61,44 @@ def temporary_role(client):
 
 
 @pytest.fixture
-def temporary_data_access_group(client):
-    data_access_group_name = f"Integration Test DAG {uuid4().hex[:8]}"
-    dag_payload = [{
-        "data_access_group_name": data_access_group_name,
-        "unique_group_name": '',
-    }]
+def temporary_data_access_group_factory(client) -> Callable[[], str]:
+    created_group_names: list[str] = []
 
-    response = client.import_dags(data=dag_payload)
-    assert response == 1
+    def _create_temporary_dag() -> str:
+        data_access_group_name = f"Integration Test DAG {uuid4().hex[:8]}"
+        dag_payload = [{
+            "data_access_group_name": data_access_group_name,
+            "unique_group_name": "",
+        }]
 
-    dags = client.get_dags()  # Ensure DAGs are initialized in the project.
-    dag_entry = next((dag for dag in dags if dag.get("data_access_group_name") == data_access_group_name), None)
-    assert dag_entry is not None, "Temporary DAG was not created"
-    unique_group_name = dag_entry.get("unique_group_name", "")
-    assert unique_group_name != "", "Temporary DAG missing unique group name"
+        response = client.import_dags(data=dag_payload)
+        assert response == 1
+
+        dags = client.get_dags()  # Ensure DAGs are initialized in the project.
+        dag_entry = next(
+            (dag for dag in dags if dag.get("data_access_group_name") == data_access_group_name),
+            None,
+        )
+        assert dag_entry is not None, "Temporary DAG was not created"
+        unique_group_name = dag_entry.get("unique_group_name", "")
+        assert unique_group_name != "", "Temporary DAG missing unique group name"
+
+        created_group_names.append(unique_group_name)
+        return unique_group_name
 
     try:
-        yield unique_group_name
+        yield _create_temporary_dag
     finally:
-        try:
-            client.delete_dags(dags=[unique_group_name])
-        except Exception:
-            pass
+        for dag_name in created_group_names:
+            try:
+                client.delete_dags(dags=[dag_name])
+            except Exception:
+                pass
+
+
+@pytest.fixture
+def temporary_data_access_group(temporary_data_access_group_factory: Callable[[], str]) -> str:
+    return temporary_data_access_group_factory()
 
 
 def _username_entries(collection: Iterable[dict], username: str) -> Iterable[dict]:
@@ -135,7 +150,8 @@ def test_import_users_variations(
 
     dag_unique_name = None
     if use_dag:
-        dag_unique_name = request.getfixturevalue("temporary_data_access_group")
+        dag_factory: Callable[[], str] = request.getfixturevalue("temporary_data_access_group_factory")
+        dag_unique_name = dag_factory()
         payload_dag = {
             "username": TEST_USERNAME,
             "redcap_data_access_group": dag_unique_name,
@@ -164,3 +180,20 @@ def test_import_users_variations(
         mapping = next(_username_entries(dag_mappings, TEST_USERNAME), None)
         assert mapping is not None, "User DAG mapping did not persist"
         assert mapping.get("redcap_data_access_group") == dag_unique_name, "User DAG mapping not applied"
+
+        new_dag_unique_name = dag_factory()
+        assert new_dag_unique_name != dag_unique_name, "Expected a distinct DAG for remapping"
+
+        update_payload_dag = {
+            "username": TEST_USERNAME,
+            "redcap_data_access_group": new_dag_unique_name,
+        }
+        response = client.import_user_dag_mappings(data=[update_payload_dag])
+        assert response == 1
+
+        updated_dag_mappings = client.get_user_dag_mappings()
+        updated_mapping = next(_username_entries(updated_dag_mappings, TEST_USERNAME), None)
+        assert updated_mapping is not None, "Updated user DAG mapping did not persist"
+        assert (
+            updated_mapping.get("redcap_data_access_group") == new_dag_unique_name
+        ), "User DAG mapping not updated"
