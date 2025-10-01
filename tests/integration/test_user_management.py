@@ -182,3 +182,70 @@ def test_import_users_variations(
     assert (
         updated_mapping.get("redcap_data_access_group") == new_dag_unique_name
     ), "User DAG mapping not updated"
+
+
+def test_update_user_dag_permissions_switch(client, ensure_test_user_absent):
+    """Ensure user DAG updates reflect in user permissions when switching groups."""
+
+    username = ensure_test_user_absent
+    user_payload = {
+        "username": username,
+        "email": TEST_USERNAME,
+    }
+
+    response = client.import_users(data=[user_payload])
+    assert response == 1
+
+    users = client.get_users()
+    original_user_entry = next(
+        _username_entries(users, username), None
+    )
+
+    first_group = "first_group"
+    second_group = ""
+
+    assign_first_payload = {
+        "username": username,
+        "redcap_data_access_group": first_group,
+    }
+    response = client.import_user_dag_mappings(data=[assign_first_payload])
+    assert response == 1
+
+    first_mapping = next(
+        _username_entries(client.get_user_dag_mappings(), username), None
+    )
+    assert first_mapping is not None, "Initial user DAG mapping missing"
+    assert (
+        first_mapping.get("redcap_data_access_group") == first_group
+    ), "Initial user DAG assignment incorrect"
+
+    users_after_first = client.get_users()
+    first_user_entry = next(_username_entries(users_after_first, username), None)
+    assert first_user_entry is not None, "User not present after initial DAG assignment"
+    assert first_user_entry['data_access_group'] == first_group, "Unexpected initial user DAG permission"
+    first_user_entry['data_access_group'] = ""
+    first_user_entry['data_access_group_id'] = ""
+    assert original_user_entry == first_user_entry
+
+    assign_second_payload = {
+        "username": username,
+        "redcap_data_access_group": second_group,
+    }
+    response = client.import_user_dag_mappings(data=[assign_second_payload])
+    assert response == 1
+
+    second_mapping = next(
+        _username_entries(client.get_user_dag_mappings(), username), None
+    )
+    assert second_mapping is not None, "Updated user DAG mapping missing"
+    assert (
+        second_mapping.get("redcap_data_access_group") == second_group
+    ), "User DAG assignment not updated"
+
+    users_after_second = client.get_users()
+    second_user_entry = next(
+        _username_entries(users_after_second, username), None
+    )
+    assert second_user_entry is not None, "User not present after DAG switch"
+    assert second_user_entry['data_access_group'] == second_group, "Unexpected user DAG permission after switch"
+    assert original_user_entry == first_user_entry
