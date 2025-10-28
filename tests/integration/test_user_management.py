@@ -249,3 +249,79 @@ def test_update_user_dag_permissions_switch(client, ensure_test_user_absent):
     assert second_user_entry is not None, "User not present after DAG switch"
     assert second_user_entry['data_access_group'] == second_group, "Unexpected user DAG permission after switch"
     assert original_user_entry == first_user_entry
+
+
+def test_update_user_role_permissions_switch(client, ensure_test_user_absent):
+    """Ensure user role updates reflect in user permissions when switching roles."""
+
+    username = ensure_test_user_absent
+    user_payload = {
+        "username": username,
+        "email": TEST_USERNAME,
+    }
+
+    response = client.import_users(data=[user_payload])
+    assert response == 1
+
+    users = client.get_users()
+    original_user_entry = next(
+        _username_entries(users, username), None
+    )
+
+    assert original_user_entry is not None, "Newly created user missing from export"
+
+    roles = client.get_user_roles()
+
+    def _unique_role_name(role_label: str) -> tuple[str, str]:
+        role_entry = next(
+            (role for role in roles if role.get("role_label") == role_label),
+            None,
+        )
+        assert role_entry is not None, f"Role '{role_label}' not found in project"
+        unique_role_name = role_entry.get("unique_role_name")
+        assert unique_role_name, f"Role '{role_label}' missing unique identifier"
+        return unique_role_name
+
+    read_unique_name = _unique_role_name("read")
+    assert read_unique_name != "", "Expected distinct roles for reassignment"
+
+    assign_read_payload = {
+        "username": username,
+        "unique_role_name": read_unique_name,
+    }
+    response = client.import_user_role_mappings(data=[assign_read_payload])
+    assert response == 1
+
+    first_mapping = next(
+        _username_entries(client.get_user_role_mappings(), username), None
+    )
+    assert first_mapping is not None, "Initial user role mapping missing"
+    assert (
+        first_mapping.get("unique_role_name") == read_unique_name
+    ), "Initial user role assignment incorrect"
+
+    users_after_first = client.get_users()
+    first_user_entry = next(_username_entries(users_after_first, username), None)
+    assert first_user_entry is not None, "User not present after initial role assignment"
+
+    assign_staff_payload = {
+        "username": username,
+        "unique_role_name": "",
+    }
+    response = client.import_user_role_mappings(data=[assign_staff_payload])
+    assert response == 1
+
+    second_mapping = next(
+        _username_entries(client.get_user_role_mappings(), username), None
+    )
+    assert second_mapping is not None, "Updated user role mapping missing"
+    assert (
+        second_mapping.get("unique_role_name") == ""
+    ), "User role assignment not updated"
+
+    users_after_second = client.get_users()
+    second_user_entry = next(
+        _username_entries(users_after_second, username), None
+    )
+    assert second_user_entry is not None, "User not present after role switch"
+    assert original_user_entry == second_user_entry
