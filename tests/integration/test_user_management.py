@@ -324,4 +324,4 @@ def test_update_user_role_permissions_switch(client, ensure_test_user_absent):
         _username_entries(users_after_second, username), None
     )
     assert second_user_entry is not None, "User not present after role switch"
-    assert first_user_entry == second_user_entry
+    assert original_user_entry == second_user_entry
