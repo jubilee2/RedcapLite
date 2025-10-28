@@ -279,9 +279,7 @@ def test_update_user_role_permissions_switch(client, ensure_test_user_absent):
         )
         assert role_entry is not None, f"Role '{role_label}' not found in project"
         unique_role_name = role_entry.get("unique_role_name")
-        assert (
-            unique_role_name not in (None, "")
-        ), f"Role '{role_label}' missing unique identifier"
+        assert unique_role_name, f"Role '{role_label}' missing unique identifier"
         return unique_role_name
 
     read_unique_name = _unique_role_name("read")
