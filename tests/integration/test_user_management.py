@@ -225,6 +225,7 @@ def test_update_user_dag_permissions_switch(client, ensure_test_user_absent):
     assert first_user_entry['data_access_group'] == first_group, "Unexpected initial user DAG permission"
     first_user_entry['data_access_group'] = ""
     first_user_entry['data_access_group_id'] = ""
+    first_user_entry['data_access_group_label'] = ""
     assert original_user_entry == first_user_entry
 
     assign_second_payload = {
