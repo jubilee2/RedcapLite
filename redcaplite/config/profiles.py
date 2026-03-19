@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import json
 import os
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 
 
 APP_DIR_ENV = "REDCAPLITE_CONFIG_DIR"
@@ -14,7 +13,7 @@ PROFILES_FILENAME = "profiles.json"
 
 @dataclass
 class Profile:
-    """Named REDCap connection settings stored separately from tokens."""
+    """Named REDCap connection settings reserved for future CLI phases."""
 
     name: str
     url: str
@@ -22,7 +21,7 @@ class Profile:
 
 
 class ProfileStore:
-    """Persist CLI profiles in a small JSON file."""
+    """Placeholder profile storage abstraction for future CLI persistence."""
 
     def __init__(self, config_dir: Optional[Path] = None) -> None:
         self.config_dir = config_dir or self.default_config_dir()
@@ -36,34 +35,19 @@ class ProfileStore:
         return DEFAULT_APP_DIR
 
     def load(self) -> Dict[str, Profile]:
-        data = self._read_data()
-        profiles: Dict[str, Profile] = {}
-        for raw_profile in data.get("profiles", []):
-            profile = Profile(**raw_profile)
-            profiles[profile.name] = profile
-        return profiles
+        return {}
 
     def save(self, profiles: Dict[str, Profile]) -> None:
-        payload = {"profiles": [asdict(profile) for profile in profiles.values()]}
-        self._write_data(payload)
+        del profiles
+        raise NotImplementedError("Profile persistence will be implemented in a later phase")
 
     def get(self, name: str) -> Optional[Profile]:
-        return self.load().get(name)
+        del name
+        return None
 
     def set(self, profile: Profile) -> Profile:
-        profiles = self.load()
-        profiles[profile.name] = profile
-        self.save(profiles)
-        return profile
+        del profile
+        raise NotImplementedError("Profile persistence will be implemented in a later phase")
 
     def list(self) -> List[Profile]:
-        return sorted(self.load().values(), key=lambda profile: profile.name)
-
-    def _read_data(self) -> Dict[str, Any]:
-        if not self.path.exists():
-            return {"profiles": []}
-        return json.loads(self.path.read_text(encoding="utf-8"))
-
-    def _write_data(self, data: Dict[str, Any]) -> None:
-        self.config_dir.mkdir(parents=True, exist_ok=True)
-        self.path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
+        return []

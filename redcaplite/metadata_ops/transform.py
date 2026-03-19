@@ -9,13 +9,11 @@ class MetadataTransformError(ValueError):
 
 
 def transform_metadata_file(source: Path, destination: Path) -> Dict[str, str]:
-    """Return a lightweight transform result for future metadata workflows."""
+    """Placeholder transform hook for future metadata workflows."""
 
-    if not source.exists():
-        raise MetadataTransformError(f"Metadata file not found: {source}")
     return {
         "source": str(source),
         "destination": str(destination),
-        "status": "pending",
-        "message": "Transformation rules will be added in a future phase.",
+        "status": "not_implemented",
+        "message": "Metadata transformation will be implemented in a later phase.",
     }

@@ -9,12 +9,10 @@ class MetadataValidationError(ValueError):
 
 
 def validate_metadata_file(path: Path) -> Dict[str, str]:
-    """Return a lightweight validation result for metadata workflows."""
+    """Placeholder validation hook for future metadata workflows."""
 
-    if not path.exists():
-        raise MetadataValidationError(f"Metadata file not found: {path}")
     return {
         "path": str(path),
-        "status": "pending",
-        "message": "Validation rules will be added in a future phase.",
+        "status": "not_implemented",
+        "message": "Metadata validation will be implemented in a later phase.",
     }
