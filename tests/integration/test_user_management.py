@@ -7,7 +7,7 @@ from uuid import uuid4
 import pytest
 
 
-TEST_USERNAME = "test@example.com"
+TEST_USERNAME = "bstat_api_user"
 
 
 def _future_expiration() -> str:
