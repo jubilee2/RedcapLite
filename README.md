@@ -198,6 +198,29 @@ This feature is particularly useful for maintaining data consistency, especially
 
 We hope this new feature helps you to work more efficiently and effectively with your REDCap data!
 
+## CLI Preview
+
+Phase 1 adds an early `rcl` command-line interface for profile access setup and metadata command scaffolding.
+
+### Access setup
+
+```sh
+rcl access data_project
+```
+
+This command creates or updates a named profile, prompts for the REDCap API URL when the profile does not exist yet, validates the supplied token, and stores the resulting access details for later CLI commands.
+
+### Metadata commands
+
+The CLI now includes a `metadata` command group rooted at the profile name:
+
+```sh
+rcl data_project metadata list-fields
+rcl data_project metadata show-field age
+```
+
+`list-fields` and `show-field` provide read-only metadata inspection, while add/edit/remove subcommands are scaffolded for future phases.
+
 ## Contributing
 
 Contributions to `redcaplite` are welcome! If you would like to contribute, please fork the repository, make your changes, and submit a pull request.
