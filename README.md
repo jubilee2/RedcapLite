@@ -198,6 +198,22 @@ This feature is particularly useful for maintaining data consistency, especially
 
 We hope this new feature helps you to work more efficiently and effectively with your REDCap data!
 
+## CLI Foundations
+
+Phase 1 adds a lightweight CLI skeleton that complements the Python client. After installing the package, you can use the `redcaplite` command to manage saved access profiles and start future metadata workflows.
+
+```sh
+redcaplite access set --profile demo --url https://redcap.example.org/api/ --token YOUR_TOKEN
+redcaplite access show --profile demo
+redcaplite metadata validate metadata.csv
+```
+
+The CLI currently includes:
+
+-   `access` commands for saving, listing, and inspecting connection profiles.
+-   A file-backed token storage abstraction with restricted file permissions for local development use.
+-   `metadata validate` and `metadata transform` command groups as placeholders for later phases.
+
 ## Contributing
 
 Contributions to `redcaplite` are welcome! If you would like to contribute, please fork the repository, make your changes, and submit a pull request.
