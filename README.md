@@ -34,6 +34,14 @@ This is the recommended installation method for most users. After installation, 
 rcl --help
 ```
 
+Top-level command routing supports profile-aware commands:
+
+```bash
+rcl access data_project
+rcl data_project metadata --help
+rcl data_project metadata export
+```
+
 ### From Source (for Development)
 If you plan to contribute to `redcaplite` or require the latest development version, you can install it directly from the source code:
 1.  Clone the repository:
