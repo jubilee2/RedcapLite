@@ -104,7 +104,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     if known_args.help or not args_list:
         _print_root_help()
-        return 0 if known_args.help or not args_list else 1
+        return 0
 
     if args_list[0] == "access":
         parser = build_access_parser()
