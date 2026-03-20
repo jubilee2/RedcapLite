@@ -29,7 +29,10 @@ To install `redcaplite` from the Python Package Index (PyPI), run the following 
 ```sh
 pip install redcaplite
 ```
-This is the recommended installation method for most users.
+This is the recommended installation method for most users. After installation, the `rcl` command is available for CLI usage:
+```sh
+rcl --help
+```
 
 ### From Source (for Development)
 If you plan to contribute to `redcaplite` or require the latest development version, you can install it directly from the source code:

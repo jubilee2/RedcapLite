@@ -13,8 +13,12 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "pandas", 
-    "requests"]
+    "pandas",
+    "requests",
+]
+
+[project.scripts]
+rcl = "redcaplite.cli.main:main"
 
 [project.urls]
 Homepage = "https://github.com/jubilee2/RedcapLite"
