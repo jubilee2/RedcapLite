@@ -63,7 +63,7 @@ class AccessCommand:
         client = self.client_factory(profile.url, token)
         try:
             client.get_version()
-        except Exception:
+        except Exception as e:
             print_error(
                 "unable to validate API token.",
                 "check the REDCap API URL and token, then try again.",
