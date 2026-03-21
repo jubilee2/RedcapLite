@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Optional
 
+import yaml
+
 
 @dataclass
 class Profile:
@@ -29,62 +31,26 @@ def get_profiles_path() -> Path:
     return base_dir / "redcaplite" / "profiles.yml"
 
 
-def _strip_yaml_scalar(value: str) -> str:
-    """Return a plain string value from a simple YAML scalar."""
-    text = value.strip()
-    if len(text) >= 2 and text[0] == text[-1] and text[0] in {"'", '"'}:
-        return text[1:-1]
-    return text
-
-
-def _parse_profiles_yaml(text: str) -> Dict[str, Dict[str, str]]:
-    """Parse the limited YAML structure used by the profiles file."""
-    profiles: Dict[str, Dict[str, str]] = {}
-    current_name: Optional[str] = None
-
-    for raw_line in text.splitlines():
-        line = raw_line.rstrip()
-        stripped = line.strip()
-        if not stripped or stripped.startswith("#"):
-            continue
-
-        if not line.startswith(" "):
-            if not line.endswith(":"):
-                raise ValueError(f"Invalid profile entry: {raw_line}")
-            current_name = line[:-1].strip()
-            if not current_name:
-                raise ValueError("Profile names cannot be empty.")
-            profiles[current_name] = {}
-            continue
-
-        if current_name is None:
-            raise ValueError("Profile settings must follow a profile name.")
-
-        if not line.startswith("  ") or ":" not in stripped:
-            raise ValueError(f"Invalid profile setting: {raw_line}")
-
-        key, value = stripped.split(":", 1)
-        profiles[current_name][key.strip()] = _strip_yaml_scalar(value)
+def _validate_profiles_data(data: object) -> Dict[str, Dict[str, str]]:
+    """Validate YAML-loaded profile data and return normalized mappings."""
+    if data is None:
+        return {}
+    if not isinstance(data, dict):
+        raise ValueError("Profiles YAML must contain a mapping of profile names to settings.")
 
     validated_profiles: Dict[str, Dict[str, str]] = {}
-    for name, details in profiles.items():
+    for name, details in data.items():
+        if not isinstance(name, str) or not name:
+            raise ValueError("Profile names must be non-empty strings.")
+        if not isinstance(details, dict):
+            raise ValueError(f'Profile "{name}" settings must be stored as a mapping.')
+
         url = details.get("url")
         if not isinstance(url, str) or not url:
             raise ValueError(f'Profile "{name}" must include a non-empty string "url" value.')
         validated_profiles[name] = {"url": url}
+
     return validated_profiles
-
-
-def _dump_profiles_yaml(data: Dict[str, Dict[str, str]]) -> str:
-    """Serialize profiles to a small YAML mapping."""
-    lines = []
-    for name in sorted(data):
-        url = data[name].get("url")
-        if not isinstance(url, str) or not url:
-            raise ValueError(f'Profile "{name}" must include a non-empty string "url" value.')
-        lines.append(f"{name}:")
-        lines.append(f"  url: {url}")
-    return "\n".join(lines) + "\n"
 
 
 def load_profiles(path: Optional[Path] = None) -> Dict[str, Dict[str, str]]:
@@ -92,14 +58,19 @@ def load_profiles(path: Optional[Path] = None) -> Dict[str, Dict[str, str]]:
     profiles_path = path or get_profiles_path()
     if not profiles_path.exists():
         return {}
-    return _parse_profiles_yaml(profiles_path.read_text(encoding="utf-8"))
+    loaded = yaml.safe_load(profiles_path.read_text(encoding="utf-8"))
+    return _validate_profiles_data(loaded)
 
 
 def save_profiles(data: Dict[str, Dict[str, str]], path: Optional[Path] = None) -> None:
     """Persist profiles to YAML, creating the parent directory when needed."""
     profiles_path = path or get_profiles_path()
     profiles_path.parent.mkdir(parents=True, exist_ok=True)
-    profiles_path.write_text(_dump_profiles_yaml(data), encoding="utf-8")
+    serialized = _validate_profiles_data(data)
+    profiles_path.write_text(
+        yaml.safe_dump(serialized, sort_keys=True, default_flow_style=False),
+        encoding="utf-8",
+    )
 
 
 def get_profile(name: str, path: Optional[Path] = None) -> Optional[Dict[str, str]]:

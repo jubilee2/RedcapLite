@@ -60,6 +60,19 @@ def test_profile_helpers_round_trip_yaml(tmp_path) -> None:
 
 
 
+def test_load_profiles_accepts_yaml_library_output(tmp_path) -> None:
+    profiles_path = tmp_path / "profiles.yml"
+    profiles_path.write_text(
+        'demo:\n  url: "https://redcap.example.edu/api/"\n',
+        encoding="utf-8",
+    )
+
+    assert load_profiles(profiles_path) == {
+        "demo": {"url": "https://redcap.example.edu/api/"}
+    }
+
+
+
 def test_remove_profile_deletes_existing_entry(tmp_path) -> None:
     profiles_path = tmp_path / "profiles.yml"
     save_profiles(
