@@ -37,8 +37,6 @@ def filter_fields(df: pd.DataFrame, form_name: str | None) -> pd.DataFrame:
         return df.copy()
 
     filtered = df.loc[df["form_name"] == form_name].copy()
-    if filtered.empty:
-        return filtered
     return filtered
 
 
