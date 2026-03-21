@@ -75,6 +75,43 @@ def test_remove_profile_deletes_existing_entry(tmp_path) -> None:
     }
 
 
+def test_load_profiles_returns_empty_dict_for_missing_file(tmp_path) -> None:
+    profiles_path = tmp_path / "missing.yml"
+
+    assert load_profiles(profiles_path) == {}
+
+
+def test_profile_store_load_returns_empty_dict_for_fresh_directory(tmp_path) -> None:
+    store = ProfileStore(tmp_path)
+
+    assert store.load() == {}
+
+
+def test_profile_store_upsert_overwrites_existing_profile_entry(tmp_path) -> None:
+    store = ProfileStore(tmp_path)
+    profiles_path = tmp_path / "profiles.yml"
+
+    store.upsert(Profile(name="demo", url="https://redcap.example.edu/api/"))
+
+    assert profiles_path.exists()
+    assert store.load() == {
+        "demo": Profile(name="demo", url="https://redcap.example.edu/api/")
+    }
+    first_contents = profiles_path.read_text(encoding="utf-8")
+    assert "demo:" in first_contents
+    assert "https://redcap.example.edu/api/" in first_contents
+
+    store.upsert(Profile(name="demo", url="https://redcap.updated.edu/api/"))
+
+    assert store.load() == {
+        "demo": Profile(name="demo", url="https://redcap.updated.edu/api/")
+    }
+    contents = profiles_path.read_text(encoding="utf-8")
+    assert contents.count("demo:") == 1
+    assert "https://redcap.updated.edu/api/" in contents
+    assert "https://redcap.example.edu/api/" not in contents
+
+
 def test_load_profiles_rejects_non_mapping_yaml(tmp_path) -> None:
     profiles_path = tmp_path / "profiles.yml"
     profiles_path.write_text("- demo\n", encoding="utf-8")
