@@ -1,6 +1,7 @@
 from argparse import Namespace
 
 from redcaplite.auth import TokenStore
+import redcaplite.cli.access as access_module
 from redcaplite.cli.access import AccessCommand
 from redcaplite.cli.main import build_parser, build_profile_parser, main
 from redcaplite.config import Profile, ProfileStore
@@ -98,14 +99,11 @@ def test_build_profile_parser_supports_metadata_remove_field_confirmation_flag()
 def test_main_access_command_creates_profile(tmp_path, monkeypatch, capsys) -> None:
     profile_store = ProfileStore(tmp_path)
     token_store = TokenStore(tmp_path)
-    command = AccessCommand(
-        profile_store=profile_store,
-        token_store=token_store,
-        client_factory=FakeClient,
-    )
+    monkeypatch.setattr(access_module, "PROFILE_STORE", profile_store)
+    monkeypatch.setattr(access_module, "TOKEN_STORE", token_store)
+    monkeypatch.setattr(access_module, "CLIENT_FACTORY", FakeClient)
     monkeypatch.setattr("redcaplite.cli.access.prompt_text", lambda _: "https://redcap.example.edu/api/")
     monkeypatch.setattr("redcaplite.cli.access.prompt_secret", lambda _: "secret-token")
-    monkeypatch.setattr("redcaplite.cli.main.AccessCommand", lambda: command)
 
     assert main(["access", "data_project"]) == 0
 
@@ -123,14 +121,12 @@ def test_access_command_rejects_invalid_token(tmp_path, monkeypatch, capsys) -> 
     profile_store = ProfileStore(tmp_path)
     token_store = TokenStore(tmp_path)
     profile_store.upsert(Profile(name="demo", url="https://redcap.example.edu/api/"))
-    command = AccessCommand(
-        profile_store=profile_store,
-        token_store=token_store,
-        client_factory=FailingClient,
-    )
+    monkeypatch.setattr(access_module, "PROFILE_STORE", profile_store)
+    monkeypatch.setattr(access_module, "TOKEN_STORE", token_store)
+    monkeypatch.setattr(access_module, "CLIENT_FACTORY", FailingClient)
     monkeypatch.setattr("redcaplite.cli.access.prompt_secret", lambda _: "bad-token")
 
-    assert command.run(Namespace(profile="demo")) == 1
+    assert AccessCommand().run(Namespace(profile="demo")) == 1
 
     captured = capsys.readouterr()
     assert "Error: unable to validate API token." in captured.err
@@ -144,3 +140,43 @@ def test_main_metadata_placeholder_returns_error(capsys) -> None:
     captured = capsys.readouterr()
     assert 'metadata command "list-fields" is not implemented yet.' in captured.err
     assert "Phase 2 wires the CLI command tree" in captured.err
+
+
+def test_access_command_prompts_before_replacing_existing_token(tmp_path, monkeypatch, capsys) -> None:
+    profile_store = ProfileStore(tmp_path)
+    token_store = TokenStore(tmp_path)
+    profile_store.upsert(Profile(name="demo", url="https://redcap.example.edu/api/"))
+    token_store.save_token("demo", "original-token")
+
+    monkeypatch.setattr(access_module, "PROFILE_STORE", profile_store)
+    monkeypatch.setattr(access_module, "TOKEN_STORE", token_store)
+    monkeypatch.setattr(access_module, "CLIENT_FACTORY", FakeClient)
+    monkeypatch.setattr("redcaplite.cli.access.prompt_confirm", lambda _: False)
+
+    assert AccessCommand().run(Namespace(profile="demo")) == 1
+
+    captured = capsys.readouterr()
+    assert 'Access already exists for "demo".' in captured.out
+    assert "Error: cancelled by user." in captured.err
+    assert token_store.get_token("demo") == "original-token"
+
+
+def test_access_command_saves_missing_profile_before_token_validation(tmp_path, monkeypatch, capsys) -> None:
+    profile_store = ProfileStore(tmp_path)
+    token_store = TokenStore(tmp_path)
+
+    monkeypatch.setattr(access_module, "PROFILE_STORE", profile_store)
+    monkeypatch.setattr(access_module, "TOKEN_STORE", token_store)
+    monkeypatch.setattr(access_module, "CLIENT_FACTORY", FailingClient)
+    monkeypatch.setattr("redcaplite.cli.access.prompt_text", lambda _: "https://redcap.example.edu/api/")
+    monkeypatch.setattr("redcaplite.cli.access.prompt_secret", lambda _: "bad-token")
+
+    assert AccessCommand().run(Namespace(profile="new_profile")) == 1
+
+    captured = capsys.readouterr()
+    assert 'Profile "new_profile" created.' in captured.out
+    assert profile_store.get("new_profile") == Profile(
+        name="new_profile",
+        url="https://redcap.example.edu/api/",
+    )
+    assert token_store.get_token("new_profile") is None

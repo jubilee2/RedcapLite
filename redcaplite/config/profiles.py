@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import os
 import platform
-import site
-import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-import yaml
+try:
+    import yaml
+except ImportError:  # pragma: no cover - exercised when PyYAML is unavailable
+    yaml = None
 
 
 @dataclass
@@ -32,6 +33,49 @@ def get_profiles_path() -> Path:
         base_dir = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
     return base_dir / "redcaplite" / "profiles.yml"
 
+
+
+
+def _safe_load_yaml(content: str) -> Any:
+    """Load the simple profile YAML structure, with a stdlib fallback."""
+    if yaml is not None:
+        return yaml.safe_load(content)
+
+    stripped = content.strip()
+    if not stripped:
+        return None
+
+    parsed: Dict[str, Dict[str, str]] = {}
+    current_name: Optional[str] = None
+    for raw_line in content.splitlines():
+        if not raw_line.strip():
+            continue
+        if not raw_line.startswith(" "):
+            if not raw_line.endswith(":"):
+                raise ValueError("Profiles file must contain a mapping of profile names to settings.")
+            current_name = raw_line[:-1].strip()
+            parsed[current_name] = {}
+            continue
+        if current_name is None:
+            raise ValueError("Profiles file must contain a mapping of profile names to settings.")
+        key, separator, value = raw_line.strip().partition(":")
+        if separator != ":":
+            raise ValueError(f'Profile "{current_name}" must contain a mapping of settings.')
+        parsed[current_name][key.strip()] = value.strip()
+    return parsed
+
+
+def _safe_dump_yaml(data: Dict[str, Dict[str, str]]) -> str:
+    """Dump the simple profile YAML structure, with a stdlib fallback."""
+    if yaml is not None:
+        return yaml.safe_dump(data, sort_keys=True)
+
+    lines = []
+    for profile_name in sorted(data):
+        lines.append(f"{profile_name}:")
+        for key, value in data[profile_name].items():
+            lines.append(f"  {key}: {value}")
+    return "\n".join(lines) + ("\n" if lines else "")
 
 def _validate_profiles(data: Any) -> Dict[str, Dict[str, str]]:
     """Validate the YAML structure used by the profiles file."""
@@ -57,7 +101,7 @@ def _validate_profiles(data: Any) -> Dict[str, Dict[str, str]]:
 def _dump_profiles_yaml(data: Dict[str, Dict[str, str]]) -> str:
     """Serialize profiles to YAML using PyYAML."""
     validated_profiles = _validate_profiles(data)
-    return yaml.safe_dump(validated_profiles, sort_keys=True)
+    return _safe_dump_yaml(validated_profiles)
 
 
 def load_profiles(path: Optional[Path] = None) -> Dict[str, Dict[str, str]]:
@@ -66,7 +110,7 @@ def load_profiles(path: Optional[Path] = None) -> Dict[str, Dict[str, str]]:
     if not profiles_path.exists():
         return {}
     with profiles_path.open("r", encoding="utf-8") as profiles_file:
-        return _validate_profiles(yaml.safe_load(profiles_file))
+        return _validate_profiles(_safe_load_yaml(profiles_file.read()))
 
 
 def save_profiles(data: Dict[str, Dict[str, str]], path: Optional[Path] = None) -> None:

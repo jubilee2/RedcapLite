@@ -91,9 +91,10 @@ The `rcl` command now includes an interactive access workflow plus the Phase 2 m
 
 Use `rcl access <profile>` to create or update a stored REDCap connection profile. The command will:
 
-- prompt for the REDCap API URL and create the profile when it does not already exist
-- prompt for the REDCap API token
-- validate the token before saving it
+- load the named profile from config and prompt for the REDCap API URL when the profile does not already exist
+- save a newly entered profile URL before collecting credentials
+- ask before replacing an existing stored token
+- prompt for the REDCap API token securely and validate it before saving it
 - store profile details in a PyYAML-managed `profiles.yml` file and save the token through the OS secret store when available (service `rcl`, account = profile name), falling back to the local `redcaplite` config directory only when no system keyring backend is installed
 
 Example:
