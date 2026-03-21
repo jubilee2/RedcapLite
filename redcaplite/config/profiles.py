@@ -66,13 +66,13 @@ def _parse_profiles_yaml(text: str) -> Dict[str, Dict[str, str]]:
         key, value = stripped.split(":", 1)
         profiles[current_name][key.strip()] = _strip_yaml_scalar(value)
 
+    validated_profiles: Dict[str, Dict[str, str]] = {}
     for name, details in profiles.items():
         url = details.get("url")
         if not isinstance(url, str) or not url:
             raise ValueError(f'Profile "{name}" must include a non-empty string "url" value.')
-        profiles[name] = {"url": url}
-
-    return profiles
+        validated_profiles[name] = {"url": url}
+    return validated_profiles
 
 
 def _dump_profiles_yaml(data: Dict[str, Dict[str, str]]) -> str:
