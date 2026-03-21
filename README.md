@@ -94,7 +94,7 @@ Use `rcl access <profile>` to create or update a stored REDCap connection profil
 - prompt for the REDCap API URL and create the profile when it does not already exist
 - prompt for the REDCap API token
 - validate the token before saving it
-- store profile details in a PyYAML-managed `profiles.yml` file and the token under the OS-specific `redcaplite` config directory (for example `~/.config/redcaplite/` on Linux)
+- store profile details in a PyYAML-managed `profiles.yml` file and save the token through the OS secret store when available (service `rcl`, account = profile name), falling back to the local `redcaplite` config directory only when no system keyring backend is installed
 
 Example:
 
