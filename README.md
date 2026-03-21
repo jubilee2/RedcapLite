@@ -83,9 +83,9 @@ except Exception as e:
 
 ```
 
-## CLI Setup (Phase 1)
+## CLI Setup (Phase 2)
 
-The `rcl` command now includes a Phase 1 interactive access workflow plus a metadata command skeleton.
+The `rcl` command now includes an interactive access workflow plus the Phase 2 metadata command tree.
 
 ### Access profiles
 
@@ -102,19 +102,19 @@ Example:
 rcl access data_project
 ```
 
-### Metadata command skeleton
+### Metadata command tree
 
-Phase 1 also reserves the metadata command layout that later phases will fill in:
+Phase 2 exposes the metadata command tree so the packaged `rcl` executable can parse the full workflow shape while later phases fill in the behavior:
 
 ```sh
 rcl <profile> metadata list-fields
 rcl <profile> metadata show-field <field_name>
-rcl <profile> metadata add-field <field_name> <form_name>
-rcl <profile> metadata edit-field <field_name>
-rcl <profile> metadata remove-field <field_name>
+rcl <profile> metadata add-field <field_name> <form_name> [flags]
+rcl <profile> metadata edit-field <field_name> [flags]
+rcl <profile> metadata remove-field <field_name> [--yes]
 ```
 
-In this phase, the metadata subcommands are placeholders so the CLI structure is available before the implementation lands.
+In this phase, the metadata subcommands are still placeholders, but the command parser now accepts the planned arguments and flags for future implementations.
 
 ## Detailed Usage
 
