@@ -155,7 +155,7 @@ def run_add_field(
         return 1
 
     print("Preview of field to add:")
-    print(json.dumps({key: value for key, value in row.items()}, indent=2, sort_keys=True))
+    print(json.dumps(row, indent=2, sort_keys=True))
 
     if not assume_yes and not prompt_confirm(
         f'Import metadata to add field "{field_name}" to form "{form_name}"? [y/N]: '
