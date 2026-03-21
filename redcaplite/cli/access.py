@@ -64,6 +64,12 @@ def run_access(
     else:
         print(f"Profile: {profile.name}")
         print(f"URL: {profile.url}")
+        if prompt_confirm("Update URL? [y/N]: "):
+            url = _prompt_for_url()
+            if url:
+                profile.url = url
+                active_profile_store.upsert(profile)
+                print(f'Profile "{profile_name}" URL updated.')
 
     if active_token_store.has_token(profile_name):
         print(f'Access already exists for "{profile_name}".')
