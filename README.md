@@ -108,17 +108,23 @@ rcl access data_project
 
 ### Metadata command tree
 
-Phase 2 exposes the metadata command tree so the packaged `rcl` executable can parse the full workflow shape while later phases fill in the behavior:
+The CLI now supports safe read-only metadata inspection commands, while the write-oriented metadata workflows remain placeholders for a later phase:
 
 ```sh
-rcl <profile> metadata list-fields
+rcl <profile> metadata list-fields [--form <form_name>]
 rcl <profile> metadata show-field <field_name>
 rcl <profile> metadata add-field <field_name> <form_name> [flags]
 rcl <profile> metadata edit-field <field_name> [flags]
 rcl <profile> metadata remove-field <field_name> [--yes]
 ```
 
-In this phase, the metadata subcommands are still placeholders, but the command parser now accepts the planned arguments and flags for future implementations.
+Available today:
+
+- `metadata list-fields` prints a read-only table of `field_name`, `form_name`, `field_type`, and `field_label`
+- `metadata list-fields --form demographics` limits the table to one REDCap form
+- `metadata show-field age` prints the full metadata record for a single field as formatted JSON
+
+The remaining metadata subcommands still return a placeholder message until the editing phases are implemented.
 
 ## Detailed Usage
 
