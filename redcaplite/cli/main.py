@@ -2,73 +2,23 @@
 
 from __future__ import annotations
 
-import argparse
 import sys
 from importlib.metadata import PackageNotFoundError, version
-from typing import Optional, Sequence
+from argparse import Namespace
+from typing import Callable, Optional, Sequence
 
 from .access import AccessCommand
-from .metadata import add_metadata_parser
+from .metadata import run_add_field, run_edit_field, run_list_fields, run_remove_field, run_show_field
 from .output import print_error
+from .parsers import (
+    build_access_parser,
+    build_parser,
+    build_profile_parser,
+    build_root_parser,
+    print_root_help,
+)
 
-
-class RootArgumentParser(argparse.ArgumentParser):
-    """Argument parser that raises instead of exiting."""
-
-    def error(self, message: str) -> None:
-        raise ValueError(message)
-
-
-class ProfileArgumentParser(argparse.ArgumentParser):
-    """Argument parser for profile-scoped commands."""
-
-    def error(self, message: str) -> None:
-        raise ValueError(message)
-
-
-
-def build_root_parser() -> argparse.ArgumentParser:
-    """Create the top-level parser for global flags and the access command."""
-    parser = RootArgumentParser(
-        prog="rcl",
-        description="Command-line interface for the redcaplite package.",
-        add_help=False,
-    )
-    parser.add_argument("--version", action="store_true", help="Show the CLI version and exit.")
-    parser.add_argument("-h", "--help", action="store_true", help="Show this help message and exit.")
-    return parser
-
-
-
-
-def build_parser() -> argparse.ArgumentParser:
-    """Backward-compatible alias for the root parser."""
-    return build_root_parser()
-
-
-def build_access_parser() -> argparse.ArgumentParser:
-    """Create the parser for ``rcl access``."""
-    parser = argparse.ArgumentParser(
-        prog="rcl access",
-        description="Create or update stored access for a REDCap profile.",
-    )
-    parser.add_argument("profile", help="Profile name.")
-    parser.set_defaults(handler=AccessCommand().run)
-    return parser
-
-
-
-def build_profile_parser(profile: str) -> argparse.ArgumentParser:
-    """Create the parser for profile-scoped commands."""
-    parser = ProfileArgumentParser(
-        prog=f"rcl {profile}",
-        description=f"Run commands against the \"{profile}\" REDCap profile.",
-    )
-    subparsers = parser.add_subparsers(dest="command")
-    subparsers.required = True
-    add_metadata_parser(subparsers)
-    return parser
-
+RouteHandler = Callable[[Namespace], int]
 
 
 def get_version() -> str:
@@ -80,24 +30,58 @@ def get_version() -> str:
 
 
 
-def _print_root_help() -> None:
-    """Print concise root help for the dynamic CLI shape."""
-    print("usage: rcl [--help] [--version] access <profile>")
-    print("       rcl <profile> metadata list-fields")
-    print("       rcl <profile> metadata show-field <field_name>")
-    print("       rcl <profile> metadata add-field <field_name> <form_name> [flags]")
-    print("       rcl <profile> metadata edit-field <field_name> [flags]")
-    print("       rcl <profile> metadata remove-field <field_name> [--yes]")
+def _run_access(args: Namespace) -> int:
+    """Execute the access workflow for parsed CLI arguments."""
+    return AccessCommand().run(args)
+
+
+
+def _run_metadata_list_fields(args: Namespace) -> int:
+    """Execute ``metadata list-fields`` for parsed CLI arguments."""
+    return run_list_fields(args.profile, args.form_name)
+
+
+
+def _run_metadata_show_field(args: Namespace) -> int:
+    """Execute ``metadata show-field`` for parsed CLI arguments."""
+    return run_show_field(args.profile, args.field_name)
+
+
+
+def _run_metadata_add_field(args: Namespace) -> int:
+    """Execute ``metadata add-field`` for parsed CLI arguments."""
+    return run_add_field(args.profile, args.field_name, args.form_name, args.field_flags)
+
+
+
+def _run_metadata_edit_field(args: Namespace) -> int:
+    """Execute ``metadata edit-field`` for parsed CLI arguments."""
+    return run_edit_field(args.profile, args.field_name, args.field_flags)
+
+
+
+def _run_metadata_remove_field(args: Namespace) -> int:
+    """Execute ``metadata remove-field`` for parsed CLI arguments."""
+    return run_remove_field(args.profile, args.field_name, args.yes)
+
+
+ROUTE_HANDLERS: dict[str, RouteHandler] = {
+    "access": _run_access,
+    "metadata_list_fields": _run_metadata_list_fields,
+    "metadata_show_field": _run_metadata_show_field,
+    "metadata_add_field": _run_metadata_add_field,
+    "metadata_edit_field": _run_metadata_edit_field,
+    "metadata_remove_field": _run_metadata_remove_field,
+}
 
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     """Run the ``rcl`` CLI."""
     args_list = list(sys.argv[1:] if argv is None else argv)
-    root_parser = build_root_parser()
 
     try:
-        known_args, _ = root_parser.parse_known_args(args_list)
+        known_args, _ = build_root_parser().parse_known_args(args_list)
     except ValueError as exc:
         print_error(str(exc))
         return 1
@@ -107,24 +91,26 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return 0
 
     if known_args.help or not args_list:
-        _print_root_help()
+        print_root_help()
         return 0
 
-    if args_list[0] == "access":
-        parser = build_access_parser()
-        parsed_args = parser.parse_args(args_list[1:])
-        return parsed_args.handler(parsed_args)
+    is_access_command = args_list[0] == "access"
+    parser = build_access_parser() if is_access_command else build_profile_parser(args_list[0])
 
-    profile = args_list[0]
-    parser = build_profile_parser(profile)
     try:
         parsed_args = parser.parse_args(args_list[1:])
     except ValueError as exc:
         print_error(str(exc))
         return 1
 
-    setattr(parsed_args, "profile", profile)
-    return parsed_args.handler(parsed_args)
+    if not is_access_command:
+        setattr(parsed_args, "profile", args_list[0])
+
+    route = getattr(parsed_args, "route", None)
+    if route is None:
+        print_error("no command selected")
+        return 1
+    return ROUTE_HANDLERS[route](parsed_args)
 
 
 if __name__ == "__main__":

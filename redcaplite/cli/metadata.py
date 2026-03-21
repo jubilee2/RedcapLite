@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import json
 from types import SimpleNamespace
 from typing import Any
@@ -27,67 +26,6 @@ from .prompts import confirm
 
 prompt_confirm = confirm
 
-_METADATA_SUBCOMMANDS = (
-    "list-fields",
-    "show-field",
-    "add-field",
-    "edit-field",
-    "remove-field",
-)
-
-
-def add_metadata_parser(subparsers: argparse._SubParsersAction) -> None:
-    """Register the metadata command group and available subcommands."""
-    metadata_parser = subparsers.add_parser(
-        "metadata",
-        help="Inspect and edit project metadata.",
-    )
-    metadata_subparsers = metadata_parser.add_subparsers(dest="metadata_command")
-    metadata_subparsers.required = True
-
-    for name in _METADATA_SUBCOMMANDS:
-        command_parser = metadata_subparsers.add_parser(name)
-        if name == "list-fields":
-            command_parser.add_argument(
-                "--form",
-                dest="form_name",
-                help="Limit results to a single REDCap form name.",
-            )
-            command_parser.set_defaults(handler=_handle_list_fields)
-            continue
-        if name == "show-field":
-            command_parser.add_argument("field_name")
-            command_parser.set_defaults(handler=_handle_show_field)
-            continue
-        if name in {"edit-field", "remove-field"}:
-            command_parser.add_argument("field_name")
-        if name == "add-field":
-            command_parser.add_argument("field_name")
-            command_parser.add_argument("form_name")
-            command_parser.add_argument(
-                "field_flags",
-                nargs=argparse.REMAINDER,
-                help="Additional field configuration flags.",
-            )
-            command_parser.set_defaults(handler=_handle_add_field)
-            continue
-        if name == "edit-field":
-            command_parser.add_argument(
-                "field_flags",
-                nargs=argparse.REMAINDER,
-                help="Additional field configuration flags.",
-            )
-            command_parser.set_defaults(handler=_handle_edit_field)
-            continue
-        if name == "remove-field":
-            command_parser.add_argument(
-                "--yes",
-                action="store_true",
-                help="Skip the removal confirmation prompt.",
-            )
-            command_parser.set_defaults(handler=_handle_remove_field)
-            continue
-        command_parser.set_defaults(handler=_not_implemented)
 
 
 def run_list_fields(profile: str, form: str | None) -> int:
@@ -214,26 +152,6 @@ def run_edit_field(profile: str, field_name: str, field_flags: list[str]) -> int
     return 0
 
 
-def _handle_list_fields(args: argparse.Namespace) -> int:
-    """CLI handler for ``metadata list-fields``."""
-    return run_list_fields(args.profile, args.form_name)
-
-
-def _handle_show_field(args: argparse.Namespace) -> int:
-    """CLI handler for ``metadata show-field``."""
-    return run_show_field(args.profile, args.field_name)
-
-
-def _handle_add_field(args: argparse.Namespace) -> int:
-    """CLI handler for ``metadata add-field``."""
-    return run_add_field(args.profile, args.field_name, args.form_name, args.field_flags)
-
-
-def _handle_edit_field(args: argparse.Namespace) -> int:
-    """CLI handler for ``metadata edit-field``."""
-    return run_edit_field(args.profile, args.field_name, args.field_flags)
-
-
 def run_remove_field(profile: str, field_name: str, assume_yes: bool = False) -> int:
     """Remove a single metadata field row and import the updated metadata."""
     try:
@@ -256,11 +174,6 @@ def run_remove_field(profile: str, field_name: str, assume_yes: bool = False) ->
     client.import_metadata(updated_metadata, format="csv")
     print_success(f'Removed field "{field_name}".')
     return 0
-
-
-def _handle_remove_field(args: argparse.Namespace) -> int:
-    """CLI handler for ``metadata remove-field``."""
-    return run_remove_field(args.profile, args.field_name, assume_yes=args.yes)
 
 
 def _ensure_metadata_frame(metadata: Any) -> pd.DataFrame:
@@ -305,11 +218,3 @@ def _build_change_preview(
         }
     return preview
 
-
-def _not_implemented(args: argparse.Namespace) -> int:
-    """Return a friendly placeholder for unfinished metadata commands."""
-    print_error(
-        f'metadata command "{args.metadata_command}" is not implemented yet.',
-        "Phase 2 wires the CLI command tree; behavior will follow in a later phase.",
-    )
-    return 1
