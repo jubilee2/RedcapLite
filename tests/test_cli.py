@@ -19,6 +19,33 @@ class FakeClient:
         return "14.0.0"
 
 
+class MetadataClient(FakeClient):
+    def __init__(self, url: str, token: str) -> None:
+        super().__init__(url, token)
+        self._metadata = [
+            {
+                "field_name": "record_id",
+                "form_name": "enrollment",
+                "field_type": "text",
+                "field_label": "Record ID",
+                "required_field": "y",
+            },
+            {
+                "field_name": "age",
+                "form_name": "demographics",
+                "field_type": "text",
+                "field_label": "Age",
+                "required_field": "",
+            },
+        ]
+
+    def get_metadata(self, format: str = "csv"):
+        import pandas as pd
+
+        assert format == "csv"
+        return pd.DataFrame(self._metadata)
+
+
 class FailingClient(FakeClient):
     def get_version(self) -> str:
         raise RuntimeError("bad token")
@@ -97,6 +124,17 @@ def test_build_profile_parser_supports_metadata_group() -> None:
     assert parsed.command == "metadata"
     assert parsed.metadata_command == "list-fields"
 
+
+
+
+
+def test_build_profile_parser_supports_metadata_list_fields_form_filter() -> None:
+    parser = build_profile_parser("demo")
+
+    parsed = parser.parse_args(["metadata", "list-fields", "--form", "demographics"])
+
+    assert parsed.metadata_command == "list-fields"
+    assert parsed.form_name == "demographics"
 
 
 def test_build_profile_parser_supports_metadata_add_field_flags() -> None:
@@ -191,12 +229,43 @@ def test_access_command_rejects_invalid_token(tmp_path, monkeypatch, capsys) -> 
 
 
 
-def test_main_metadata_placeholder_returns_error(capsys) -> None:
-    assert main(["demo", "metadata", "list-fields"]) == 1
+
+
+def test_main_metadata_list_fields_prints_table(tmp_path, monkeypatch, capsys) -> None:
+    profile_store = ProfileStore(tmp_path)
+    token_store = TokenStore(tmp_path)
+    profile_store.upsert(Profile(name="demo", url="https://redcap.example.edu/api/"))
+    token_store.save_token("demo", "secret-token")
+    monkeypatch.setattr("redcaplite.cli.metadata.build_client", lambda profile: MetadataClient("https://redcap.example.edu/api/", "secret-token"))
+
+    assert main(["demo", "metadata", "list-fields", "--form", "demographics"]) == 0
 
     captured = capsys.readouterr()
-    assert 'metadata command "list-fields" is not implemented yet.' in captured.err
+    assert "field_name" in captured.out
+    assert "age" in captured.out
+    assert "demographics" in captured.out
+    assert captured.err == ""
+
+
+def test_main_metadata_add_field_placeholder_returns_error(capsys) -> None:
+    assert main(["demo", "metadata", "add-field", "age", "demographics"]) == 1
+
+    captured = capsys.readouterr()
+    assert 'metadata command "add-field" is not implemented yet.' in captured.err
     assert "Phase 2 wires the CLI command tree" in captured.err
+
+
+
+
+def test_main_metadata_show_field_prints_json(monkeypatch, capsys) -> None:
+    monkeypatch.setattr("redcaplite.cli.metadata.build_client", lambda profile: MetadataClient("https://redcap.example.edu/api/", "secret-token"))
+
+    assert main(["demo", "metadata", "show-field", "age"]) == 0
+
+    captured = capsys.readouterr()
+    assert '"field_name": "age"' in captured.out
+    assert '"form_name": "demographics"' in captured.out
+    assert captured.err == ""
 
 
 def test_run_access_rejects_invalid_url(tmp_path, monkeypatch, capsys) -> None:
