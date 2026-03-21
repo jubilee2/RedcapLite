@@ -87,6 +87,8 @@ except Exception as e:
 
 The `rcl` command now includes an interactive access workflow plus the Phase 2 metadata command tree.
 
+Internally, CLI commands can now share a single bootstrap helper, `redcaplite.cli.helpers.build_client(profile_name)`, to load the saved profile URL, load the stored token, raise typed `ProfileNotFoundError` or `TokenNotFoundError` exceptions when access is incomplete, and return a ready `RedcapClient` instance for metadata workflows.
+
 ### Access profiles
 
 Use `rcl access <profile>` to create or update a stored REDCap connection profile. The command will:

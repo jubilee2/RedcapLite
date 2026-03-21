@@ -1,8 +1,11 @@
 from argparse import Namespace
 
+import pytest
+
 from redcaplite.auth import TokenStore
 from redcaplite.cli import access as access_module
 from redcaplite.cli.access import AccessCommand
+from redcaplite.cli.helpers import ProfileNotFoundError, TokenNotFoundError, build_client
 from redcaplite.cli.main import build_parser, build_profile_parser, main
 from redcaplite.config import Profile, ProfileStore
 
@@ -19,6 +22,54 @@ class FakeClient:
 class FailingClient(FakeClient):
     def get_version(self) -> str:
         raise RuntimeError("bad token")
+
+
+def test_build_client_returns_ready_client(tmp_path) -> None:
+    profile_store = ProfileStore(tmp_path)
+    token_store = TokenStore(tmp_path)
+    profile_store.upsert(Profile(name="demo", url="https://redcap.example.edu/api/"))
+    token_store.save_token("demo", "secret-token")
+
+    client = build_client(
+        "demo",
+        profile_store=profile_store,
+        token_store=token_store,
+        client_factory=FakeClient,
+    )
+
+    assert isinstance(client, FakeClient)
+    assert client.url == "https://redcap.example.edu/api/"
+    assert client.token == "secret-token"
+
+
+def test_build_client_errors_when_profile_is_missing(tmp_path) -> None:
+    token_store = TokenStore(tmp_path)
+    token_store.save_token("demo", "secret-token")
+
+    with pytest.raises(ProfileNotFoundError) as exc_info:
+        build_client(
+            "demo",
+            profile_store=ProfileStore(tmp_path),
+            token_store=token_store,
+            client_factory=FakeClient,
+        )
+
+    assert 'Profile "demo" was not found.' in str(exc_info.value)
+
+
+def test_build_client_errors_when_token_is_missing(tmp_path) -> None:
+    profile_store = ProfileStore(tmp_path)
+    profile_store.upsert(Profile(name="demo", url="https://redcap.example.edu/api/"))
+
+    with pytest.raises(TokenNotFoundError) as exc_info:
+        build_client(
+            "demo",
+            profile_store=profile_store,
+            token_store=TokenStore(tmp_path),
+            client_factory=FakeClient,
+        )
+
+    assert 'Access token for profile "demo" was not found.' in str(exc_info.value)
 
 
 
@@ -129,6 +180,7 @@ def test_access_command_rejects_invalid_token(tmp_path, monkeypatch, capsys) -> 
         token_store=token_store,
         client_factory=FailingClient,
     )
+    monkeypatch.setattr("redcaplite.cli.access.prompt_confirm", lambda _: False)
     monkeypatch.setattr("redcaplite.cli.access.prompt_secret", lambda _: "bad-token")
 
     assert command.run(Namespace(profile="demo")) == 1
@@ -194,7 +246,8 @@ def test_run_access_updates_existing_profile_token(tmp_path, monkeypatch, capsys
     token_store = TokenStore(tmp_path)
     profile_store.upsert(Profile(name="demo", url="https://redcap.example.edu/api/"))
     token_store.save_token("demo", "existing-token")
-    monkeypatch.setattr("redcaplite.cli.access.prompt_confirm", lambda _: True)
+    prompt_answers = iter([False, True])
+    monkeypatch.setattr("redcaplite.cli.access.prompt_confirm", lambda _: next(prompt_answers))
     monkeypatch.setattr("redcaplite.cli.access.prompt_secret", lambda _: "new-token")
 
     assert (
