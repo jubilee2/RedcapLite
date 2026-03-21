@@ -17,6 +17,7 @@ from redcaplite.metadata_ops.transform import (
 from redcaplite.metadata_ops.validate import (
     ensure_field_exists,
     ensure_field_missing,
+    validate_choice_field_config,
     validate_field_type,
 )
 
@@ -127,6 +128,49 @@ def test_build_new_field_row_uses_defaults_and_ignores_cli_only_fields() -> None
     }
 
 
+def test_build_new_field_row_requires_choices_for_choice_types() -> None:
+    args = Namespace(
+        field_name="favorite_color",
+        form_name="demographics",
+        field_type="radio",
+        field_label="Favorite Color",
+    )
+
+    with pytest.raises(ValueError) as exc_info:
+        build_new_field_row(args)
+
+    assert (
+        'Field type "radio" requires non-empty "select_choices_or_calculations".'
+        == str(exc_info.value)
+    )
+
+
+def test_update_field_requires_choices_when_switching_to_choice_type(metadata_frame: pd.DataFrame) -> None:
+    with pytest.raises(ValueError) as exc_info:
+        update_field(metadata_frame, "age", {"field_type": "radio"})
+
+    assert (
+        'Field type "radio" requires non-empty "select_choices_or_calculations".'
+        == str(exc_info.value)
+    )
+
+
+def test_update_field_allows_existing_choices_for_choice_type(metadata_frame: pd.DataFrame) -> None:
+    metadata_with_choices = metadata_frame.copy()
+    metadata_with_choices.loc[metadata_with_choices["field_name"] == "age", "field_type"] = "radio"
+    metadata_with_choices.loc[
+        metadata_with_choices["field_name"] == "age",
+        "select_choices_or_calculations",
+    ] = "1, Yes | 0, No"
+
+    updated = update_field(metadata_with_choices, "age", {"field_label": "Participant Age"})
+
+    field = find_field(updated, "age")
+    assert field["field_label"] == "Participant Age"
+    assert field["select_choices_or_calculations"] == "1, Yes | 0, No"
+
+
+
 
 def test_append_field_adds_new_row(metadata_frame: pd.DataFrame) -> None:
     row = {
@@ -174,7 +218,11 @@ def test_update_field_normalizes_field_type_and_rename(metadata_frame: pd.DataFr
     updated = update_field(
         metadata_frame,
         "age",
-        {"field_name": "participant_age", "field_type": "RADIO"},
+        {
+            "field_name": "participant_age",
+            "field_type": "RADIO",
+            "select_choices_or_calculations": "1, Yes | 0, No",
+        },
     )
 
     field = find_field(updated, "participant_age")
@@ -208,6 +256,29 @@ def test_validate_field_type_rejects_unknown_values() -> None:
         validate_field_type("number")
 
     assert 'Unsupported field type "number".' in str(exc_info.value)
+
+
+def test_validate_choice_field_config_accepts_non_choice_types_without_choices() -> None:
+    validate_choice_field_config("text", {})
+
+
+def test_validate_choice_field_config_rejects_missing_choices() -> None:
+    with pytest.raises(ValueError) as exc_info:
+        validate_choice_field_config("dropdown", {})
+
+    assert (
+        'Field type "dropdown" requires non-empty "select_choices_or_calculations".'
+        == str(exc_info.value)
+    )
+
+
+def test_validate_choice_field_config_uses_existing_choices_when_available() -> None:
+    validate_choice_field_config(
+        "checkbox",
+        {"field_label": "Symptoms"},
+        existing_row={"select_choices_or_calculations": "1, Cough | 2, Fever"},
+    )
+
 
 
 

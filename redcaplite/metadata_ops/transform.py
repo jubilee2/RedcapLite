@@ -6,7 +6,12 @@ from typing import Any
 
 import pandas as pd
 
-from .validate import ensure_field_exists, ensure_field_missing, validate_field_type
+from .validate import (
+    ensure_field_exists,
+    ensure_field_missing,
+    validate_choice_field_config,
+    validate_field_type,
+)
 
 _REQUIRED_COLUMNS = (
     "field_name",
@@ -111,6 +116,7 @@ def build_new_field_row(args: Any) -> dict[str, Any]:
             continue
         row[key] = value
 
+    validate_choice_field_config(field_type, row)
     return row
 
 
@@ -135,9 +141,14 @@ def update_field(df: pd.DataFrame, field_name: str, patch: dict[str, Any]) -> pd
     if isinstance(new_field_name, str) and new_field_name != field_name:
         ensure_field_missing(updated.loc[updated["field_name"] != field_name], new_field_name)
 
+    original_field = find_field(updated, field_name)
+
     if "field_type" in patch and patch["field_type"] is not None:
         validate_field_type(str(patch["field_type"]))
         patch = {**patch, "field_type": str(patch["field_type"]).strip().lower()}
+
+    effective_field_type = str(patch.get("field_type", original_field["field_type"]))
+    validate_choice_field_config(effective_field_type, patch, existing_row=original_field)
 
     field_mask = updated["field_name"] == field_name
     for column, value in patch.items():
