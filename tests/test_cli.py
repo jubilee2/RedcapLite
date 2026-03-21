@@ -306,6 +306,76 @@ def test_main_metadata_show_field_prints_json(monkeypatch, capsys) -> None:
     assert captured.err == ""
 
 
+def test_main_metadata_edit_field_imports_changed_values_only(monkeypatch, capsys) -> None:
+    client = MetadataClient("https://redcap.example.edu/api/", "secret-token")
+    monkeypatch.setattr("redcaplite.cli.metadata.build_client", lambda profile: client)
+
+    assert main([
+        "demo",
+        "metadata",
+        "edit-field",
+        "age",
+        "--field-label",
+        "Participant Age",
+        "--required-field",
+        "--yes",
+    ]) == 0
+
+    captured = capsys.readouterr()
+    assert "Preview of field changes:" in captured.out
+    assert '"field_label": {' in captured.out
+    assert '"from": "Age"' in captured.out
+    assert '"to": "Participant Age"' in captured.out
+    assert '"required_field": {' in captured.out
+    assert '"field_name"' not in captured.out
+    assert 'Updated field "age".' in captured.out
+    assert client.imported_format == "csv"
+    assert client.imported_metadata is not None
+    updated_age = client.imported_metadata.loc[client.imported_metadata["field_name"] == "age"].iloc[0]
+    assert updated_age["field_label"] == "Participant Age"
+    assert updated_age["required_field"] == "y"
+    assert captured.err == ""
+
+
+def test_main_metadata_edit_field_warns_for_type_changes(monkeypatch, capsys) -> None:
+    client = MetadataClient("https://redcap.example.edu/api/", "secret-token")
+    monkeypatch.setattr("redcaplite.cli.metadata.build_client", lambda profile: client)
+
+    assert main(["demo", "metadata", "edit-field", "age", "--field-type", "radio", "--yes"]) == 0
+
+    captured = capsys.readouterr()
+    assert "Warning: changing field_type may require additional REDCap metadata updates." in captured.out
+    updated_age = client.imported_metadata.loc[client.imported_metadata["field_name"] == "age"].iloc[0]
+    assert updated_age["field_type"] == "radio"
+
+
+def test_main_metadata_edit_field_prompts_before_import(monkeypatch, capsys) -> None:
+    client = MetadataClient("https://redcap.example.edu/api/", "secret-token")
+    monkeypatch.setattr("redcaplite.cli.metadata.build_client", lambda profile: client)
+    monkeypatch.setattr("redcaplite.cli.metadata.prompt_confirm", lambda prompt: False)
+
+    assert main(["demo", "metadata", "edit-field", "age", "--field-label", "Participant Age"]) == 1
+
+    captured = capsys.readouterr()
+    assert "Preview of field changes:" in captured.out
+    assert "Error: cancelled by user." in captured.err
+    assert client.imported_metadata is None
+
+
+def test_main_metadata_edit_field_requires_patch_flags(monkeypatch, capsys) -> None:
+    client = MetadataClient("https://redcap.example.edu/api/", "secret-token")
+    monkeypatch.setattr("redcaplite.cli.metadata.build_client", lambda profile: client)
+
+    assert main(["demo", "metadata", "edit-field", "age"]) == 1
+
+    captured = capsys.readouterr()
+    assert (
+        "Error: No metadata changes were provided. Pass at least one --flag to update."
+        in captured.err
+    )
+    assert client.imported_metadata is None
+
+
 def test_run_access_rejects_invalid_url(tmp_path, monkeypatch, capsys) -> None:
     profile_store = ProfileStore(tmp_path)
     token_store = TokenStore(tmp_path)
