@@ -26,6 +26,7 @@ def test_main_without_args_prints_help(capsys) -> None:
 
     captured = capsys.readouterr()
     assert "usage: rcl" in captured.out
+    assert "rcl <profile> metadata add-field <field_name> <form_name> [flags]" in captured.out
 
 
 
@@ -43,6 +44,54 @@ def test_build_profile_parser_supports_metadata_group() -> None:
 
     assert parsed.command == "metadata"
     assert parsed.metadata_command == "list-fields"
+
+
+
+def test_build_profile_parser_supports_metadata_add_field_flags() -> None:
+    parser = build_profile_parser("demo")
+
+    parsed = parser.parse_args(
+        [
+            "metadata",
+            "add-field",
+            "age",
+            "demographics",
+            "--field-type",
+            "text",
+            "--field-label",
+            "Age",
+        ]
+    )
+
+    assert parsed.command == "metadata"
+    assert parsed.metadata_command == "add-field"
+    assert parsed.field_name == "age"
+    assert parsed.form_name == "demographics"
+    assert parsed.field_flags == ["--field-type", "text", "--field-label", "Age"]
+
+
+
+def test_build_profile_parser_supports_metadata_edit_field_flags() -> None:
+    parser = build_profile_parser("demo")
+
+    parsed = parser.parse_args(
+        ["metadata", "edit-field", "age", "--field-label", "Participant age"]
+    )
+
+    assert parsed.metadata_command == "edit-field"
+    assert parsed.field_name == "age"
+    assert parsed.field_flags == ["--field-label", "Participant age"]
+
+
+
+def test_build_profile_parser_supports_metadata_remove_field_confirmation_flag() -> None:
+    parser = build_profile_parser("demo")
+
+    parsed = parser.parse_args(["metadata", "remove-field", "age", "--yes"])
+
+    assert parsed.metadata_command == "remove-field"
+    assert parsed.field_name == "age"
+    assert parsed.yes is True
 
 
 
@@ -94,3 +143,4 @@ def test_main_metadata_placeholder_returns_error(capsys) -> None:
 
     captured = capsys.readouterr()
     assert 'metadata command "list-fields" is not implemented yet.' in captured.err
+    assert "Phase 2 wires the CLI command tree" in captured.err

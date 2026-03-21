@@ -15,9 +15,8 @@ _METADATA_SUBCOMMANDS = (
 )
 
 
-
 def add_metadata_parser(subparsers: argparse._SubParsersAction) -> None:
-    """Register the metadata command group and Phase 1 subcommands."""
+    """Register the metadata command group and placeholder subcommands."""
     metadata_parser = subparsers.add_parser(
         "metadata",
         help="Inspect and edit project metadata.",
@@ -32,6 +31,23 @@ def add_metadata_parser(subparsers: argparse._SubParsersAction) -> None:
         if name == "add-field":
             command_parser.add_argument("field_name")
             command_parser.add_argument("form_name")
+            command_parser.add_argument(
+                "field_flags",
+                nargs=argparse.REMAINDER,
+                help="Additional field configuration flags.",
+            )
+        if name == "edit-field":
+            command_parser.add_argument(
+                "field_flags",
+                nargs=argparse.REMAINDER,
+                help="Additional field configuration flags.",
+            )
+        if name == "remove-field":
+            command_parser.add_argument(
+                "--yes",
+                action="store_true",
+                help="Skip the removal confirmation prompt.",
+            )
         command_parser.set_defaults(handler=_not_implemented)
 
 
@@ -40,6 +56,6 @@ def _not_implemented(args: argparse.Namespace) -> int:
     """Return a friendly placeholder for unfinished metadata commands."""
     print_error(
         f'metadata command "{args.metadata_command}" is not implemented yet.',
-        "Phase 1 adds the command structure; behavior will follow in a later phase.",
+        "Phase 2 wires the CLI command tree; behavior will follow in a later phase.",
     )
     return 1

@@ -83,7 +83,11 @@ def get_version() -> str:
 def _print_root_help() -> None:
     """Print concise root help for the dynamic CLI shape."""
     print("usage: rcl [--help] [--version] access <profile>")
-    print("       rcl <profile> metadata <subcommand> ...")
+    print("       rcl <profile> metadata list-fields")
+    print("       rcl <profile> metadata show-field <field_name>")
+    print("       rcl <profile> metadata add-field <field_name> <form_name> [flags]")
+    print("       rcl <profile> metadata edit-field <field_name> [flags]")
+    print("       rcl <profile> metadata remove-field <field_name> [--yes]")
 
 
 
