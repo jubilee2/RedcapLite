@@ -4,18 +4,24 @@ from __future__ import annotations
 
 import argparse
 import json
+from types import SimpleNamespace
 from typing import Any, Iterable
 
 import pandas as pd
 
 from redcaplite.metadata_ops.transform import (
+    append_field,
+    build_new_field_row,
     filter_fields,
     find_field,
     metadata_to_records,
+    parse_field_flags,
 )
+from redcaplite.metadata_ops.validate import ensure_field_missing
 
 from .helpers import ClientBootstrapError, build_client
 from .output import print_error
+from .prompts import prompt_confirm
 
 _METADATA_SUBCOMMANDS = (
     "list-fields",
@@ -59,6 +65,8 @@ def add_metadata_parser(subparsers: argparse._SubParsersAction) -> None:
                 nargs=argparse.REMAINDER,
                 help="Additional field configuration flags.",
             )
+            command_parser.set_defaults(handler=_handle_add_field)
+            continue
         if name == "edit-field":
             command_parser.add_argument(
                 "field_flags",
@@ -121,6 +129,45 @@ def run_show_field(profile: str, field_name: str) -> int:
     return 0
 
 
+def run_add_field(
+    profile: str,
+    field_name: str,
+    form_name: str,
+    field_flags: list[str],
+) -> int:
+    """Append a new metadata field and import the updated metadata."""
+    assume_yes, metadata_flag_tokens = _split_confirmation_flag(field_flags)
+
+    try:
+        client = build_client(profile)
+        metadata = _ensure_metadata_frame(client.get_metadata(format="csv"))
+        ensure_field_missing(metadata, field_name)
+        row = build_new_field_row(
+            SimpleNamespace(
+                field_name=field_name,
+                form_name=form_name,
+                **parse_field_flags(metadata_flag_tokens),
+            )
+        )
+        updated_metadata = append_field(metadata, row)
+    except (ClientBootstrapError, TypeError, ValueError) as exc:
+        print_error(str(exc))
+        return 1
+
+    print("Preview of field to add:")
+    print(json.dumps(row, indent=2, sort_keys=True))
+
+    if not assume_yes and not prompt_confirm(
+        f'Import metadata to add field "{field_name}" to form "{form_name}"? [y/N]: '
+    ):
+        print_error("cancelled by user.")
+        return 1
+
+    client.import_metadata(updated_metadata, format="csv")
+    print(f'Added field "{field_name}" to form "{form_name}".')
+    return 0
+
+
 def _handle_list_fields(args: argparse.Namespace) -> int:
     """CLI handler for ``metadata list-fields``."""
     return run_list_fields(args.profile, args.form_name)
@@ -129,6 +176,11 @@ def _handle_list_fields(args: argparse.Namespace) -> int:
 def _handle_show_field(args: argparse.Namespace) -> int:
     """CLI handler for ``metadata show-field``."""
     return run_show_field(args.profile, args.field_name)
+
+
+def _handle_add_field(args: argparse.Namespace) -> int:
+    """CLI handler for ``metadata add-field``."""
+    return run_add_field(args.profile, args.field_name, args.form_name, args.field_flags)
 
 
 def _ensure_metadata_frame(metadata: Any) -> pd.DataFrame:
@@ -149,6 +201,13 @@ def _print_table(rows: Iterable[tuple[str, str, str, str]], headers: tuple[str, 
         print("  ".join(str(value).ljust(widths[index]) for index, value in enumerate(row)))
         if row_index == 0:
             print("  ".join("-" * width for width in widths))
+
+
+def _split_confirmation_flag(field_flags: list[str]) -> tuple[bool, list[str]]:
+    """Extract ``--yes`` from metadata add-field flag tokens."""
+    assume_yes = "--yes" in field_flags
+    remaining_flags = [token for token in field_flags if token != "--yes"]
+    return assume_yes, remaining_flags
 
 
 def _not_implemented(args: argparse.Namespace) -> int:
