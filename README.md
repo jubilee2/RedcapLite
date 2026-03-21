@@ -108,7 +108,7 @@ rcl access data_project
 
 ### Metadata command tree
 
-The CLI now supports metadata inspection plus the first write-oriented metadata workflow for adding a field:
+The CLI now supports metadata inspection plus add/edit/remove metadata write workflows:
 
 ```sh
 rcl <profile> metadata list-fields [--form <form_name>]
@@ -125,10 +125,11 @@ Available today:
 - `metadata show-field age` prints the full metadata record for a single field as formatted JSON
 - `metadata add-field age demographics [flags]` exports metadata, validates that the field is new, previews the generated row, confirms unless `--yes` is present, and re-imports the updated data dictionary
 - `metadata edit-field age [flags]` exports metadata, validates that the field exists, builds a patch from only the flags you pass, previews only the changed values, confirms unless `--yes` is present, and re-imports the updated data dictionary
+- `metadata remove-field age [--yes]` exports metadata, validates that the field exists, previews the exact row that will be deleted, confirms unless `--yes` is present, removes the row, and re-imports the updated data dictionary
 
-`metadata add-field` uses sensible defaults when flags are omitted: a generated title-cased label from the field name and the REDCap `text` field type. `metadata edit-field` updates only the columns you specify, so `rcl demo metadata edit-field age --field-label "Participant Age"` leaves all other metadata columns untouched. Additional metadata columns can be passed as CLI flags such as `--field-label "Participant Age"`, `--field-type radio`, or `--required-field`. Standalone flags without a value are imported as `"y"`. When `--field-type` is present during editing, the CLI validates the new type and prints a warning in the preview because REDCap field type changes can require follow-up metadata adjustments.
+`metadata add-field` uses sensible defaults when flags are omitted: a generated title-cased label from the field name and the REDCap `text` field type. `metadata edit-field` updates only the columns you specify, so `rcl demo metadata edit-field age --field-label "Participant Age"` leaves all other metadata columns untouched. Additional metadata columns can be passed as CLI flags such as `--field-label "Participant Age"`, `--field-type radio`, or `--required-field`. Standalone flags without a value are imported as `"y"`. When `--field-type` is present during editing, the CLI validates the new type and prints a warning in the preview because REDCap field type changes can require follow-up metadata adjustments. `metadata remove-field` follows the same safe export-preview-confirm-import flow, but deletes exactly one row by `field_name`.
 
-The remaining metadata subcommands still return a placeholder message until the later removal phases are implemented. Internally, `redcaplite.metadata_ops.transform` and `redcaplite.metadata_ops.validate` now provide the reusable add/edit/remove helpers for metadata write workflows, including CLI flag-to-row conversion, field-type validation, default label generation, and DataFrame-based append/update/remove helpers.
+Internally, `redcaplite.metadata_ops.transform` and `redcaplite.metadata_ops.validate` now provide the reusable add/edit/remove helpers for metadata write workflows, including CLI flag-to-row conversion, field-type validation, default label generation, and DataFrame-based append/update/remove helpers.
 
 ## Detailed Usage
 

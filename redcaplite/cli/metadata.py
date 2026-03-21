@@ -16,6 +16,7 @@ from redcaplite.metadata_ops.transform import (
     find_field,
     metadata_to_records,
     parse_field_flags,
+    remove_field,
     update_field,
 )
 from redcaplite.metadata_ops.validate import ensure_field_exists, ensure_field_missing, validate_field_type
@@ -82,6 +83,8 @@ def add_metadata_parser(subparsers: argparse._SubParsersAction) -> None:
                 action="store_true",
                 help="Skip the removal confirmation prompt.",
             )
+            command_parser.set_defaults(handler=_handle_remove_field)
+            continue
         command_parser.set_defaults(handler=_not_implemented)
 
 
@@ -225,6 +228,36 @@ def _handle_add_field(args: argparse.Namespace) -> int:
 def _handle_edit_field(args: argparse.Namespace) -> int:
     """CLI handler for ``metadata edit-field``."""
     return run_edit_field(args.profile, args.field_name, args.field_flags)
+
+
+def run_remove_field(profile: str, field_name: str, assume_yes: bool = False) -> int:
+    """Remove a single metadata field row and import the updated metadata."""
+    try:
+        client = build_client(profile)
+        metadata = _ensure_metadata_frame(client.get_metadata(format="csv"))
+        field = find_field(metadata, field_name)
+        updated_metadata = remove_field(metadata, field_name)
+    except (ClientBootstrapError, ValueError) as exc:
+        print_error(str(exc))
+        return 1
+
+    print("Preview of field to remove:")
+    print(json.dumps(field, indent=2, sort_keys=True))
+
+    if not assume_yes and not prompt_confirm(
+        f'Import metadata to remove field "{field_name}"? [y/N]: '
+    ):
+        print_error("cancelled by user.")
+        return 1
+
+    client.import_metadata(updated_metadata, format="csv")
+    print(f'Removed field "{field_name}".')
+    return 0
+
+
+def _handle_remove_field(args: argparse.Namespace) -> int:
+    """CLI handler for ``metadata remove-field``."""
+    return run_remove_field(args.profile, args.field_name, assume_yes=args.yes)
 
 
 def _ensure_metadata_frame(metadata: Any) -> pd.DataFrame:
