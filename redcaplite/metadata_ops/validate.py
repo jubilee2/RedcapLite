@@ -49,7 +49,7 @@ def ensure_field_missing(df: pd.DataFrame, field_name: str) -> None:
     """Ensure a metadata field does not already exist in the provided DataFrame."""
     _ensure_field_name_column(df)
     matches = df["field_name"] == field_name
-    if not bool(matches.any()):
+    if not matches.any():
         return
 
     raise ValueError(f'Metadata field "{field_name}" already exists.')
