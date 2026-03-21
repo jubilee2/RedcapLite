@@ -38,7 +38,7 @@ def ensure_field_exists(df: pd.DataFrame, field_name: str) -> None:
     """Ensure a metadata field exists in the provided DataFrame."""
     _ensure_field_name_column(df)
     matches = df["field_name"] == field_name
-    if bool(matches.any()):
+    if matches.any():
         return
 
     raise ValueError(f'Metadata field "{field_name}" was not found.')
