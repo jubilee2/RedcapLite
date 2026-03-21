@@ -83,6 +83,39 @@ except Exception as e:
 
 ```
 
+## CLI Setup (Phase 1)
+
+The `rcl` command now includes a Phase 1 interactive access workflow plus a metadata command skeleton.
+
+### Access profiles
+
+Use `rcl access <profile>` to create or update a stored REDCap connection profile. The command will:
+
+- prompt for the REDCap API URL when the profile does not exist
+- prompt for the REDCap API token
+- validate the token before saving it
+- store profile details and the token under `~/.config/redcaplite/`
+
+Example:
+
+```sh
+rcl access data_project
+```
+
+### Metadata command skeleton
+
+Phase 1 also reserves the metadata command layout that later phases will fill in:
+
+```sh
+rcl <profile> metadata list-fields
+rcl <profile> metadata show-field <field_name>
+rcl <profile> metadata add-field <field_name> <form_name>
+rcl <profile> metadata edit-field <field_name>
+rcl <profile> metadata remove-field <field_name>
+```
+
+In this phase, the metadata subcommands are placeholders so the CLI structure is available before the implementation lands.
+
 ## Detailed Usage
 
 ### Importing the Package
