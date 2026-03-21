@@ -326,6 +326,29 @@ def test_main_metadata_add_field_imports_metadata(monkeypatch, capsys) -> None:
     assert captured.err == ""
 
 
+def test_main_metadata_add_field_requires_choices_for_choice_types(monkeypatch, capsys) -> None:
+    client = MetadataClient("https://redcap.example.edu/api/", "secret-token")
+    monkeypatch.setattr("redcaplite.cli.metadata.build_client", lambda profile: client)
+
+    assert main([
+        "demo",
+        "metadata",
+        "add-field",
+        "height",
+        "demographics",
+        "--field-type",
+        "radio",
+        "--yes",
+    ]) == 1
+
+    captured = capsys.readouterr()
+    assert (
+        'Error: Field type "radio" requires non-empty "select_choices_or_calculations".'
+        in captured.err
+    )
+    assert client.imported_metadata is None
+
+
 
 def test_main_metadata_add_field_prompts_before_import(monkeypatch, capsys) -> None:
     client = MetadataClient("https://redcap.example.edu/api/", "secret-token")
@@ -387,12 +410,36 @@ def test_main_metadata_edit_field_warns_for_type_changes(monkeypatch, capsys) ->
     client = MetadataClient("https://redcap.example.edu/api/", "secret-token")
     monkeypatch.setattr("redcaplite.cli.metadata.build_client", lambda profile: client)
 
-    assert main(["demo", "metadata", "edit-field", "age", "--field-type", "radio", "--yes"]) == 0
+    assert main([
+        "demo",
+        "metadata",
+        "edit-field",
+        "age",
+        "--field-type",
+        "radio",
+        "--select-choices-or-calculations",
+        "1, Yes | 0, No",
+        "--yes",
+    ]) == 0
 
     captured = capsys.readouterr()
     assert "Warning: changing field_type may require additional REDCap metadata updates." in captured.out
     updated_age = client.imported_metadata.loc[client.imported_metadata["field_name"] == "age"].iloc[0]
     assert updated_age["field_type"] == "radio"
+
+
+def test_main_metadata_edit_field_requires_choices_for_choice_types(monkeypatch, capsys) -> None:
+    client = MetadataClient("https://redcap.example.edu/api/", "secret-token")
+    monkeypatch.setattr("redcaplite.cli.metadata.build_client", lambda profile: client)
+
+    assert main(["demo", "metadata", "edit-field", "age", "--field-type", "radio", "--yes"]) == 1
+
+    captured = capsys.readouterr()
+    assert (
+        'Error: Field type "radio" requires non-empty "select_choices_or_calculations".'
+        in captured.err
+    )
+    assert client.imported_metadata is None
 
 
 def test_main_metadata_edit_field_prompts_before_import(monkeypatch, capsys) -> None:
