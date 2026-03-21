@@ -133,6 +133,40 @@ Internally, `redcaplite.metadata_ops.transform` and `redcaplite.metadata_ops.val
 
 The preview/output layer is also centralized for reuse: `redcaplite.cli.output` now exposes consistent `print_error`, `print_success`, `print_preview`, and `print_table` helpers, while `redcaplite.cli.prompts` provides `prompt`, `prompt_secret`, and `confirm` wrappers for interactive CLI input.
 
+### Phase 14 suggested test plan
+
+Before implementing the next round of CLI/profile work, the repository should track the following test plan so the work lands with intentional coverage.
+
+#### Unit tests
+
+- **Config**
+  - load empty profiles
+  - save new profile
+  - update existing profile
+- **Auth**
+  - token store save/load/delete
+  - access flow with existing profile
+  - access flow creating new profile
+- **Metadata transforms**
+  - default label generation
+  - add row with defaults
+  - edit row patch
+  - remove row
+  - invalid field type
+  - field exists/missing checks
+- **CLI parsing**
+  - `rcl access data_project`
+  - `rcl data_project metadata add-field age demographics`
+  - `--yes` handling
+  - flag parsing for `--choices`
+
+#### Integration tests
+
+- access against mocked client
+- add/edit/remove metadata through mocked REDCap methods
+
+This plan aligns with the current CLI architecture: configuration and auth helpers underpin `rcl access`, metadata transforms drive add/edit/remove behavior, and mocked client integration tests verify that the CLI sends the expected REDCap calls without depending on a live server.
+
 ## Detailed Usage
 
 ### Importing the Package
