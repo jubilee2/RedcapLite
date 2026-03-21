@@ -64,6 +64,32 @@ def generate_default_label(field_name: str) -> str:
 
 
 
+def parse_field_flags(flag_tokens: list[str]) -> dict[str, Any]:
+    """Convert CLI ``--flag value`` tokens into metadata row keys and values."""
+    parsed_flags: dict[str, Any] = {}
+    index = 0
+    while index < len(flag_tokens):
+        token = flag_tokens[index]
+        if not token.startswith("--"):
+            raise ValueError(f'Unexpected flag token "{token}". Expected a --name option.')
+
+        key = token[2:].replace("-", "_")
+        if not key:
+            raise ValueError("Encountered an empty metadata flag name.")
+
+        next_index = index + 1
+        if next_index >= len(flag_tokens) or flag_tokens[next_index].startswith("--"):
+            parsed_flags[key] = "y"
+            index += 1
+            continue
+
+        parsed_flags[key] = flag_tokens[next_index]
+        index += 2
+
+    return parsed_flags
+
+
+
 def build_new_field_row(args: Any) -> dict[str, Any]:
     """Build a metadata row for a new field from parsed CLI arguments."""
     field_name = _read_arg(args, "field_name")

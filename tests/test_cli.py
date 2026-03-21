@@ -22,6 +22,8 @@ class FakeClient:
 class MetadataClient(FakeClient):
     def __init__(self, url: str, token: str) -> None:
         super().__init__(url, token)
+        self.imported_metadata = None
+        self.imported_format = None
         self._metadata = [
             {
                 "field_name": "record_id",
@@ -44,6 +46,11 @@ class MetadataClient(FakeClient):
 
         assert format == "csv"
         return pd.DataFrame(self._metadata)
+
+    def import_metadata(self, data, format: str = "csv") -> str:
+        self.imported_metadata = data
+        self.imported_format = format
+        return "1"
 
 
 class FailingClient(FakeClient):
@@ -247,13 +254,44 @@ def test_main_metadata_list_fields_prints_table(tmp_path, monkeypatch, capsys) -
     assert captured.err == ""
 
 
-def test_main_metadata_add_field_placeholder_returns_error(capsys) -> None:
-    assert main(["demo", "metadata", "add-field", "age", "demographics"]) == 1
+def test_main_metadata_add_field_imports_metadata(monkeypatch, capsys) -> None:
+    client = MetadataClient("https://redcap.example.edu/api/", "secret-token")
+    monkeypatch.setattr("redcaplite.cli.metadata.build_client", lambda profile: client)
+
+    assert main([
+        "demo",
+        "metadata",
+        "add-field",
+        "height",
+        "demographics",
+        "--field-label",
+        "Height",
+        "--required-field",
+        "--yes",
+    ]) == 0
 
     captured = capsys.readouterr()
-    assert 'metadata command "add-field" is not implemented yet.' in captured.err
-    assert "Phase 2 wires the CLI command tree" in captured.err
+    assert 'Preview of field to add:' in captured.out
+    assert 'Added field "height" to form "demographics".' in captured.out
+    assert client.imported_format == "csv"
+    assert client.imported_metadata is not None
+    assert list(client.imported_metadata["field_name"])[-1] == "height"
+    assert list(client.imported_metadata["required_field"])[-1] == "y"
+    assert captured.err == ""
 
+
+
+def test_main_metadata_add_field_prompts_before_import(monkeypatch, capsys) -> None:
+    client = MetadataClient("https://redcap.example.edu/api/", "secret-token")
+    monkeypatch.setattr("redcaplite.cli.metadata.build_client", lambda profile: client)
+    monkeypatch.setattr("redcaplite.cli.metadata.prompt_confirm", lambda prompt: False)
+
+    assert main(["demo", "metadata", "add-field", "height", "demographics"]) == 1
+
+    captured = capsys.readouterr()
+    assert 'Preview of field to add:' in captured.out
+    assert 'Error: cancelled by user.' in captured.err
+    assert client.imported_metadata is None
 
 
 

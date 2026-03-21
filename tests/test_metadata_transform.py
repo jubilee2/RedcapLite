@@ -10,6 +10,7 @@ from redcaplite.metadata_ops.transform import (
     find_field,
     generate_default_label,
     metadata_to_records,
+    parse_field_flags,
     remove_field,
     update_field,
 )
@@ -79,6 +80,27 @@ def test_generate_default_label_humanizes_field_name() -> None:
     assert generate_default_label("baseline-height") == "Baseline Height"
 
 
+
+
+def test_parse_field_flags_converts_tokens_to_metadata_keys() -> None:
+    assert parse_field_flags([
+        "--field-type",
+        "radio",
+        "--field-label",
+        "Participant Age",
+        "--required-field",
+    ]) == {
+        "field_type": "radio",
+        "field_label": "Participant Age",
+        "required_field": "y",
+    }
+
+
+def test_parse_field_flags_rejects_non_flag_tokens() -> None:
+    with pytest.raises(ValueError) as exc_info:
+        parse_field_flags(["field-label", "Age"])
+
+    assert 'Unexpected flag token "field-label".' in str(exc_info.value)
 
 def test_build_new_field_row_uses_defaults_and_ignores_cli_only_fields() -> None:
     args = Namespace(
