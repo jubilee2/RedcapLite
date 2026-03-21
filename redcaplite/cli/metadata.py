@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 from types import SimpleNamespace
-from typing import Any, Iterable
+from typing import Any
 
 import pandas as pd
 
@@ -22,8 +22,10 @@ from redcaplite.metadata_ops.transform import (
 from redcaplite.metadata_ops.validate import ensure_field_exists, ensure_field_missing, validate_field_type
 
 from .helpers import ClientBootstrapError, build_client
-from .output import print_error
-from .prompts import prompt_confirm
+from .output import print_error, print_preview, print_success, print_table
+from .prompts import confirm
+
+prompt_confirm = confirm
 
 _METADATA_SUBCOMMANDS = (
     "list-fields",
@@ -106,17 +108,16 @@ def run_list_fields(profile: str, form: str | None) -> int:
             print(f'No metadata fields found for form "{form}".')
         return 0
 
-    _print_table(
-        rows=[
-            (
-                record["field_name"],
-                record["form_name"],
-                record["field_type"],
-                record["field_label"],
-            )
+    print_table(
+        [
+            {
+                "field_name": record["field_name"],
+                "form_name": record["form_name"],
+                "field_type": record["field_type"],
+                "field_label": record["field_label"],
+            }
             for record in records
-        ],
-        headers=("field_name", "form_name", "field_type", "field_label"),
+        ]
     )
     return 0
 
@@ -160,8 +161,7 @@ def run_add_field(
         print_error(str(exc))
         return 1
 
-    print("Preview of field to add:")
-    print(json.dumps(row, indent=2, sort_keys=True))
+    print_preview(["Preview of field to add:", json.dumps(row, indent=2, sort_keys=True)])
 
     if not assume_yes and not prompt_confirm(
         f'Import metadata to add field "{field_name}" to form "{form_name}"? [y/N]: '
@@ -170,7 +170,7 @@ def run_add_field(
         return 1
 
     client.import_metadata(updated_metadata, format="csv")
-    print(f'Added field "{field_name}" to form "{form_name}".')
+    print_success(f'Added field "{field_name}" to form "{form_name}".')
     return 0
 
 
@@ -191,10 +191,14 @@ def run_edit_field(profile: str, field_name: str, field_flags: list[str]) -> int
         print_error(str(exc))
         return 1
 
-    print("Preview of field changes:")
-    print(json.dumps(_build_change_preview(original_field, updated_field, patch), indent=2, sort_keys=True))
+    print_preview(
+        [
+            "Preview of field changes:",
+            json.dumps(_build_change_preview(original_field, updated_field, patch), indent=2, sort_keys=True),
+        ]
+    )
     if "field_type" in patch:
-        print("Warning: changing field_type may require additional REDCap metadata updates.")
+        print_preview(["Warning: changing field_type may require additional REDCap metadata updates."])
 
     if not assume_yes and not prompt_confirm(
         f'Import metadata to update field "{field_name}"? [y/N]: '
@@ -204,9 +208,9 @@ def run_edit_field(profile: str, field_name: str, field_flags: list[str]) -> int
 
     client.import_metadata(updated_metadata, format="csv")
     if updated_field_name == field_name:
-        print(f'Updated field "{field_name}".')
+        print_success(f'Updated field "{field_name}".')
     else:
-        print(f'Updated field "{field_name}" to "{updated_field_name}".')
+        print_success(f'Updated field "{field_name}" to "{updated_field_name}".')
     return 0
 
 
@@ -241,8 +245,7 @@ def run_remove_field(profile: str, field_name: str, assume_yes: bool = False) ->
         print_error(str(exc))
         return 1
 
-    print("Preview of field to remove:")
-    print(json.dumps(field, indent=2, sort_keys=True))
+    print_preview(["Preview of field to remove:", json.dumps(field, indent=2, sort_keys=True)])
 
     if not assume_yes and not prompt_confirm(
         f'Import metadata to remove field "{field_name}"? [y/N]: '
@@ -251,7 +254,7 @@ def run_remove_field(profile: str, field_name: str, assume_yes: bool = False) ->
         return 1
 
     client.import_metadata(updated_metadata, format="csv")
-    print(f'Removed field "{field_name}".')
+    print_success(f'Removed field "{field_name}".')
     return 0
 
 
@@ -267,17 +270,6 @@ def _ensure_metadata_frame(metadata: Any) -> pd.DataFrame:
     if isinstance(metadata, list):
         return pd.DataFrame(metadata)
     raise ValueError("Metadata export returned an unexpected response type.")
-
-
-def _print_table(rows: Iterable[tuple[str, str, str, str]], headers: tuple[str, ...]) -> None:
-    """Print rows in a simple aligned table."""
-    table_rows = [headers, *rows]
-    widths = [max(len(str(row[index])) for row in table_rows) for index in range(len(headers))]
-
-    for row_index, row in enumerate(table_rows):
-        print("  ".join(str(value).ljust(widths[index]) for index, value in enumerate(row)))
-        if row_index == 0:
-            print("  ".join("-" * width for width in widths))
 
 
 def _split_confirmation_flag(field_flags: list[str]) -> tuple[bool, list[str]]:
