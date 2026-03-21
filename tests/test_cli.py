@@ -376,6 +376,36 @@ def test_main_metadata_edit_field_requires_patch_flags(monkeypatch, capsys) -> N
     assert client.imported_metadata is None
 
 
+def test_main_metadata_remove_field_imports_metadata(monkeypatch, capsys) -> None:
+    client = MetadataClient("https://redcap.example.edu/api/", "secret-token")
+    monkeypatch.setattr("redcaplite.cli.metadata.build_client", lambda profile: client)
+
+    assert main(["demo", "metadata", "remove-field", "age", "--yes"]) == 0
+
+    captured = capsys.readouterr()
+    assert "Preview of field to remove:" in captured.out
+    assert '"field_name": "age"' in captured.out
+    assert 'Removed field "age".' in captured.out
+    assert client.imported_format == "csv"
+    assert client.imported_metadata is not None
+    assert list(client.imported_metadata["field_name"]) == ["record_id"]
+    assert captured.err == ""
+
+
+
+def test_main_metadata_remove_field_prompts_before_import(monkeypatch, capsys) -> None:
+    client = MetadataClient("https://redcap.example.edu/api/", "secret-token")
+    monkeypatch.setattr("redcaplite.cli.metadata.build_client", lambda profile: client)
+    monkeypatch.setattr("redcaplite.cli.metadata.prompt_confirm", lambda prompt: False)
+
+    assert main(["demo", "metadata", "remove-field", "age"]) == 1
+
+    captured = capsys.readouterr()
+    assert "Preview of field to remove:" in captured.out
+    assert "Error: cancelled by user." in captured.err
+    assert client.imported_metadata is None
+
+
 def test_run_access_rejects_invalid_url(tmp_path, monkeypatch, capsys) -> None:
     profile_store = ProfileStore(tmp_path)
     token_store = TokenStore(tmp_path)
