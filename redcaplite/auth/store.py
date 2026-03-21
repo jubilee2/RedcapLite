@@ -49,9 +49,10 @@ class JsonFileSecretBackend:
         return self.path.parent
 
     def _load_all(self) -> dict[str, dict[str, str]]:
-        if not self.path.exists():
+        try:
+            return json.loads(self.path.read_text(encoding="utf-8"))
+        except (FileNotFoundError, json.JSONDecodeError):
             return {}
-        return json.loads(self.path.read_text(encoding="utf-8"))
 
     def _save_all(self, data: dict[str, dict[str, str]]) -> None:
         self.config_dir.mkdir(parents=True, exist_ok=True)
