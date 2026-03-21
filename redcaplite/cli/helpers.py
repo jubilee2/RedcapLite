@@ -12,6 +12,18 @@ from redcaplite.config import ProfileStore
 ClientFactory = Callable[[str, str], RedcapClient]
 
 
+class ClientBootstrapError(ValueError):
+    """Base error for failures while building a CLI REDCap client."""
+
+
+class ProfileNotFoundError(ClientBootstrapError):
+    """Raised when a requested CLI profile is not stored."""
+
+
+class TokenNotFoundError(ClientBootstrapError):
+    """Raised when a requested CLI profile has no stored token."""
+
+
 def build_client(
     profile_name: str,
     profile_store: Optional[ProfileStore] = None,
@@ -24,13 +36,13 @@ def build_client(
 
     profile = active_profile_store.get(profile_name)
     if profile is None:
-        raise ValueError(
+        raise ProfileNotFoundError(
             f'Profile "{profile_name}" was not found. Run "rcl access {profile_name}" first.'
         )
 
     token = active_token_store.get_token(profile_name)
     if token is None:
-        raise ValueError(
+        raise TokenNotFoundError(
             f'Access token for profile "{profile_name}" was not found. '
             f'Run "rcl access {profile_name}" first.'
         )

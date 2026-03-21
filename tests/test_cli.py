@@ -5,7 +5,7 @@ import pytest
 from redcaplite.auth import TokenStore
 from redcaplite.cli import access as access_module
 from redcaplite.cli.access import AccessCommand
-from redcaplite.cli.helpers import build_client
+from redcaplite.cli.helpers import ProfileNotFoundError, TokenNotFoundError, build_client
 from redcaplite.cli.main import build_parser, build_profile_parser, main
 from redcaplite.config import Profile, ProfileStore
 
@@ -46,7 +46,7 @@ def test_build_client_errors_when_profile_is_missing(tmp_path) -> None:
     token_store = TokenStore(tmp_path)
     token_store.save_token("demo", "secret-token")
 
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(ProfileNotFoundError) as exc_info:
         build_client(
             "demo",
             profile_store=ProfileStore(tmp_path),
@@ -61,7 +61,7 @@ def test_build_client_errors_when_token_is_missing(tmp_path) -> None:
     profile_store = ProfileStore(tmp_path)
     profile_store.upsert(Profile(name="demo", url="https://redcap.example.edu/api/"))
 
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(TokenNotFoundError) as exc_info:
         build_client(
             "demo",
             profile_store=profile_store,
