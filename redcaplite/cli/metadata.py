@@ -16,8 +16,9 @@ from redcaplite.metadata_ops.transform import (
     find_field,
     metadata_to_records,
     parse_field_flags,
+    update_field,
 )
-from redcaplite.metadata_ops.validate import ensure_field_missing
+from redcaplite.metadata_ops.validate import ensure_field_exists, ensure_field_missing, validate_field_type
 
 from .helpers import ClientBootstrapError, build_client
 from .output import print_error
@@ -73,6 +74,8 @@ def add_metadata_parser(subparsers: argparse._SubParsersAction) -> None:
                 nargs=argparse.REMAINDER,
                 help="Additional field configuration flags.",
             )
+            command_parser.set_defaults(handler=_handle_edit_field)
+            continue
         if name == "remove-field":
             command_parser.add_argument(
                 "--yes",
@@ -168,6 +171,42 @@ def run_add_field(
     return 0
 
 
+def run_edit_field(profile: str, field_name: str, field_flags: list[str]) -> int:
+    """Patch a single metadata field row and import the updated metadata."""
+    assume_yes, metadata_flag_tokens = _split_confirmation_flag(field_flags)
+
+    try:
+        client = build_client(profile)
+        metadata = _ensure_metadata_frame(client.get_metadata(format="csv"))
+        ensure_field_exists(metadata, field_name)
+        patch = _build_field_patch(metadata_flag_tokens)
+        original_field = find_field(metadata, field_name)
+        updated_metadata = update_field(metadata, field_name, patch)
+        updated_field_name = str(patch.get("field_name", field_name))
+        updated_field = find_field(updated_metadata, updated_field_name)
+    except (ClientBootstrapError, TypeError, ValueError) as exc:
+        print_error(str(exc))
+        return 1
+
+    print("Preview of field changes:")
+    print(json.dumps(_build_change_preview(original_field, updated_field, patch), indent=2, sort_keys=True))
+    if "field_type" in patch:
+        print("Warning: changing field_type may require additional REDCap metadata updates.")
+
+    if not assume_yes and not prompt_confirm(
+        f'Import metadata to update field "{field_name}"? [y/N]: '
+    ):
+        print_error("cancelled by user.")
+        return 1
+
+    client.import_metadata(updated_metadata, format="csv")
+    if updated_field_name == field_name:
+        print(f'Updated field "{field_name}".')
+    else:
+        print(f'Updated field "{field_name}" to "{updated_field_name}".')
+    return 0
+
+
 def _handle_list_fields(args: argparse.Namespace) -> int:
     """CLI handler for ``metadata list-fields``."""
     return run_list_fields(args.profile, args.form_name)
@@ -181,6 +220,11 @@ def _handle_show_field(args: argparse.Namespace) -> int:
 def _handle_add_field(args: argparse.Namespace) -> int:
     """CLI handler for ``metadata add-field``."""
     return run_add_field(args.profile, args.field_name, args.form_name, args.field_flags)
+
+
+def _handle_edit_field(args: argparse.Namespace) -> int:
+    """CLI handler for ``metadata edit-field``."""
+    return run_edit_field(args.profile, args.field_name, args.field_flags)
 
 
 def _ensure_metadata_frame(metadata: Any) -> pd.DataFrame:
@@ -208,6 +252,33 @@ def _split_confirmation_flag(field_flags: list[str]) -> tuple[bool, list[str]]:
     assume_yes = "--yes" in field_flags
     remaining_flags = [token for token in field_flags if token != "--yes"]
     return assume_yes, remaining_flags
+
+
+def _build_field_patch(field_flags: list[str]) -> dict[str, Any]:
+    """Build an update patch from only the explicitly provided CLI flags."""
+    patch = parse_field_flags(field_flags)
+    if not patch:
+        raise ValueError("No metadata changes were provided. Pass at least one --flag to update.")
+
+    if "field_type" in patch:
+        validate_field_type(str(patch["field_type"]))
+
+    return patch
+
+
+def _build_change_preview(
+    original_field: dict[str, Any],
+    updated_field: dict[str, Any],
+    patch: dict[str, Any],
+) -> dict[str, dict[str, Any]]:
+    """Return a preview payload containing only fields changed by the patch."""
+    preview: dict[str, dict[str, Any]] = {}
+    for key in patch:
+        preview[key] = {
+            "from": original_field.get(key, ""),
+            "to": updated_field.get(key, ""),
+        }
+    return preview
 
 
 def _not_implemented(args: argparse.Namespace) -> int:
