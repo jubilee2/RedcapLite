@@ -75,6 +75,40 @@ def test_remove_profile_deletes_existing_entry(tmp_path) -> None:
     }
 
 
+def test_load_profiles_returns_empty_dict_for_missing_file(tmp_path) -> None:
+    profiles_path = tmp_path / "missing.yml"
+
+    assert load_profiles(profiles_path) == {}
+
+
+def test_profile_store_load_returns_empty_dict_for_fresh_directory(tmp_path) -> None:
+    store = ProfileStore(tmp_path)
+
+    assert store.load() == {}
+
+
+def test_profile_store_upsert_overwrites_existing_profile_entry(tmp_path) -> None:
+    store = ProfileStore(tmp_path)
+    initial_profile = Profile(name="demo", url="https://redcap.example.edu/api/")
+    updated_profile = Profile(name="demo", url="https://redcap.updated.edu/api/")
+
+    # 1. Initial upsert
+    store.upsert(initial_profile)
+
+    assert store.path.exists()
+    assert store.load() == {"demo": initial_profile}
+
+    # 2. Overwrite with second upsert
+    store.upsert(updated_profile)
+
+    # Verify the profile is updated
+    assert store.load() == {"demo": updated_profile}
+
+    # Verify the underlying file has no duplicate entries
+    contents = store.path.read_text(encoding="utf-8")
+    assert contents.count("demo:") == 1
+
+
 def test_load_profiles_rejects_non_mapping_yaml(tmp_path) -> None:
     profiles_path = tmp_path / "profiles.yml"
     profiles_path.write_text("- demo\n", encoding="utf-8")
