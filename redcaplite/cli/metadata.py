@@ -205,13 +205,8 @@ def _print_table(rows: Iterable[tuple[str, str, str, str]], headers: tuple[str, 
 
 def _split_confirmation_flag(field_flags: list[str]) -> tuple[bool, list[str]]:
     """Extract ``--yes`` from metadata add-field flag tokens."""
-    assume_yes = False
-    remaining_flags: list[str] = []
-    for token in field_flags:
-        if token == "--yes":
-            assume_yes = True
-            continue
-        remaining_flags.append(token)
+    assume_yes = "--yes" in field_flags
+    remaining_flags = [token for token in field_flags if token != "--yes"]
     return assume_yes, remaining_flags
 
 
