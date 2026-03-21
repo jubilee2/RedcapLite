@@ -1,8 +1,25 @@
-"""Argument parser builders for the redcaplite CLI."""
+"""Argument parser builders and route definitions for the redcaplite CLI."""
 
 from __future__ import annotations
 
 import argparse
+from typing import Final, Literal, TypeAlias
+
+RouteName: TypeAlias = Literal[
+    "access",
+    "metadata_list_fields",
+    "metadata_show_field",
+    "metadata_add_field",
+    "metadata_edit_field",
+    "metadata_remove_field",
+]
+
+ROUTE_ACCESS: Final[RouteName] = "access"
+ROUTE_METADATA_LIST_FIELDS: Final[RouteName] = "metadata_list_fields"
+ROUTE_METADATA_SHOW_FIELD: Final[RouteName] = "metadata_show_field"
+ROUTE_METADATA_ADD_FIELD: Final[RouteName] = "metadata_add_field"
+ROUTE_METADATA_EDIT_FIELD: Final[RouteName] = "metadata_edit_field"
+ROUTE_METADATA_REMOVE_FIELD: Final[RouteName] = "metadata_remove_field"
 
 _ROOT_HELP_LINES = (
     "usage: rcl [--help] [--version] access <profile>",
@@ -63,7 +80,7 @@ def build_access_parser() -> argparse.ArgumentParser:
         description="Create or update stored access for a REDCap profile.",
     )
     parser.add_argument("profile", help="Profile name.")
-    parser.set_defaults(route="access")
+    parser.set_defaults(route=ROUTE_ACCESS)
     return parser
 
 
@@ -85,11 +102,11 @@ def add_metadata_parser(subparsers: argparse._SubParsersAction[argparse.Argument
                 dest="form_name",
                 help="Limit results to a single REDCap form name.",
             )
-            command_parser.set_defaults(route="metadata_list_fields")
+            command_parser.set_defaults(route=ROUTE_METADATA_LIST_FIELDS)
             continue
         if name == "show-field":
             command_parser.add_argument("field_name")
-            command_parser.set_defaults(route="metadata_show_field")
+            command_parser.set_defaults(route=ROUTE_METADATA_SHOW_FIELD)
             continue
         if name in {"edit-field", "remove-field"}:
             command_parser.add_argument("field_name")
@@ -101,7 +118,7 @@ def add_metadata_parser(subparsers: argparse._SubParsersAction[argparse.Argument
                 nargs=argparse.REMAINDER,
                 help="Additional field configuration flags.",
             )
-            command_parser.set_defaults(route="metadata_add_field")
+            command_parser.set_defaults(route=ROUTE_METADATA_ADD_FIELD)
             continue
         if name == "edit-field":
             command_parser.add_argument(
@@ -109,7 +126,7 @@ def add_metadata_parser(subparsers: argparse._SubParsersAction[argparse.Argument
                 nargs=argparse.REMAINDER,
                 help="Additional field configuration flags.",
             )
-            command_parser.set_defaults(route="metadata_edit_field")
+            command_parser.set_defaults(route=ROUTE_METADATA_EDIT_FIELD)
             continue
         if name == "remove-field":
             command_parser.add_argument(
@@ -117,7 +134,7 @@ def add_metadata_parser(subparsers: argparse._SubParsersAction[argparse.Argument
                 action="store_true",
                 help="Skip the removal confirmation prompt.",
             )
-            command_parser.set_defaults(route="metadata_remove_field")
+            command_parser.set_defaults(route=ROUTE_METADATA_REMOVE_FIELD)
 
 
 

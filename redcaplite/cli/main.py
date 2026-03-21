@@ -3,14 +3,21 @@
 from __future__ import annotations
 
 import sys
-from importlib.metadata import PackageNotFoundError, version
 from argparse import Namespace
+from importlib.metadata import PackageNotFoundError, version
 from typing import Callable, Optional, Sequence
 
 from .access import AccessCommand
 from .metadata import run_add_field, run_edit_field, run_list_fields, run_remove_field, run_show_field
 from .output import print_error
 from .parsers import (
+    ROUTE_ACCESS,
+    ROUTE_METADATA_ADD_FIELD,
+    ROUTE_METADATA_EDIT_FIELD,
+    ROUTE_METADATA_LIST_FIELDS,
+    ROUTE_METADATA_REMOVE_FIELD,
+    ROUTE_METADATA_SHOW_FIELD,
+    RouteName,
     build_access_parser,
     build_parser,
     build_profile_parser,
@@ -65,13 +72,13 @@ def _run_metadata_remove_field(args: Namespace) -> int:
     return run_remove_field(args.profile, args.field_name, args.yes)
 
 
-ROUTE_HANDLERS: dict[str, RouteHandler] = {
-    "access": _run_access,
-    "metadata_list_fields": _run_metadata_list_fields,
-    "metadata_show_field": _run_metadata_show_field,
-    "metadata_add_field": _run_metadata_add_field,
-    "metadata_edit_field": _run_metadata_edit_field,
-    "metadata_remove_field": _run_metadata_remove_field,
+ROUTE_HANDLERS: dict[RouteName, RouteHandler] = {
+    ROUTE_ACCESS: _run_access,
+    ROUTE_METADATA_LIST_FIELDS: _run_metadata_list_fields,
+    ROUTE_METADATA_SHOW_FIELD: _run_metadata_show_field,
+    ROUTE_METADATA_ADD_FIELD: _run_metadata_add_field,
+    ROUTE_METADATA_EDIT_FIELD: _run_metadata_edit_field,
+    ROUTE_METADATA_REMOVE_FIELD: _run_metadata_remove_field,
 }
 
 
@@ -107,7 +114,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         setattr(parsed_args, "profile", args_list[0])
 
     route = getattr(parsed_args, "route", None)
-    if route is None:
+    if route not in ROUTE_HANDLERS:
         print_error("no command selected")
         return 1
     return ROUTE_HANDLERS[route](parsed_args)
