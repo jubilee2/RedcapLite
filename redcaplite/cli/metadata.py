@@ -41,6 +41,7 @@ def add_metadata_parser(subparsers: argparse._SubParsersAction) -> None:
     metadata_parser = subparsers.add_parser(
         "metadata",
         help="Inspect and edit project metadata.",
+        description="Inspect and edit project metadata.",
     )
     metadata_subparsers = metadata_parser.add_subparsers(dest="metadata_command")
     metadata_subparsers.required = True
