@@ -126,6 +126,8 @@ Available today:
 
 The remaining metadata subcommands still return a placeholder message until the editing phases are implemented.
 
+Internally, `redcaplite.metadata_ops.transform` and `redcaplite.metadata_ops.validate` now provide the reusable add/edit/remove building blocks for upcoming write workflows, including field-type validation, default label generation, and DataFrame-based append/update/remove helpers.
+
 ## Detailed Usage
 
 ### Importing the Package
