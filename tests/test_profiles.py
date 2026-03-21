@@ -43,7 +43,6 @@ def test_get_profiles_path_supports_platform_conventions(
     assert get_profiles_path() == expected
 
 
-
 def test_profile_helpers_round_trip_yaml(tmp_path) -> None:
     profiles_path = tmp_path / "profiles.yml"
 
@@ -57,7 +56,6 @@ def test_profile_helpers_round_trip_yaml(tmp_path) -> None:
     }
     assert get_profile_url("demo", profiles_path) == "https://redcap.example.edu/api/"
     assert "demo:" in profiles_path.read_text(encoding="utf-8")
-
 
 
 def test_remove_profile_deletes_existing_entry(tmp_path) -> None:
@@ -76,6 +74,13 @@ def test_remove_profile_deletes_existing_entry(tmp_path) -> None:
         "other": {"url": "https://redcap.other.edu/api/"}
     }
 
+
+def test_load_profiles_rejects_non_mapping_yaml(tmp_path) -> None:
+    profiles_path = tmp_path / "profiles.yml"
+    profiles_path.write_text("- demo\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="must contain a mapping"):
+        load_profiles(profiles_path)
 
 
 def test_profile_store_uses_yaml_file(tmp_path) -> None:

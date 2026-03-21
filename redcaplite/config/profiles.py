@@ -4,9 +4,17 @@ from __future__ import annotations
 
 import os
 import platform
+import site
+import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
+
+SYSTEM_DIST_PACKAGES = Path("/usr/lib/python3/dist-packages")
+if SYSTEM_DIST_PACKAGES.exists() and str(SYSTEM_DIST_PACKAGES) not in sys.path:
+    site.addsitedir(str(SYSTEM_DIST_PACKAGES))
+
+import yaml
 
 
 @dataclass
@@ -29,45 +37,20 @@ def get_profiles_path() -> Path:
     return base_dir / "redcaplite" / "profiles.yml"
 
 
-def _strip_yaml_scalar(value: str) -> str:
-    """Return a plain string value from a simple YAML scalar."""
-    text = value.strip()
-    if len(text) >= 2 and text[0] == text[-1] and text[0] in {"'", '"'}:
-        return text[1:-1]
-    return text
-
-
-def _parse_profiles_yaml(text: str) -> Dict[str, Dict[str, str]]:
-    """Parse the limited YAML structure used by the profiles file."""
-    profiles: Dict[str, Dict[str, str]] = {}
-    current_name: Optional[str] = None
-
-    for raw_line in text.splitlines():
-        line = raw_line.rstrip()
-        stripped = line.strip()
-        if not stripped or stripped.startswith("#"):
-            continue
-
-        if not line.startswith(" "):
-            if not line.endswith(":"):
-                raise ValueError(f"Invalid profile entry: {raw_line}")
-            current_name = line[:-1].strip()
-            if not current_name:
-                raise ValueError("Profile names cannot be empty.")
-            profiles[current_name] = {}
-            continue
-
-        if current_name is None:
-            raise ValueError("Profile settings must follow a profile name.")
-
-        if not line.startswith("  ") or ":" not in stripped:
-            raise ValueError(f"Invalid profile setting: {raw_line}")
-
-        key, value = stripped.split(":", 1)
-        profiles[current_name][key.strip()] = _strip_yaml_scalar(value)
+def _validate_profiles(data: Any) -> Dict[str, Dict[str, str]]:
+    """Validate the YAML structure used by the profiles file."""
+    if data is None:
+        return {}
+    if not isinstance(data, dict):
+        raise ValueError("Profiles file must contain a mapping of profile names to settings.")
 
     validated_profiles: Dict[str, Dict[str, str]] = {}
-    for name, details in profiles.items():
+    for name, details in data.items():
+        if not isinstance(name, str) or not name:
+            raise ValueError("Profile names must be non-empty strings.")
+        if not isinstance(details, dict):
+            raise ValueError(f'Profile "{name}" must contain a mapping of settings.')
+
         url = details.get("url")
         if not isinstance(url, str) or not url:
             raise ValueError(f'Profile "{name}" must include a non-empty string "url" value.')
@@ -76,15 +59,9 @@ def _parse_profiles_yaml(text: str) -> Dict[str, Dict[str, str]]:
 
 
 def _dump_profiles_yaml(data: Dict[str, Dict[str, str]]) -> str:
-    """Serialize profiles to a small YAML mapping."""
-    lines = []
-    for name in sorted(data):
-        url = data[name].get("url")
-        if not isinstance(url, str) or not url:
-            raise ValueError(f'Profile "{name}" must include a non-empty string "url" value.')
-        lines.append(f"{name}:")
-        lines.append(f"  url: {url}")
-    return "\n".join(lines) + "\n"
+    """Serialize profiles to YAML using PyYAML."""
+    validated_profiles = _validate_profiles(data)
+    return yaml.safe_dump(validated_profiles, sort_keys=True)
 
 
 def load_profiles(path: Optional[Path] = None) -> Dict[str, Dict[str, str]]:
@@ -92,7 +69,8 @@ def load_profiles(path: Optional[Path] = None) -> Dict[str, Dict[str, str]]:
     profiles_path = path or get_profiles_path()
     if not profiles_path.exists():
         return {}
-    return _parse_profiles_yaml(profiles_path.read_text(encoding="utf-8"))
+    with profiles_path.open("r", encoding="utf-8") as profiles_file:
+        return _validate_profiles(yaml.safe_load(profiles_file))
 
 
 def save_profiles(data: Dict[str, Dict[str, str]], path: Optional[Path] = None) -> None:

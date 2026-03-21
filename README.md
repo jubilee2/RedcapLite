@@ -15,7 +15,7 @@
 -   Intuitive interface for the most common REDCap API endpoints.
 -   Installable from PyPI and ready to use in seconds.
 -   Fully typed and tested for reliable data exchange.
--   Minimal dependencies to keep your environment lean.
+-   Minimal dependencies to keep your environment lean, including PyYAML-backed CLI profile storage.
 
 ## Prerequisites
 Before using `redcaplite`, you need to obtain two key pieces of information from your REDCap project's API page:
@@ -94,7 +94,7 @@ Use `rcl access <profile>` to create or update a stored REDCap connection profil
 - prompt for the REDCap API URL and create the profile when it does not already exist
 - prompt for the REDCap API token
 - validate the token before saving it
-- store profile details in `profiles.yml` and the token under the OS-specific `redcaplite` config directory (for example `~/.config/redcaplite/` on Linux)
+- store profile details in a PyYAML-managed `profiles.yml` file and the token under the OS-specific `redcaplite` config directory (for example `~/.config/redcaplite/` on Linux)
 
 Example:
 
