@@ -23,11 +23,13 @@ def metadata_to_records(df: pd.DataFrame) -> list[dict[str, Any]]:
 
 def find_field(df: pd.DataFrame, field_name: str) -> dict[str, Any]:
     """Return a single metadata field record by exact field name."""
-    records = metadata_to_records(df)
-    for record in records:
-        if record.get("field_name") == field_name:
-            return record
-    raise ValueError(f'Metadata field "{field_name}" was not found.')
+    _validate_metadata_columns(df)
+    matches = df.loc[df["field_name"] == field_name]
+    if matches.empty:
+        raise ValueError(f'Metadata field "{field_name}" was not found.')
+
+    record = matches.iloc[0].fillna("").to_dict()
+    return {str(key): value for key, value in record.items()}
 
 
 def filter_fields(df: pd.DataFrame, form_name: str | None) -> pd.DataFrame:
