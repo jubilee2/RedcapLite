@@ -1,3 +1,4 @@
+from io import StringIO
 from argparse import Namespace
 
 import pytest
@@ -7,6 +8,8 @@ from redcaplite.cli import access as access_module
 from redcaplite.cli.access import AccessCommand
 from redcaplite.cli.helpers import ProfileNotFoundError, TokenNotFoundError, build_client
 from redcaplite.cli.main import build_parser, build_profile_parser, main
+from redcaplite.cli.output import print_preview, print_success, print_table
+from redcaplite.cli.prompts import confirm, prompt
 from redcaplite.config import Profile, ProfileStore
 
 
@@ -104,6 +107,49 @@ def test_build_client_errors_when_token_is_missing(tmp_path) -> None:
         )
 
     assert 'Access token for profile "demo" was not found.' in str(exc_info.value)
+
+
+def test_print_success_writes_to_stdout_stream() -> None:
+    stream = StringIO()
+
+    print_success("Done.", stream=stream)
+
+    assert stream.getvalue() == "Done.\n"
+
+
+def test_print_preview_writes_each_line_in_order() -> None:
+    stream = StringIO()
+
+    print_preview(["Preview heading", '{"field_name": "age"}'], stream=stream)
+
+    assert stream.getvalue() == 'Preview heading\n{"field_name": "age"}\n'
+
+
+def test_print_table_formats_rows_from_dicts() -> None:
+    stream = StringIO()
+
+    print_table(
+        [
+            {"field_name": "record_id", "form_name": "enrollment"},
+            {"field_name": "age", "form_name": "demographics"},
+        ],
+        stream=stream,
+    )
+
+    output = stream.getvalue()
+    assert "field_name" in output
+    assert "form_name" in output
+    assert "record_id" in output
+    assert "demographics" in output
+
+
+def test_prompt_strips_whitespace() -> None:
+    assert prompt("Enter value: ", input_func=lambda _: "  demo  ") == "demo"
+
+
+def test_confirm_accepts_yes_variants() -> None:
+    assert confirm("Continue? ", input_func=lambda _: "YeS") is True
+    assert confirm("Continue? ", input_func=lambda _: "n") is False
 
 
 

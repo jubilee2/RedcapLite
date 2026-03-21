@@ -9,8 +9,12 @@ from urllib.parse import urlparse
 from redcaplite import RedcapClient
 from redcaplite.auth import TokenStore
 from redcaplite.config import Profile, ProfileStore
-from .output import print_error
-from .prompts import prompt_confirm, prompt_secret, prompt_text
+from .output import print_error, print_success
+from .prompts import confirm, prompt, prompt_secret
+
+# Backward-compatible aliases for existing tests and CLI internals.
+prompt_confirm = confirm
+prompt_text = prompt
 
 
 ClientFactory = Callable[[str, str], RedcapClient]
@@ -60,7 +64,7 @@ def run_access(
             return 1
         profile = Profile(name=profile_name, url=url)
         active_profile_store.upsert(profile)
-        print(f'Profile "{profile_name}" created.')
+        print_success(f'Profile "{profile_name}" created.')
     else:
         print(f"Profile: {profile.name}")
         print(f"URL: {profile.url}")
@@ -69,7 +73,7 @@ def run_access(
             if url:
                 profile.url = url
                 active_profile_store.upsert(profile)
-                print(f'Profile "{profile_name}" URL updated.')
+                print_success(f'Profile "{profile_name}" URL updated.')
 
     if active_token_store.has_token(profile_name):
         print(f'Access already exists for "{profile_name}".')
@@ -90,7 +94,7 @@ def run_access(
         return 1
 
     active_token_store.save_token(profile_name, token)
-    print(f'Access saved for profile "{profile_name}".')
+    print_success(f'Access saved for profile "{profile_name}".')
     return 0
 
 

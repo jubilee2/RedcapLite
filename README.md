@@ -131,6 +131,8 @@ Available today:
 
 Internally, `redcaplite.metadata_ops.transform` and `redcaplite.metadata_ops.validate` now provide the reusable add/edit/remove helpers for metadata write workflows, including CLI flag-to-row conversion, field-type validation, default label generation, and DataFrame-based append/update/remove helpers.
 
+The preview/output layer is also centralized for reuse: `redcaplite.cli.output` now exposes consistent `print_error`, `print_success`, `print_preview`, and `print_table` helpers, while `redcaplite.cli.prompts` provides `prompt`, `prompt_secret`, and `confirm` wrappers for interactive CLI input.
+
 ## Detailed Usage
 
 ### Importing the Package
