@@ -106,13 +106,20 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(f"rcl {get_version()}")
         return 0
 
-    if known_args.help or not args_list:
+    if not args_list:
+        _print_root_help()
+        return 0
+
+    if known_args.help and args_list[0] in {"-h", "--help"}:
         _print_root_help()
         return 0
 
     if args_list[0] == "access":
         parser = build_access_parser()
-        parsed_args = parser.parse_args(args_list[1:])
+        try:
+            parsed_args = parser.parse_args(args_list[1:])
+        except SystemExit as exc:
+            return int(exc.code)
         return parsed_args.handler(parsed_args)
 
     profile = args_list[0]
@@ -122,6 +129,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     except ValueError as exc:
         print_error(str(exc))
         return 1
+    except SystemExit as exc:
+        return int(exc.code)
 
     setattr(parsed_args, "profile", profile)
     return parsed_args.handler(parsed_args)

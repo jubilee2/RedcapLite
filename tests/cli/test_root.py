@@ -21,6 +21,41 @@ def test_main_with_version_prints_version(monkeypatch, capsys) -> None:
     assert captured.err == ""
 
 
+def test_main_with_root_help_flag_prints_root_help(capsys) -> None:
+    assert main(["--help"]) == 0
+
+    captured = capsys.readouterr()
+    assert "usage: rcl" in captured.out
+    assert captured.err == ""
+
+
+def test_main_with_access_help_prints_access_help(capsys) -> None:
+    assert main(["access", "--help"]) == 0
+
+    captured = capsys.readouterr()
+    assert "usage: rcl access" in captured.out
+    assert "Create or update stored access for a REDCap profile." in captured.out
+    assert captured.err == ""
+
+
+def test_main_with_metadata_help_prints_metadata_help(capsys) -> None:
+    assert main(["demo", "metadata", "--help"]) == 0
+
+    captured = capsys.readouterr()
+    assert "usage: rcl demo metadata" in captured.out
+    assert "Inspect and edit project metadata." in captured.out
+    assert captured.err == ""
+
+
+def test_main_with_metadata_subcommand_help_prints_subcommand_help(capsys) -> None:
+    assert main(["demo", "metadata", "show-field", "--help"]) == 0
+
+    captured = capsys.readouterr()
+    assert "usage: rcl demo metadata show-field" in captured.out
+    assert "field_name" in captured.out
+    assert captured.err == ""
+
+
 def test_main_returns_error_for_missing_profile_subcommand(capsys) -> None:
     assert main(["demo"]) == 1
 
