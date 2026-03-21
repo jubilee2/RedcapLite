@@ -80,10 +80,7 @@ def run_list_fields(profile: str, form: str | None) -> int:
         client = build_client(profile)
         metadata = client.get_metadata(format="csv")
         filtered = filter_fields(_ensure_metadata_frame(metadata), form)
-    except ClientBootstrapError as exc:
-        print_error(str(exc))
-        return 1
-    except ValueError as exc:
+    except (ClientBootstrapError, ValueError) as exc:
         print_error(str(exc))
         return 1
 
