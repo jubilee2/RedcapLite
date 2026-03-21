@@ -10,10 +10,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-SYSTEM_DIST_PACKAGES = Path("/usr/lib/python3/dist-packages")
-if SYSTEM_DIST_PACKAGES.exists() and str(SYSTEM_DIST_PACKAGES) not in sys.path:
-    site.addsitedir(str(SYSTEM_DIST_PACKAGES))
-
 import yaml
 
 
