@@ -12,13 +12,16 @@ from redcaplite.config import Profile, ProfileStore
 from .output import print_error, print_success
 from .prompts import confirm, prompt, prompt_secret
 
-# Backward-compatible aliases for existing tests and CLI internals.
+# Keep the older prompt names available so tests and any internal callers
+# do not break while the CLI helpers live in ``prompts.py``.
 prompt_confirm = confirm
 prompt_text = prompt
 
 
 ClientFactory = Callable[[str, str], RedcapClient]
 
+# These module-level defaults let the command share the standard stores in
+# production while still allowing tests to inject temporary stores.
 _DEFAULT_PROFILE_STORE: Optional[ProfileStore] = None
 _DEFAULT_TOKEN_STORE: Optional[TokenStore] = None
 
@@ -57,6 +60,8 @@ def run_access(
     active_token_store = token_store or _DEFAULT_TOKEN_STORE or TokenStore()
     profile = active_profile_store.get(profile_name)
 
+    # Start by making sure the named profile exists and points at the right
+    # REDCap API endpoint before asking for a token.
     if profile is None:
         print(f'Profile "{profile_name}" not found.')
         url = _prompt_for_url()
@@ -75,6 +80,8 @@ def run_access(
                 active_profile_store.upsert(profile)
                 print_success(f'Profile "{profile_name}" URL updated.')
 
+    # Replacing a token is a destructive change, so confirm before overwriting
+    # any saved credential for this profile.
     if active_token_store.has_token(profile_name):
         print(f'Access already exists for "{profile_name}".')
         if not prompt_confirm("Replace it? [y/N]: "):
@@ -86,6 +93,8 @@ def run_access(
         return 1
 
     print("Validating token...")
+    # Save the token only after the API accepts it so we do not persist a bad
+    # credential that would fail on the next command.
     if not _validate_access(profile.url, token, client_factory=client_factory):
         print_error(
             "unable to validate API token.",
@@ -135,5 +144,7 @@ def _validate_access(
 
 def _is_valid_url(url: str) -> bool:
     """Return whether the value looks like an HTTP(S) URL."""
+    # A minimal URL check is enough here: the CLI only needs to confirm the
+    # user entered something that looks like a full REDCap endpoint.
     parsed = urlparse(url)
     return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
