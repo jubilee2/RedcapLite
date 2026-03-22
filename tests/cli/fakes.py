@@ -34,9 +34,19 @@ class MetadataClient(FakeClient):
             },
         ]
 
-    def get_metadata(self, format: str = "csv") -> pd.DataFrame:
+    def get_metadata(
+        self,
+        fields: list[str] | None = None,
+        forms: list[str] | None = None,
+        format: str = "csv",
+    ) -> pd.DataFrame:
         assert format == "csv"
-        return pd.DataFrame(self._metadata)
+        metadata = pd.DataFrame(self._metadata)
+        if forms:
+            metadata = metadata.loc[metadata["form_name"].isin(forms)]
+        if fields:
+            metadata = metadata.loc[metadata["field_name"].isin(fields)]
+        return metadata
 
     def import_metadata(self, data: pd.DataFrame, format: str = "csv") -> str:
         self.imported_metadata = data

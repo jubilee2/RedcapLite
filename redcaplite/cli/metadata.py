@@ -12,7 +12,6 @@ import pandas as pd
 from redcaplite.metadata_ops.transform import (
     append_field,
     build_new_field_row,
-    filter_fields,
     find_field,
     metadata_to_records,
     parse_field_flags,
@@ -29,7 +28,6 @@ prompt_confirm = confirm
 
 _METADATA_SUBCOMMANDS = (
     "list-fields",
-    "show-field",
     "add-field",
     "edit-field",
     "remove-field",
@@ -54,14 +52,17 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
         if name == "list-fields":
             command_parser.add_argument(
                 "--form",
-                dest="form_name",
-                help="Limit results to a single REDCap form name.",
+                dest="form_names",
+                action="append",
+                help="Limit results to one or more REDCap form names. Repeat to pass multiple forms.",
+            )
+            command_parser.add_argument(
+                "--field",
+                dest="field_names",
+                action="append",
+                help="Limit results to one or more REDCap field names. Repeat to pass multiple fields.",
             )
             command_parser.set_defaults(handler=_handle_list_fields)
-            continue
-        if name == "show-field":
-            command_parser.add_argument("field_name")
-            command_parser.set_defaults(handler=_handle_show_field)
             continue
         if name in {"edit-field", "remove-field"}:
             command_parser.add_argument("field_name")
@@ -94,22 +95,30 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
         command_parser.set_defaults(handler=_not_implemented)
 
 
-def run_list_fields(profile: str, form: str | None) -> int:
-    """List metadata fields for a profile, optionally filtered to one form."""
+def run_list_fields(
+    profile: str,
+    forms: list[str] | None = None,
+    fields: list[str] | None = None,
+) -> int:
+    """List metadata fields for a profile, optionally filtered by API-supported selectors."""
     try:
         client = build_client(profile)
-        metadata = client.get_metadata(format="csv")
-        filtered = filter_fields(_ensure_metadata_frame(metadata), form)
+        metadata = client.get_metadata(
+            fields=fields or [],
+            forms=forms or [],
+            format="csv",
+        )
+        filtered = _ensure_metadata_frame(metadata)
     except (ClientBootstrapError, ValueError) as exc:
         print_error(str(exc))
         return 1
 
     records = metadata_to_records(filtered)
     if not records:
-        if form is None:
+        if not forms and not fields:
             print("No metadata fields were returned.")
         else:
-            print(f'No metadata fields found for form "{form}".')
+            print("No metadata fields matched the requested filters.")
         return 0
 
     print_table(
@@ -123,20 +132,6 @@ def run_list_fields(profile: str, form: str | None) -> int:
             for record in records
         ]
     )
-    return 0
-
-
-def run_show_field(profile: str, field_name: str) -> int:
-    """Show a single field's metadata as formatted JSON."""
-    try:
-        client = build_client(profile)
-        metadata = client.get_metadata(format="csv")
-        field = find_field(_ensure_metadata_frame(metadata), field_name)
-    except (ClientBootstrapError, ValueError) as exc:
-        print_error(str(exc))
-        return 1
-
-    print(json.dumps(field, indent=2, sort_keys=True))
     return 0
 
 
@@ -227,12 +222,7 @@ def run_edit_field(profile: str, field_name: str, field_flags: list[str]) -> int
 
 def _handle_list_fields(args: argparse.Namespace) -> int:
     """CLI handler for ``metadata list-fields``."""
-    return run_list_fields(args.profile, args.form_name)
-
-
-def _handle_show_field(args: argparse.Namespace) -> int:
-    """CLI handler for ``metadata show-field``."""
-    return run_show_field(args.profile, args.field_name)
+    return run_list_fields(args.profile, forms=args.form_names, fields=args.field_names)
 
 
 def _handle_add_field(args: argparse.Namespace) -> int:

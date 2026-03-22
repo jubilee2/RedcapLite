@@ -50,11 +50,12 @@ def test_main_with_metadata_help_prints_metadata_help(capsys) -> None:
 
 
 def test_main_with_metadata_subcommand_help_prints_subcommand_help(capsys) -> None:
-    assert main(["demo", "metadata", "show-field", "--help"]) == 0
+    assert main(["demo", "metadata", "list-fields", "--help"]) == 0
 
     captured = capsys.readouterr()
-    assert "usage: rcl <profile> metadata show-field [-h] field_name" in captured.out
-    assert "field_name" in captured.out
+    assert "usage: rcl <profile> metadata list-fields [-h]" in captured.out
+    assert "--field FIELD_NAMES" in captured.out
+    assert "--form FORM_NAMES" in captured.out
     assert captured.err == ""
 
 
@@ -76,14 +77,17 @@ def test_build_parser_supports_metadata_group() -> None:
     assert parsed.metadata_command == "list-fields"
 
 
-def test_build_parser_supports_metadata_list_fields_form_filter() -> None:
+def test_build_parser_supports_metadata_list_fields_filters() -> None:
     parser = build_parser()
 
-    parsed = parser.parse_args(["demo", "metadata", "list-fields", "--form", "demographics"])
+    parsed = parser.parse_args(
+        ["demo", "metadata", "list-fields", "--form", "demographics", "--field", "age"]
+    )
 
     assert parsed.profile == "demo"
     assert parsed.metadata_command == "list-fields"
-    assert parsed.form_name == "demographics"
+    assert parsed.form_names == ["demographics"]
+    assert parsed.field_names == ["age"]
 
 
 def test_build_parser_supports_metadata_add_field_flags() -> None:
