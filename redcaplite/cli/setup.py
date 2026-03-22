@@ -21,11 +21,6 @@ prompt_text = prompt
 
 ClientFactory = Callable[[str, str], RedcapClient]
 
-# These module-level defaults let the command share the standard stores in
-# production while still allowing tests to inject temporary stores.
-_DEFAULT_PROFILE_STORE: Optional[ProfileStore] = None
-_DEFAULT_TOKEN_STORE: Optional[TokenStore] = None
-
 
 class SetupCommand:
     """Create or update a named CLI setup profile."""
@@ -68,8 +63,8 @@ def run_setup(
     client_factory: ClientFactory = RedcapClient,
 ) -> int:
     """Create or update access for the requested profile name."""
-    active_profile_store = profile_store or _DEFAULT_PROFILE_STORE or ProfileStore()
-    active_token_store = token_store or _DEFAULT_TOKEN_STORE or TokenStore()
+    active_profile_store = profile_store or ProfileStore()
+    active_token_store = token_store or TokenStore()
     profile = active_profile_store.get(profile_name)
 
     # Start by making sure the named profile exists and points at the right
