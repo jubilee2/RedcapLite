@@ -12,6 +12,17 @@ Current package release: `2.0.0`.
 
 `redcaplite` makes it easy to connect to your REDCap project and perform common operations with minimal code. Whether you're a researcher automating data pulls or a developer building integrations, `redcaplite` keeps things simple and efficient.
 
+## ✨ v2.0.0 – Introducing the RedcapLite CLI
+
+Version 2.0.0 introduces `rcl`, a command-line interface for interacting with REDCap projects.
+
+The CLI provides:
+- Profile-based access (`rcl <profile> ...`)
+- Structured metadata management commands
+- Automation-friendly workflows for scripting and pipelines
+
+This release marks a shift toward a unified, extensible CLI-driven architecture.
+
 ## Key Features
 
 -   Intuitive interface for the most common REDCap API endpoints.
