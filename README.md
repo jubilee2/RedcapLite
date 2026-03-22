@@ -17,7 +17,7 @@ Current package release: `2.0.0`.
 -   Intuitive interface for the most common REDCap API endpoints.
 -   Installable from PyPI and ready to use in seconds.
 -   Fully typed and tested for reliable data exchange.
--   Minimal dependencies to keep your environment lean, including PyYAML-backed CLI profile storage.
+-   Core runtime dependencies: `keyring`, `pandas`, `pyyaml`, and `requests`.
 
 ## Prerequisites
 Before using `redcaplite`, you need to obtain two key pieces of information from your REDCap project's API page:
@@ -31,7 +31,7 @@ To install `redcaplite` from the Python Package Index (PyPI), run the following 
 ```sh
 pip install redcaplite
 ```
-This is the recommended installation method for most users. After installation, the `rcl` command is available for CLI usage:
+This installs the package with its core runtime dependencies: `keyring`, `pandas`, `pyyaml`, and `requests`. This is the recommended installation method for most users. After installation, the `rcl` command is available for CLI usage:
 ```sh
 rcl --help
 ```
@@ -88,6 +88,8 @@ except Exception as e:
 ## CLI Setup (Phase 2)
 
 The `rcl` command now includes an interactive setup workflow plus the Phase 2 metadata command tree.
+
+> **Important update:** the REDCap CLI is no longer limited to setup alone. You can now use `rcl` to perform REDCap operations directly from the command line, including metadata listing, add/edit workflows, and field removal.
 
 Internally, CLI commands can now share a single bootstrap helper, `redcaplite.cli.helpers.build_client(profile_name)`, to load the saved profile URL, load the stored token, raise typed `ProfileNotFoundError` or `TokenNotFoundError` exceptions when access is incomplete, and return a ready `RedcapClient` instance for metadata workflows.
 
