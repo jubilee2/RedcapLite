@@ -53,17 +53,6 @@ def find_field(df: pd.DataFrame, field_name: str) -> dict[str, Any]:
 
 
 
-def filter_fields(df: pd.DataFrame, form_name: str | None) -> pd.DataFrame:
-    """Filter metadata rows to a single form when requested."""
-    _validate_metadata_columns(df)
-    if form_name is None:
-        return df.copy()
-
-    filtered = df.loc[df["form_name"] == form_name].copy()
-    return filtered
-
-
-
 def generate_default_label(field_name: str) -> str:
     """Generate a readable field label from a field name."""
     cleaned_name = " ".join(field_name.replace("-", " ").replace("_", " ").split())
