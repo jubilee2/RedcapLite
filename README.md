@@ -111,14 +111,13 @@ rcl data_project setup
 The CLI now supports metadata inspection plus add/edit/remove metadata write workflows:
 
 ```sh
-rcl <profile> metadata list-fields [--form <form_name>]
-rcl <profile> metadata show-field <field_name>
+rcl <profile> metadata list-fields [--form <form_name>] [--field <field_name>]
 rcl <profile> metadata add-field <field_name> <form_name> [flags]
 rcl <profile> metadata edit-field <field_name> [flags]
 rcl <profile> metadata remove-field <field_name> [--yes]
 ```
 
-You can also ask for help at any level of the command tree, such as `rcl demo setup --help`, `rcl demo metadata --help`, or `rcl demo metadata show-field --help`.
+You can also ask for help at any level of the command tree, such as `rcl demo setup --help`, `rcl demo metadata --help`, or `rcl demo metadata list-fields --help`.
 
 At the root level, `rcl --help` now highlights both entry points explicitly: the `setup` workflow and the profile-scoped `metadata` command tree.
 
@@ -126,7 +125,8 @@ Available today:
 
 - `metadata list-fields` prints a read-only table of `field_name`, `form_name`, `field_type`, and `field_label`
 - `metadata list-fields --form demographics` limits the table to one REDCap form
-- `metadata show-field age` prints the full metadata record for a single field as formatted JSON
+- `metadata list-fields --field age` limits the table to one REDCap field
+- `metadata list-fields` forwards repeated `--form` and `--field` filters directly to the REDCap metadata export API instead of filtering after export
 - `metadata add-field age demographics [flags]` exports metadata, validates that the field is new, previews the generated row, confirms unless `--yes` is present, and re-imports the updated data dictionary
 - `metadata edit-field age [flags]` exports metadata, validates that the field exists, builds a patch from only the flags you pass, previews only the changed values, confirms unless `--yes` is present, and re-imports the updated data dictionary
 - `metadata remove-field age [--yes]` exports metadata, validates that the field exists, previews the exact row that will be deleted, confirms unless `--yes` is present, removes the row, and re-imports the updated data dictionary

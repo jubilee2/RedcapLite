@@ -19,6 +19,20 @@ def test_main_metadata_list_fields_prints_table(tmp_path, monkeypatch, capsys) -
     assert captured.err == ""
 
 
+def test_main_metadata_list_fields_supports_field_filter(monkeypatch, capsys) -> None:
+    monkeypatch.setattr(
+        "redcaplite.cli.metadata.build_client",
+        lambda profile: MetadataClient("https://redcap.example.edu/api/", "secret-token"),
+    )
+
+    assert main(["demo", "metadata", "list-fields", "--field", "record_id"]) == 0
+
+    captured = capsys.readouterr()
+    assert "record_id" in captured.out
+    assert "age" not in captured.out
+    assert captured.err == ""
+
+
 def test_main_metadata_add_field_imports_metadata(monkeypatch, capsys) -> None:
     client = MetadataClient("https://redcap.example.edu/api/", "secret-token")
     monkeypatch.setattr("redcaplite.cli.metadata.build_client", lambda profile: client)
@@ -112,21 +126,6 @@ def test_main_metadata_add_field_prompts_before_import(monkeypatch, capsys) -> N
     assert "Preview of field to add:" in captured.out
     assert "Error: cancelled by user." in captured.err
     assert client.imported_metadata is None
-
-
-def test_main_metadata_show_field_prints_json(monkeypatch, capsys) -> None:
-    monkeypatch.setattr(
-        "redcaplite.cli.metadata.build_client",
-        lambda profile: MetadataClient("https://redcap.example.edu/api/", "secret-token"),
-    )
-
-    assert main(["demo", "metadata", "show-field", "age"]) == 0
-
-    captured = capsys.readouterr()
-    assert '"field_name": "age"' in captured.out
-    assert '"form_name": "demographics"' in captured.out
-    assert captured.err == ""
-
 
 def test_main_metadata_edit_field_imports_changed_values_only(monkeypatch, capsys) -> None:
     client = MetadataClient("https://redcap.example.edu/api/", "secret-token")
