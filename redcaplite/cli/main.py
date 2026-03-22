@@ -39,13 +39,6 @@ def build_root_parser() -> argparse.ArgumentParser:
     return parser
 
 
-
-
-def build_parser() -> argparse.ArgumentParser:
-    """Backward-compatible alias for the root parser."""
-    return build_root_parser()
-
-
 def build_access_parser() -> argparse.ArgumentParser:
     """Create the parser for ``rcl access``."""
     parser = argparse.ArgumentParser(
