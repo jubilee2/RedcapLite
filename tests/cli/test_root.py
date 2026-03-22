@@ -26,6 +26,8 @@ def test_main_with_root_help_flag_prints_root_help(capsys) -> None:
 
     captured = capsys.readouterr()
     assert "usage: rcl" in captured.out
+    assert "access <profile>" in captured.out
+    assert "Create or update stored access for a REDCap profile." in captured.out
     assert captured.err == ""
 
 

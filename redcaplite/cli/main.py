@@ -88,6 +88,14 @@ def _print_root_help() -> None:
     print("       rcl <profile> metadata add-field <field_name> <form_name> [flags]")
     print("       rcl <profile> metadata edit-field <field_name> [flags]")
     print("       rcl <profile> metadata remove-field <field_name> [--yes]")
+    print()
+    print("commands:")
+    print("  access <profile>                 Create or update stored access for a REDCap profile.")
+    print("  <profile> metadata ...          Inspect and edit project metadata.")
+    print()
+    print("options:")
+    print("  -h, --help                      Show this help message and exit.")
+    print("  --version                       Show the CLI version and exit.")
 
 
 

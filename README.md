@@ -120,6 +120,8 @@ rcl <profile> metadata remove-field <field_name> [--yes]
 
 You can also ask for help at any level of the command tree, such as `rcl access --help`, `rcl demo metadata --help`, or `rcl demo metadata show-field --help`.
 
+At the root level, `rcl --help` now highlights both entry points explicitly: the `access <profile>` setup workflow and the profile-scoped `metadata` command tree.
+
 Available today:
 
 - `metadata list-fields` prints a read-only table of `field_name`, `form_name`, `field_type`, and `field_label`
