@@ -64,10 +64,9 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
             )
             command_parser.set_defaults(handler=_handle_list_fields)
             continue
-        if name in {"edit-field", "remove-field"}:
+        if name in {"add-field", "edit-field", "remove-field"}:
             command_parser.add_argument("field_name")
         if name == "add-field":
-            command_parser.add_argument("field_name")
             command_parser.add_argument("form_name")
             command_parser.add_argument(
                 "field_flags",
