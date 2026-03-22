@@ -20,6 +20,8 @@ _REQUIRED_COLUMNS = (
     "field_label",
 )
 
+# These argparse-only keys control CLI behavior and should never be written
+# into the REDCap metadata row that gets exported or updated.
 _IGNORED_BUILD_KEYS = {
     "command",
     "field_flags",
