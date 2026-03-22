@@ -122,12 +122,20 @@ def build_new_field_row(args: Any) -> dict[str, Any]:
 
 
 def append_field(df: pd.DataFrame, row: dict[str, Any]) -> pd.DataFrame:
-    """Append a new metadata field row to the exported metadata."""
+    """Insert a new metadata field row after the last row for the same form."""
     _validate_metadata_columns(pd.DataFrame([row]))
     ensure_field_missing(df, row["field_name"])
 
-    appended = pd.concat([df.copy(), pd.DataFrame([row])], ignore_index=True, sort=False)
-    return appended
+    updated = df.copy()
+    row_frame = pd.DataFrame([row])
+    matching_rows = updated.index[updated["form_name"] == row["form_name"]]
+    if matching_rows.empty:
+        return pd.concat([updated, row_frame], ignore_index=True, sort=False)
+
+    insert_after = int(matching_rows[-1]) + 1
+    before = updated.iloc[:insert_after]
+    after = updated.iloc[insert_after:]
+    return pd.concat([before, row_frame, after], ignore_index=True, sort=False)
 
 
 
