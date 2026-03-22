@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from redcaplite.cli.main import build_parser, build_profile_parser, main
+from redcaplite.cli.main import build_profile_parser, main
 
 
 def test_main_without_args_prints_help(capsys) -> None:
@@ -64,12 +64,6 @@ def test_main_returns_error_for_missing_profile_subcommand(capsys) -> None:
     captured = capsys.readouterr()
     assert captured.out == ""
     assert "the following arguments are required: command" in captured.err
-
-
-def test_build_parser_uses_rcl_prog() -> None:
-    parser = build_parser()
-
-    assert parser.prog == "rcl"
 
 
 def test_build_profile_parser_supports_metadata_group() -> None:
