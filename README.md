@@ -127,7 +127,7 @@ Available today:
 - `metadata list-fields --form demographics` limits the table to one REDCap form
 - `metadata list-fields --field age` limits the table to one REDCap field
 - `metadata list-fields` forwards repeated `--form` and `--field` filters directly to the REDCap metadata export API instead of filtering after export
-- `metadata add-field age demographics [flags]` exports metadata, validates that the field is new, previews the generated row, confirms unless `--yes` is present, and re-imports the updated data dictionary
+- `metadata add-field age demographics [flags]` exports metadata, validates that the field is new, inserts the row after the last existing field in the same form when that form already exists (otherwise appending it), previews the generated row, confirms unless `--yes` is present, and re-imports the updated data dictionary
 - `metadata edit-field age [flags]` exports metadata, validates that the field exists, builds a patch from only the flags you pass, previews only the changed values, confirms unless `--yes` is present, and re-imports the updated data dictionary
 - `metadata remove-field age [--yes]` exports metadata, validates that the field exists, previews the exact row that will be deleted, confirms unless `--yes` is present, removes the row, and re-imports the updated data dictionary
 

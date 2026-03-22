@@ -172,7 +172,7 @@ def test_update_field_allows_existing_choices_for_choice_type(metadata_frame: pd
 
 
 
-def test_append_field_adds_new_row(metadata_frame: pd.DataFrame) -> None:
+def test_append_field_adds_new_row_after_matching_form(metadata_frame: pd.DataFrame) -> None:
     row = {
         "field_name": "height",
         "form_name": "demographics",
@@ -183,6 +183,62 @@ def test_append_field_adds_new_row(metadata_frame: pd.DataFrame) -> None:
     updated = append_field(metadata_frame, row)
 
     assert list(updated["field_name"]) == ["record_id", "age", "height"]
+
+
+
+def test_append_field_appends_when_form_is_new(metadata_frame: pd.DataFrame) -> None:
+    row = {
+        "field_name": "consent_date",
+        "form_name": "follow_up",
+        "field_type": "text",
+        "field_label": "Consent Date",
+    }
+
+    updated = append_field(metadata_frame, row)
+
+    assert list(updated["field_name"]) == ["record_id", "age", "consent_date"]
+
+
+
+def test_append_field_inserts_after_last_matching_form_row() -> None:
+    metadata = pd.DataFrame(
+        [
+            {
+                "field_name": "record_id",
+                "form_name": "enrollment",
+                "field_type": "text",
+                "field_label": "Record ID",
+            },
+            {
+                "field_name": "age",
+                "form_name": "demographics",
+                "field_type": "text",
+                "field_label": "Age",
+            },
+            {
+                "field_name": "sex",
+                "form_name": "demographics",
+                "field_type": "radio",
+                "field_label": "Sex",
+            },
+            {
+                "field_name": "visit_date",
+                "form_name": "follow_up",
+                "field_type": "text",
+                "field_label": "Visit Date",
+            },
+        ]
+    )
+    row = {
+        "field_name": "height",
+        "form_name": "demographics",
+        "field_type": "text",
+        "field_label": "Height",
+    }
+
+    updated = append_field(metadata, row)
+
+    assert list(updated["field_name"]) == ["record_id", "age", "sex", "height", "visit_date"]
 
 
 
