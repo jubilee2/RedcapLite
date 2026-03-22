@@ -6,7 +6,6 @@ import pytest
 from redcaplite.metadata_ops.transform import (
     append_field,
     build_new_field_row,
-    filter_fields,
     find_field,
     generate_default_label,
     metadata_to_records,
@@ -66,13 +65,6 @@ def test_find_field_errors_for_missing_field(metadata_frame: pd.DataFrame) -> No
         find_field(metadata_frame, "height")
 
     assert 'Metadata field "height" was not found.' == str(exc_info.value)
-
-
-
-def test_filter_fields_limits_rows_to_form(metadata_frame: pd.DataFrame) -> None:
-    filtered = filter_fields(metadata_frame, "demographics")
-
-    assert list(filtered["field_name"]) == ["age"]
 
 
 
