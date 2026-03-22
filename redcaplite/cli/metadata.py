@@ -46,6 +46,8 @@ def add_metadata_parser(subparsers: argparse._SubParsersAction) -> None:
     metadata_subparsers = metadata_parser.add_subparsers(dest="metadata_command")
     metadata_subparsers.required = True
 
+    # Keep subcommand registration in one loop so the public CLI surface is easy
+    # to scan and update as metadata features are added.
     for name in _METADATA_SUBCOMMANDS:
         command_parser = metadata_subparsers.add_parser(name)
         if name == "list-fields":
@@ -144,6 +146,9 @@ def run_add_field(
     field_flags: list[str],
 ) -> int:
     """Append a new metadata field and import the updated metadata."""
+    # ``add-field`` accepts arbitrary metadata flags after the required
+    # positional arguments, so strip out the CLI-only confirmation flag before
+    # passing the remainder into metadata parsing.
     assume_yes, metadata_flag_tokens = _split_confirmation_flag(field_flags)
 
     try:
@@ -162,6 +167,8 @@ def run_add_field(
         print_error(str(exc))
         return 1
 
+    # Show the exact record that will be imported so users can sanity-check the
+    # generated metadata before REDCap is updated.
     print_preview(["Preview of field to add:", json.dumps(row, indent=2, sort_keys=True)])
 
     if not assume_yes and not prompt_confirm(
@@ -192,6 +199,8 @@ def run_edit_field(profile: str, field_name: str, field_flags: list[str]) -> int
         print_error(str(exc))
         return 1
 
+    # The preview only includes keys that were explicitly changed, which keeps
+    # the confirmation output focused on the user's requested edits.
     print_preview(
         [
             "Preview of field changes:",
@@ -246,6 +255,8 @@ def run_remove_field(profile: str, field_name: str, assume_yes: bool = False) ->
         print_error(str(exc))
         return 1
 
+    # Echo the full field definition before deletion because this action cannot
+    # be inferred from a field name alone once the metadata import completes.
     print_preview(["Preview of field to remove:", json.dumps(field, indent=2, sort_keys=True)])
 
     if not assume_yes and not prompt_confirm(
@@ -266,6 +277,8 @@ def _handle_remove_field(args: argparse.Namespace) -> int:
 
 def _ensure_metadata_frame(metadata: Any) -> pd.DataFrame:
     """Normalize metadata API responses into a DataFrame."""
+    # Metadata helpers operate on DataFrames, but the API layer may already have
+    # parsed the response into Python records depending on the caller.
     if isinstance(metadata, pd.DataFrame):
         return metadata
     if isinstance(metadata, list):
@@ -275,6 +288,8 @@ def _ensure_metadata_frame(metadata: Any) -> pd.DataFrame:
 
 def _split_confirmation_flag(field_flags: list[str]) -> tuple[bool, list[str]]:
     """Extract ``--yes`` from metadata add-field flag tokens."""
+    # ``argparse.REMAINDER`` treats every remaining token as metadata input, so
+    # we manually peel off ``--yes`` instead of declaring it as a normal option.
     assume_yes = "--yes" in field_flags
     remaining_flags = [token for token in field_flags if token != "--yes"]
     return assume_yes, remaining_flags
@@ -299,6 +314,8 @@ def _build_change_preview(
 ) -> dict[str, dict[str, Any]]:
     """Return a preview payload containing only fields changed by the patch."""
     preview: dict[str, dict[str, Any]] = {}
+    # Preserve the order from the parsed patch so the preview matches the
+    # sequence of flags the caller supplied on the command line.
     for key in patch:
         preview[key] = {
             "from": original_field.get(key, ""),
