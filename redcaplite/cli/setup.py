@@ -1,14 +1,15 @@
-"""Interactive access command for the redcaplite CLI."""
+"""Interactive setup command for the redcaplite CLI."""
 
 from __future__ import annotations
 
-from argparse import Namespace
+import argparse
 from typing import Callable, Optional
 from urllib.parse import urlparse
 
 from redcaplite import RedcapClient
 from redcaplite.auth import TokenStore
 from redcaplite.config import Profile, ProfileStore
+
 from .output import print_error, print_success
 from .prompts import confirm, prompt, prompt_secret
 
@@ -26,8 +27,8 @@ _DEFAULT_PROFILE_STORE: Optional[ProfileStore] = None
 _DEFAULT_TOKEN_STORE: Optional[TokenStore] = None
 
 
-class AccessCommand:
-    """Create or update a named CLI access profile."""
+class SetupCommand:
+    """Create or update a named CLI setup profile."""
 
     def __init__(
         self,
@@ -39,9 +40,9 @@ class AccessCommand:
         self.token_store = token_store or TokenStore()
         self.client_factory = client_factory
 
-    def run(self, args: Namespace) -> int:
-        """Run the interactive access workflow."""
-        return run_access(
+    def run(self, args: argparse.Namespace) -> int:
+        """Run the interactive setup workflow."""
+        return run_setup(
             profile_name=args.profile,
             profile_store=self.profile_store,
             token_store=self.token_store,
@@ -49,7 +50,18 @@ class AccessCommand:
         )
 
 
-def run_access(
+def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
+    """Attach the ``setup`` command parser to the CLI root."""
+    parser = subparsers.add_parser(
+        "setup",
+        prog="rcl <profile> setup",
+        help="Create or update stored access for a REDCap profile.",
+        description="Create or update stored access for a REDCap profile.",
+    )
+    parser.set_defaults(handler=SetupCommand().run)
+
+
+def run_setup(
     profile_name: str,
     profile_store: Optional[ProfileStore] = None,
     token_store: Optional[TokenStore] = None,
