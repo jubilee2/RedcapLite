@@ -36,10 +36,11 @@ _METADATA_SUBCOMMANDS = (
 )
 
 
-def add_metadata_parser(subparsers: argparse._SubParsersAction) -> None:
-    """Register the metadata command group and available subcommands."""
+def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
+    """Attach the ``metadata`` command group to the CLI root."""
     metadata_parser = subparsers.add_parser(
         "metadata",
+        prog="rcl <profile> metadata",
         help="Inspect and edit project metadata.",
         description="Inspect and edit project metadata.",
     )
@@ -49,7 +50,7 @@ def add_metadata_parser(subparsers: argparse._SubParsersAction) -> None:
     # Keep subcommand registration in one loop so the public CLI surface is easy
     # to scan and update as metadata features are added.
     for name in _METADATA_SUBCOMMANDS:
-        command_parser = metadata_subparsers.add_parser(name)
+        command_parser = metadata_subparsers.add_parser(name, prog=f"rcl <profile> metadata {name}")
         if name == "list-fields":
             command_parser.add_argument(
                 "--form",

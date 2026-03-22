@@ -85,13 +85,13 @@ except Exception as e:
 
 ## CLI Setup (Phase 2)
 
-The `rcl` command now includes an interactive access workflow plus the Phase 2 metadata command tree.
+The `rcl` command now includes an interactive setup workflow plus the Phase 2 metadata command tree.
 
 Internally, CLI commands can now share a single bootstrap helper, `redcaplite.cli.helpers.build_client(profile_name)`, to load the saved profile URL, load the stored token, raise typed `ProfileNotFoundError` or `TokenNotFoundError` exceptions when access is incomplete, and return a ready `RedcapClient` instance for metadata workflows.
 
-### Access profiles
+### Setup profiles
 
-Use `rcl access <profile>` to create or update a stored REDCap connection profile. The command will:
+Use `rcl <profile> setup` to create or update a stored REDCap connection profile. The command will:
 
 - load the requested profile from the saved CLI config
 - prompt for the REDCap API URL and create the profile when it does not already exist
@@ -103,7 +103,7 @@ Use `rcl access <profile>` to create or update a stored REDCap connection profil
 Example:
 
 ```sh
-rcl access data_project
+rcl data_project setup
 ```
 
 ### Metadata command tree
@@ -118,9 +118,9 @@ rcl <profile> metadata edit-field <field_name> [flags]
 rcl <profile> metadata remove-field <field_name> [--yes]
 ```
 
-You can also ask for help at any level of the command tree, such as `rcl access --help`, `rcl demo metadata --help`, or `rcl demo metadata show-field --help`.
+You can also ask for help at any level of the command tree, such as `rcl demo setup --help`, `rcl demo metadata --help`, or `rcl demo metadata show-field --help`.
 
-At the root level, `rcl --help` now highlights both entry points explicitly: the `access <profile>` setup workflow and the profile-scoped `metadata` command tree.
+At the root level, `rcl --help` now highlights both entry points explicitly: the `setup` workflow and the profile-scoped `metadata` command tree.
 
 Available today:
 
