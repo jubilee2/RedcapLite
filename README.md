@@ -8,6 +8,8 @@
 
 **Lightweight, user-friendly Python client for the REDCap API.**
 
+Current package release: `2.0.0`.
+
 `redcaplite` makes it easy to connect to your REDCap project and perform common operations with minimal code. Whether you're a researcher automating data pulls or a developer building integrations, `redcaplite` keeps things simple and efficient.
 
 ## Key Features
