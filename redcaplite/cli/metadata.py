@@ -104,8 +104,8 @@ def run_list_fields(
     try:
         client = build_client(profile)
         metadata = client.get_metadata(
-            fields=[] if fields is None else fields,
-            forms=[] if forms is None else forms,
+            fields=fields or [],
+            forms=forms or [],
             format="csv",
         )
         filtered = _ensure_metadata_frame(metadata)
