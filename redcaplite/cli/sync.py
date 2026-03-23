@@ -47,7 +47,7 @@ def run_sync(source_profile: str, target_profile: str, assume_yes: bool = False)
             f'Metadata comparison: source "{source_profile}" -> target "{target_profile}"',
             f'Source fields: {len(source_metadata.index)}',
             f'Target fields: {len(target_metadata.index)}',
-            "Comparison first computes source-only/target-only sets with an all-column anti join, then aligns rows by field_name + form_name for side-by-side differences.",
+            "Comparison first computes source-only/target-only sets with an all-column anti join, then aligns rows by field_name for side-by-side differences.",
         ]
     )
     _print_comparison_table(
@@ -106,8 +106,7 @@ def compare_metadata(source_metadata: pd.DataFrame, target_metadata: pd.DataFram
         if not differing_columns:
             continue
         changed_row: dict[str, Any] = {
-            "field_name": str(key[0]),
-            "form_name": str(key[1]),
+            "field_name": key,
             "differing_columns": ", ".join(differing_columns),
         }
         for column in detail_columns:
@@ -127,9 +126,9 @@ def _handle_sync(args: argparse.Namespace) -> int:
     return run_sync(args.profile, args.target_profile, assume_yes=args.yes)
 
 
-def _record_key(record: dict[str, Any]) -> tuple[str, str]:
-    """Return the field/form identifier for a metadata row."""
-    return str(record["field_name"]), str(record["form_name"])
+def _record_key(record: dict[str, Any]) -> str:
+    """Return the metadata row identifier used for aligned comparison."""
+    return str(record["field_name"])
 
 
 def _comparison_columns(
@@ -143,14 +142,14 @@ def _comparison_columns(
             if column not in discovered_columns:
                 discovered_columns.append(column)
 
-    leading_columns = [column for column in ("field_name", "form_name") if column in discovered_columns]
+    leading_columns = [column for column in ("field_name",) if column in discovered_columns]
     trailing_columns = [column for column in discovered_columns if not _is_identifier_column(column)]
     return [*leading_columns, *trailing_columns]
 
 
 def _is_identifier_column(column: str) -> bool:
     """Return whether a metadata column is one of the row alignment identifiers."""
-    return column in {"field_name", "form_name"}
+    return column == "field_name"
 
 
 def _row_for_display(record: dict[str, Any], columns: list[str]) -> dict[str, Any]:
