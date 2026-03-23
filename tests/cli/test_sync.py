@@ -68,12 +68,19 @@ def test_main_sync_prints_differences_and_imports_source_metadata(monkeypatch, c
 
     captured = capsys.readouterr()
     assert 'Metadata comparison: source "profile1" -> target "profile2"' in captured.out
-    assert "Fields only in source metadata:" in captured.out
+    assert "Comparison uses field_name + form_name to align rows" in captured.out
+    assert "Rows only in source metadata (all columns):" in captured.out
     assert "height" in captured.out
-    assert "Fields only in target metadata:" in captured.out
+    assert "Height" in captured.out
+    assert "Rows only in target metadata (all columns):" in captured.out
     assert "weight" in captured.out
-    assert "Shared fields with differing metadata columns:" in captured.out
+    assert "Weight" in captured.out
+    assert "Aligned rows with differing metadata values" in captured.out
     assert "field_label" in captured.out
+    assert "source__field_label" in captured.out
+    assert "target__field_label" in captured.out
+    assert "Participant Age" in captured.out
+    assert "Age" in captured.out
     assert 'Imported metadata from "profile1" into "profile2".' in captured.out
     assert target_client.imported_metadata is not None
     assert list(target_client.imported_metadata["field_name"]) == ["record_id", "age", "height"]
@@ -107,8 +114,9 @@ def test_main_sync_prompts_before_import(monkeypatch, capsys) -> None:
     assert main(["profile1", "sync", "profile2"]) == 1
 
     captured = capsys.readouterr()
-    assert "Fields only in source metadata:" in captured.out
+    assert "Rows only in source metadata (all columns):" in captured.out
     assert "record_id" in captured.out
+    assert "Record ID" in captured.out
     assert "Error: cancelled by user." in captured.err
     assert target_client.imported_metadata is None
 

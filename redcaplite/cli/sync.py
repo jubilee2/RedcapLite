@@ -53,18 +53,19 @@ def run_sync(source_profile: str, target_profile: str, assume_yes: bool = False)
             f'Metadata comparison: source "{source_profile}" -> target "{target_profile}"',
             f'Source fields: {len(source_metadata.index)}',
             f'Target fields: {len(target_metadata.index)}',
+            "Comparison uses field_name + form_name to align rows, then prints all metadata columns for differences.",
         ]
     )
     _print_comparison_table(
-        "Fields only in source metadata:",
+        "Rows only in source metadata (all columns):",
         comparison["source_only"],
     )
     _print_comparison_table(
-        "Fields only in target metadata:",
+        "Rows only in target metadata (all columns):",
         comparison["target_only"],
     )
     _print_comparison_table(
-        "Shared fields with differing metadata columns:",
+        "Aligned rows with differing metadata values (all compared columns shown side-by-side):",
         comparison["changed"],
     )
 
@@ -83,36 +84,46 @@ def run_sync(source_profile: str, target_profile: str, assume_yes: bool = False)
     return 0
 
 
-def compare_metadata(source_metadata: pd.DataFrame, target_metadata: pd.DataFrame) -> dict[str, list[dict[str, str]]]:
-    """Return metadata differences grouped by missing and changed fields."""
+def compare_metadata(source_metadata: pd.DataFrame, target_metadata: pd.DataFrame) -> dict[str, list[dict[str, Any]]]:
+    """Return metadata differences grouped by missing and changed rows."""
     source_records = {_record_key(record): record for record in metadata_to_records(source_metadata)}
     target_records = {_record_key(record): record for record in metadata_to_records(target_metadata)}
+    comparison_columns = _comparison_columns(source_records, target_records)
+    detail_columns = [column for column in comparison_columns if column not in _IDENTIFIER_COLUMNS]
 
     source_keys = set(source_records)
     target_keys = set(target_records)
     shared_keys = sorted(source_keys & target_keys)
 
-    source_only = [_identifier_row(key) for key in sorted(source_keys - target_keys)]
-    target_only = [_identifier_row(key) for key in sorted(target_keys - source_keys)]
+    source_only = [
+        _row_for_display(source_records[key], comparison_columns)
+        for key in sorted(source_keys - target_keys)
+    ]
+    target_only = [
+        _row_for_display(target_records[key], comparison_columns)
+        for key in sorted(target_keys - source_keys)
+    ]
 
-    changed: list[dict[str, str]] = []
+    changed: list[dict[str, Any]] = []
     for key in shared_keys:
         source_record = source_records[key]
         target_record = target_records[key]
         differing_columns = [
             column
-            for column in sorted(set(source_record) | set(target_record))
+            for column in comparison_columns
             if source_record.get(column, "") != target_record.get(column, "")
         ]
         if not differing_columns:
             continue
-        changed.append(
-            {
-                "field_name": str(key[0]),
-                "form_name": str(key[1]),
-                "differing_columns": ", ".join(differing_columns),
-            }
-        )
+        changed_row: dict[str, Any] = {
+            "field_name": str(key[0]),
+            "form_name": str(key[1]),
+            "differing_columns": ", ".join(differing_columns),
+        }
+        for column in detail_columns:
+            changed_row[f"source__{column}"] = source_record.get(column, "")
+            changed_row[f"target__{column}"] = target_record.get(column, "")
+        changed.append(changed_row)
 
     return {
         "source_only": source_only,
@@ -142,23 +153,46 @@ def _record_key(record: dict[str, Any]) -> tuple[str, str]:
     return str(record["field_name"]), str(record["form_name"])
 
 
-def _identifier_row(key: tuple[str, str]) -> dict[str, str]:
-    """Convert a metadata key into a display row."""
-    return {
-        "field_name": str(key[0]),
-        "form_name": str(key[1]),
-    }
+def _comparison_columns(
+    source_records: dict[tuple[str, str], dict[str, Any]],
+    target_records: dict[tuple[str, str], dict[str, Any]],
+) -> list[str]:
+    """Return ordered metadata columns that should participate in comparison output."""
+    discovered_columns: list[str] = []
+    for record in list(source_records.values()) + list(target_records.values()):
+        for column in record:
+            if column not in discovered_columns:
+                discovered_columns.append(column)
+
+    leading_columns = [column for column in _IDENTIFIER_COLUMNS if column in discovered_columns]
+    trailing_columns = [column for column in discovered_columns if column not in _IDENTIFIER_COLUMNS]
+    return [*leading_columns, *trailing_columns]
 
 
-def _has_differences(comparison: dict[str, list[dict[str, str]]]) -> bool:
+def _row_for_display(record: dict[str, Any], columns: list[str]) -> dict[str, Any]:
+    """Return a metadata row normalized to the requested display columns."""
+    return {column: record.get(column, "") for column in columns}
+
+
+def _has_differences(comparison: dict[str, list[dict[str, Any]]]) -> bool:
     """Return whether the comparison payload contains any difference rows."""
     return any(comparison[group] for group in ("source_only", "target_only", "changed"))
 
 
-def _print_comparison_table(title: str, rows: list[dict[str, str]]) -> None:
+def _print_comparison_table(title: str, rows: list[dict[str, Any]]) -> None:
     """Print a titled comparison section."""
     print_preview([title])
     if not rows:
         print_preview(["  (none)"])
         return
-    print_table(rows)
+    print_table(_normalize_rows_for_table(rows))
+
+
+def _normalize_rows_for_table(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Fill missing keys so the table renderer prints every column for every row."""
+    ordered_keys: list[str] = []
+    for row in rows:
+        for key in row:
+            if key not in ordered_keys:
+                ordered_keys.append(key)
+    return [{key: row.get(key, "") for key in ordered_keys} for row in rows]
