@@ -4,7 +4,7 @@ version = "2.0.0"
 authors = [
   { name="Jubilee Tan", email="jubilee2@gmail.com" },
 ]
-description = "A Lightweight Python Client for REDCap"
+description = "A Python client for REDCap with integrated CLI support"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [

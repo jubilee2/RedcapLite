@@ -6,29 +6,29 @@
 [![PyPI Downloads](https://static.pepy.tech/badge/redcaplite/month)](https://pepy.tech/projects/redcaplite)
 [![PyPI Downloads](https://static.pepy.tech/badge/redcaplite)](https://pepy.tech/projects/redcaplite)
 
-**Lightweight, user-friendly Python client for the REDCap API.**
+**A Python client for REDCap with integrated CLI support.**
 
 Current package release: `2.0.0`.
 
-`redcaplite` makes it easy to connect to your REDCap project and perform common operations with minimal code. Whether you're a researcher automating data pulls or a developer building integrations, `redcaplite` keeps things simple and efficient.
+`redcaplite` helps you connect to REDCap projects and perform common API and CLI workflows from one package. Whether you're a researcher automating data pulls or a developer building integrations, `redcaplite` supports both scripted API usage and command-line operations.
 
 ## ✨ v2.0.0 – Introducing the RedcapLite CLI
 
-Version 2.0.0 introduces `rcl`, a command-line interface for interacting with REDCap projects.
+Version 2.0.0 includes `rcl`, a command-line interface for interacting with REDCap projects as part of the standard `redcaplite` installation.
 
 The CLI provides:
 - Profile-based access (`rcl <profile> ...`)
 - Structured metadata management commands
 - Automation-friendly workflows for scripting and pipelines
 
-This release marks a shift toward a unified, extensible CLI-driven architecture.
+This release provides a unified package for REDCap API access and CLI workflows.
 
 ## Key Features
 
--   Intuitive interface for the most common REDCap API endpoints.
--   Installable from PyPI and ready to use in seconds.
+-   Python client support for the most common REDCap API endpoints.
+-   Integrated `rcl` CLI included in the standard installation.
 -   Fully typed and tested for reliable data exchange.
--   Core runtime dependencies: `keyring`, `pandas`, `pyyaml`, and `requests`.
+-   Runtime dependencies include `keyring`, `pandas`, `pyyaml`, and `requests`.
 
 ## Prerequisites
 Before using `redcaplite`, you need to obtain two key pieces of information from your REDCap project's API page:
@@ -42,7 +42,7 @@ To install `redcaplite` from the Python Package Index (PyPI), run the following 
 ```sh
 pip install redcaplite
 ```
-This installs the package with its core runtime dependencies: `keyring`, `pandas`, `pyyaml`, and `requests`. This is the recommended installation method for most users. After installation, the `rcl` command is available for CLI usage:
+This installs the package together with its runtime dependencies: `keyring`, `pandas`, `pyyaml`, and `requests`. This is the recommended installation method for most users, and it includes the `rcl` command for CLI usage:
 ```sh
 rcl --help
 ```
