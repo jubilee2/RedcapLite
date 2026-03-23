@@ -13,9 +13,6 @@ from .helpers import ClientBootstrapError, build_client
 from .output import print_error, print_preview, print_success, print_table
 from .prompts import confirm
 
-_MINIMUM_METADATA_COLUMNS = ("field_name", "form_name", "field_type", "field_label")
-
-
 def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     """Attach the ``sync`` command parser to the CLI root."""
     parser = subparsers.add_parser(
@@ -38,9 +35,9 @@ def run_sync(source_profile: str, target_profile: str, assume_yes: bool = False)
     try:
         source_client = build_client(source_profile)
         target_client = build_client(target_profile)
-        source_metadata = _ensure_metadata_frame(source_client.get_metadata(format="csv"))
-        target_metadata = _ensure_metadata_frame(target_client.get_metadata(format="csv"))
-    except (ClientBootstrapError, ValueError) as exc:
+        source_metadata = source_client.get_metadata(format="csv")
+        target_metadata = target_client.get_metadata(format="csv")
+    except ClientBootstrapError as exc:
         print_error(str(exc))
         return 1
 
@@ -128,17 +125,6 @@ def compare_metadata(source_metadata: pd.DataFrame, target_metadata: pd.DataFram
 def _handle_sync(args: argparse.Namespace) -> int:
     """CLI handler for ``sync``."""
     return run_sync(args.profile, args.target_profile, assume_yes=args.yes)
-
-
-def _ensure_metadata_frame(metadata: Any) -> pd.DataFrame:
-    """Normalize metadata API responses into a DataFrame."""
-    if isinstance(metadata, pd.DataFrame):
-        return metadata
-    if isinstance(metadata, list):
-        if metadata:
-            return pd.DataFrame(metadata)
-        return pd.DataFrame(columns=_MINIMUM_METADATA_COLUMNS)
-    raise ValueError("Metadata export returned an unexpected response type.")
 
 
 def _record_key(record: dict[str, Any]) -> tuple[str, str]:
