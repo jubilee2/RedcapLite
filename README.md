@@ -130,6 +130,7 @@ rcl <profile> metadata list-fields [--form <form_name>] [--field <field_name>]
 rcl <profile> metadata add-field <field_name> <form_name> [flags]
 rcl <profile> metadata edit-field <field_name> [flags]
 rcl <profile> metadata remove-field <field_name> [--yes]
+rcl <source_profile> sync <target_profile> [--yes]
 ```
 
 You can also ask for help at any level of the command tree, such as `rcl demo setup --help`, `rcl demo metadata --help`, or `rcl demo metadata list-fields --help`.
@@ -145,6 +146,7 @@ Available today:
 - `metadata add-field age demographics [flags]` exports metadata, validates that the field is new, inserts the row after the last existing field in the same form when that form already exists (otherwise appending it), previews the generated row, confirms unless `--yes` is present, and re-imports the updated data dictionary
 - `metadata edit-field age [flags]` exports metadata, validates that the field exists, builds a patch from only the flags you pass, previews only the changed values, confirms unless `--yes` is present, and re-imports the updated data dictionary
 - `metadata remove-field age [--yes]` exports metadata, validates that the field exists, previews the exact row that will be deleted, confirms unless `--yes` is present, removes the row, and re-imports the updated data dictionary
+- `sync profile2 [--yes]` exports metadata from both profiles, compares differences by `field_name` and `form_name`, reports any column-level differences across the full metadata row, and then optionally imports the source profile metadata into the target profile
 
 `metadata add-field` uses sensible defaults when flags are omitted: a generated title-cased label from the field name and the REDCap `text` field type. `metadata edit-field` updates only the columns you specify, so `rcl demo metadata edit-field age --field-label "Participant Age"` leaves all other metadata columns untouched. Additional metadata columns can be passed as CLI flags such as `--field-label "Participant Age"`, `--field-type radio`, or `--required-field`. Standalone flags without a value are imported as `"y"`. When `--field-type` is present during editing, the CLI validates the new type and prints a warning in the preview because REDCap field type changes can require follow-up metadata adjustments. For v1, metadata validation stays intentionally light: the CLI checks profile/token presence, verifies whether a field should exist or be missing, validates allowed field types, and requires non-empty `select_choices_or_calculations` values for basic choice field types (`radio`, `dropdown`, and `checkbox`). It does not yet deeply validate branching logic syntax, advanced REDCap metadata dependencies, or record/data safety concerns. `metadata remove-field` follows the same safe export-preview-confirm-import flow, but deletes exactly one row by `field_name`.
 

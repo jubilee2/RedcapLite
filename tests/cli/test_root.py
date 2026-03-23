@@ -7,9 +7,10 @@ def test_main_without_args_prints_help(capsys) -> None:
     assert main([]) == 0
 
     captured = capsys.readouterr()
-    assert "usage: rcl <profile> [-h] {setup,metadata} ..." in captured.out
+    assert "usage: rcl <profile> [-h] {setup,metadata,sync} ..." in captured.out
     assert "setup" in captured.out
     assert "metadata" in captured.out
+    assert "sync" in captured.out
 
 
 def test_main_with_version_prints_version(monkeypatch, capsys) -> None:
@@ -26,8 +27,9 @@ def test_main_with_root_help_flag_prints_root_help(capsys) -> None:
     assert main(["--help"]) == 0
 
     captured = capsys.readouterr()
-    assert "usage: rcl <profile> [-h] {setup,metadata} ..." in captured.out
+    assert "usage: rcl <profile> [-h] {setup,metadata,sync} ..." in captured.out
     assert "Create or update stored access for a REDCap profile." in captured.out
+    assert "sync" in captured.out
     assert captured.err == ""
 
 
@@ -145,3 +147,14 @@ def test_build_parser_supports_setup_command() -> None:
     assert parsed.profile == "demo"
     assert parsed.command == "setup"
     assert callable(parsed.handler)
+
+
+def test_build_parser_supports_sync_command() -> None:
+    parser = build_parser()
+
+    parsed = parser.parse_args(["profile1", "sync", "profile2", "--yes"])
+
+    assert parsed.profile == "profile1"
+    assert parsed.command == "sync"
+    assert parsed.target_profile == "profile2"
+    assert parsed.yes is True

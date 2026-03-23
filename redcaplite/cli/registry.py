@@ -5,9 +5,9 @@ from __future__ import annotations
 from collections.abc import Iterator
 from types import ModuleType
 
-from . import metadata, setup
+from . import metadata, setup, sync
 
-_COMMAND_MODULES: tuple[ModuleType, ...] = (setup, metadata)
+_COMMAND_MODULES: tuple[ModuleType, ...] = (setup, metadata, sync)
 
 
 def iter_command_modules() -> Iterator[ModuleType]:
