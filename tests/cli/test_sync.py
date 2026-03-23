@@ -109,7 +109,7 @@ def test_main_sync_prompts_before_import(monkeypatch, capsys) -> None:
         "redcaplite.cli.sync.build_client",
         lambda profile: source_client if profile == "profile1" else target_client,
     )
-    monkeypatch.setattr("redcaplite.cli.sync.prompt_confirm", lambda prompt: False)
+    monkeypatch.setattr("redcaplite.cli.sync.confirm", lambda prompt: False)
 
     assert main(["profile1", "sync", "profile2"]) == 1
 

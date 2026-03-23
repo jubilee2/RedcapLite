@@ -13,8 +13,6 @@ from .helpers import ClientBootstrapError, build_client
 from .output import print_error, print_preview, print_success, print_table
 from .prompts import confirm
 
-prompt_confirm = confirm
-
 _IDENTIFIER_COLUMNS = ("field_name", "form_name")
 _MINIMUM_METADATA_COLUMNS = ("field_name", "form_name", "field_type", "field_label")
 
@@ -73,7 +71,7 @@ def run_sync(source_profile: str, target_profile: str, assume_yes: bool = False)
         print_success(f'No metadata differences found between "{source_profile}" and "{target_profile}".')
         return 0
 
-    if not assume_yes and not prompt_confirm(
+    if not assume_yes and not confirm(
         f'Import metadata from "{source_profile}" into "{target_profile}"? [y/N]: '
     ):
         print_error("cancelled by user.")
