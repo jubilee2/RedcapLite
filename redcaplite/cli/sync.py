@@ -47,7 +47,7 @@ def run_sync(source_profile: str, target_profile: str, assume_yes: bool = False)
             f'Metadata comparison: source "{source_profile}" -> target "{target_profile}"',
             f'Source fields: {len(source_metadata.index)}',
             f'Target fields: {len(target_metadata.index)}',
-            "Comparison first computes source-only/target-only sets with an all-column anti join, then aligns rows by field_name for side-by-side differences.",
+            "Comparison prints rows that appear only in the source export and only in the target export using paired all-column anti joins.",
         ]
     )
     _print_comparison_table(
@@ -58,11 +58,6 @@ def run_sync(source_profile: str, target_profile: str, assume_yes: bool = False)
         "Rows only in target metadata (all columns):",
         comparison["target_only"],
     )
-    _print_comparison_table(
-        "Aligned rows with differing metadata values (all compared columns shown side-by-side):",
-        comparison["changed"],
-    )
-
     if not _has_differences(comparison):
         print_success(f'No metadata differences found between "{source_profile}" and "{target_profile}".')
         return 0
@@ -79,56 +74,23 @@ def run_sync(source_profile: str, target_profile: str, assume_yes: bool = False)
 
 
 def compare_metadata(source_metadata: pd.DataFrame, target_metadata: pd.DataFrame) -> dict[str, list[dict[str, Any]]]:
-    """Return metadata differences grouped by missing and changed rows."""
+    """Return metadata rows that only exist in one export or the other."""
     source_rows = metadata_to_records(source_metadata)
     target_rows = metadata_to_records(target_metadata)
-    source_records = {_record_key(record): record for record in source_rows}
-    target_records = {_record_key(record): record for record in target_rows}
     comparison_columns = _comparison_columns(source_rows, target_rows)
-    detail_columns = [column for column in comparison_columns if not _is_identifier_column(column)]
-
-    source_keys = set(source_records)
-    target_keys = set(target_records)
-    shared_keys = sorted(source_keys & target_keys)
 
     source_only = _left_anti_rows(source_rows, target_rows, comparison_columns)
     target_only = _left_anti_rows(target_rows, source_rows, comparison_columns)
 
-    changed: list[dict[str, Any]] = []
-    for key in shared_keys:
-        source_record = source_records[key]
-        target_record = target_records[key]
-        differing_columns = [
-            column
-            for column in comparison_columns
-            if source_record.get(column, "") != target_record.get(column, "")
-        ]
-        if not differing_columns:
-            continue
-        changed_row: dict[str, Any] = {
-            "field_name": key,
-            "differing_columns": ", ".join(differing_columns),
-        }
-        for column in detail_columns:
-            changed_row[f"source__{column}"] = source_record.get(column, "")
-            changed_row[f"target__{column}"] = target_record.get(column, "")
-        changed.append(changed_row)
-
     return {
         "source_only": source_only,
         "target_only": target_only,
-        "changed": changed,
     }
 
 
 def _handle_sync(args: argparse.Namespace) -> int:
     """CLI handler for ``sync``."""
     return run_sync(args.profile, args.target_profile, assume_yes=args.yes)
-
-
-def _record_key(record: dict[str, Any]) -> str:
-    """Return the metadata row identifier used for aligned comparison."""
-    return str(record["field_name"])
 
 
 def _comparison_columns(
@@ -141,15 +103,7 @@ def _comparison_columns(
         for column in record:
             if column not in discovered_columns:
                 discovered_columns.append(column)
-
-    leading_columns = [column for column in ("field_name",) if column in discovered_columns]
-    trailing_columns = [column for column in discovered_columns if not _is_identifier_column(column)]
-    return [*leading_columns, *trailing_columns]
-
-
-def _is_identifier_column(column: str) -> bool:
-    """Return whether a metadata column is one of the row alignment identifiers."""
-    return column == "field_name"
+    return discovered_columns
 
 
 def _row_for_display(record: dict[str, Any], columns: list[str]) -> dict[str, Any]:
@@ -182,7 +136,7 @@ def _left_anti_rows(
 
 def _has_differences(comparison: dict[str, list[dict[str, Any]]]) -> bool:
     """Return whether the comparison payload contains any difference rows."""
-    return any(comparison[group] for group in ("source_only", "target_only", "changed"))
+    return any(comparison[group] for group in ("source_only", "target_only"))
 
 
 def _print_comparison_table(title: str, rows: list[dict[str, Any]]) -> None:

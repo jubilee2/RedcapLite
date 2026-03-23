@@ -78,10 +78,6 @@ def test_main_sync_prints_differences_and_imports_source_metadata(monkeypatch, c
     assert "Rows only in target metadata (all columns):" in captured.out
     assert "weight" in captured.out
     assert "Weight" in captured.out
-    assert "Aligned rows with differing metadata values" in captured.out
-    assert "field_label" in captured.out
-    assert "source__field_label" in captured.out
-    assert "target__field_label" in captured.out
     assert "Participant Age" in captured.out
     assert "Age" in captured.out
     assert 'Imported metadata from "profile1" into "profile2".' in captured.out
@@ -191,57 +187,5 @@ def test_compare_metadata_uses_all_column_anti_join_for_source_and_target_sets()
             "field_type": "text",
             "field_label": "Age",
             "required_field": "",
-        }
-    ]
-    assert comparison["changed"] == [
-        {
-            "field_name": "age",
-            "differing_columns": "field_label",
-            "source__form_name": "demographics",
-            "target__form_name": "demographics",
-            "source__field_type": "text",
-            "target__field_type": "text",
-            "source__field_label": "Participant Age",
-            "target__field_label": "Age",
-            "source__required_field": "",
-            "target__required_field": "",
-        }
-    ]
-
-
-def test_compare_metadata_aligns_changed_rows_by_field_name_only() -> None:
-    source_metadata = pd.DataFrame(
-        [
-            {
-                "field_name": "age",
-                "form_name": "demographics",
-                "field_type": "text",
-                "field_label": "Age",
-            }
-        ]
-    )
-    target_metadata = pd.DataFrame(
-        [
-            {
-                "field_name": "age",
-                "form_name": "follow_up",
-                "field_type": "text",
-                "field_label": "Age",
-            }
-        ]
-    )
-
-    comparison = compare_metadata(source_metadata, target_metadata)
-
-    assert comparison["changed"] == [
-        {
-            "field_name": "age",
-            "differing_columns": "form_name",
-            "source__form_name": "demographics",
-            "target__form_name": "follow_up",
-            "source__field_type": "text",
-            "target__field_type": "text",
-            "source__field_label": "Age",
-            "target__field_label": "Age",
         }
     ]
