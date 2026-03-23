@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import pandas as pd
+
+from redcaplite.cli.sync import compare_metadata
 from redcaplite.cli.main import main
 from tests.cli.fakes import SyncMetadataClient
 
@@ -68,7 +71,7 @@ def test_main_sync_prints_differences_and_imports_source_metadata(monkeypatch, c
 
     captured = capsys.readouterr()
     assert 'Metadata comparison: source "profile1" -> target "profile2"' in captured.out
-    assert "Comparison uses field_name + form_name to align rows" in captured.out
+    assert "all-column anti join" in captured.out
     assert "Rows only in source metadata (all columns):" in captured.out
     assert "height" in captured.out
     assert "Height" in captured.out
@@ -144,3 +147,62 @@ def test_main_sync_reports_when_metadata_matches(monkeypatch, capsys) -> None:
     assert 'No metadata differences found between "profile1" and "profile2".' in captured.out
     assert target_client.imported_metadata is None
     assert captured.err == ""
+
+
+def test_compare_metadata_uses_all_column_anti_join_for_source_and_target_sets() -> None:
+    source_metadata = pd.DataFrame(
+        [
+            {
+                "field_name": "age",
+                "form_name": "demographics",
+                "field_type": "text",
+                "field_label": "Participant Age",
+                "required_field": "",
+            }
+        ]
+    )
+    target_metadata = pd.DataFrame(
+        [
+            {
+                "field_name": "age",
+                "form_name": "demographics",
+                "field_type": "text",
+                "field_label": "Age",
+                "required_field": "",
+            }
+        ]
+    )
+
+    comparison = compare_metadata(source_metadata, target_metadata)
+
+    assert comparison["source_only"] == [
+        {
+            "field_name": "age",
+            "form_name": "demographics",
+            "field_type": "text",
+            "field_label": "Participant Age",
+            "required_field": "",
+        }
+    ]
+    assert comparison["target_only"] == [
+        {
+            "field_name": "age",
+            "form_name": "demographics",
+            "field_type": "text",
+            "field_label": "Age",
+            "required_field": "",
+        }
+    ]
+    assert comparison["changed"] == [
+        {
+            "field_name": "age",
+            "form_name": "demographics",
+            "differing_columns": "field_label",
+            "source__field_type": "text",
+            "target__field_type": "text",
+            "source__field_label": "Participant Age",
+            "target__field_label": "Age",
+            "source__required_field": "",
+            "target__required_field": "",
+        }
+    ]

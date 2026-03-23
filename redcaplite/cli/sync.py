@@ -50,7 +50,7 @@ def run_sync(source_profile: str, target_profile: str, assume_yes: bool = False)
             f'Metadata comparison: source "{source_profile}" -> target "{target_profile}"',
             f'Source fields: {len(source_metadata.index)}',
             f'Target fields: {len(target_metadata.index)}',
-            "Comparison uses field_name + form_name to align rows, then prints all metadata columns for differences.",
+            "Comparison first computes source-only/target-only sets with an all-column anti join, then aligns rows by field_name + form_name for side-by-side differences.",
         ]
     )
     _print_comparison_table(
@@ -83,23 +83,19 @@ def run_sync(source_profile: str, target_profile: str, assume_yes: bool = False)
 
 def compare_metadata(source_metadata: pd.DataFrame, target_metadata: pd.DataFrame) -> dict[str, list[dict[str, Any]]]:
     """Return metadata differences grouped by missing and changed rows."""
-    source_records = {_record_key(record): record for record in metadata_to_records(source_metadata)}
-    target_records = {_record_key(record): record for record in metadata_to_records(target_metadata)}
-    comparison_columns = _comparison_columns(source_records, target_records)
+    source_rows = metadata_to_records(source_metadata)
+    target_rows = metadata_to_records(target_metadata)
+    source_records = {_record_key(record): record for record in source_rows}
+    target_records = {_record_key(record): record for record in target_rows}
+    comparison_columns = _comparison_columns(source_rows, target_rows)
     detail_columns = [column for column in comparison_columns if not _is_identifier_column(column)]
 
     source_keys = set(source_records)
     target_keys = set(target_records)
     shared_keys = sorted(source_keys & target_keys)
 
-    source_only = [
-        _row_for_display(source_records[key], comparison_columns)
-        for key in sorted(source_keys - target_keys)
-    ]
-    target_only = [
-        _row_for_display(target_records[key], comparison_columns)
-        for key in sorted(target_keys - source_keys)
-    ]
+    source_only = _left_anti_rows(source_rows, target_rows, comparison_columns)
+    target_only = _left_anti_rows(target_rows, source_rows, comparison_columns)
 
     changed: list[dict[str, Any]] = []
     for key in shared_keys:
@@ -151,12 +147,12 @@ def _record_key(record: dict[str, Any]) -> tuple[str, str]:
 
 
 def _comparison_columns(
-    source_records: dict[tuple[str, str], dict[str, Any]],
-    target_records: dict[tuple[str, str], dict[str, Any]],
+    source_rows: list[dict[str, Any]],
+    target_rows: list[dict[str, Any]],
 ) -> list[str]:
     """Return ordered metadata columns that should participate in comparison output."""
     discovered_columns: list[str] = []
-    for record in list(source_records.values()) + list(target_records.values()):
+    for record in [*source_rows, *target_rows]:
         for column in record:
             if column not in discovered_columns:
                 discovered_columns.append(column)
@@ -174,6 +170,29 @@ def _is_identifier_column(column: str) -> bool:
 def _row_for_display(record: dict[str, Any], columns: list[str]) -> dict[str, Any]:
     """Return a metadata row normalized to the requested display columns."""
     return {column: record.get(column, "") for column in columns}
+
+
+def _left_anti_rows(
+    left_rows: list[dict[str, Any]],
+    right_rows: list[dict[str, Any]],
+    columns: list[str],
+) -> list[dict[str, Any]]:
+    """Return left-only metadata rows using an all-column anti join."""
+    left_frame = pd.DataFrame([_row_for_display(row, columns) for row in left_rows], columns=columns)
+    if left_frame.empty:
+        return []
+
+    right_frame = pd.DataFrame([_row_for_display(row, columns) for row in right_rows], columns=columns)
+    if right_frame.empty:
+        return left_frame.to_dict(orient="records")
+
+    anti_join = left_frame.merge(
+        right_frame.drop_duplicates(),
+        how="left",
+        on=columns,
+        indicator=True,
+    )
+    return anti_join.loc[anti_join["_merge"] == "left_only", columns].to_dict(orient="records")
 
 
 def _has_differences(comparison: dict[str, list[dict[str, Any]]]) -> bool:
