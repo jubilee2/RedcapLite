@@ -1,10 +1,10 @@
 [project]
 name = "redcaplite"
-version = "1.4.2"
+version = "2.0.0"
 authors = [
   { name="Jubilee Tan", email="jubilee2@gmail.com" },
 ]
-description = "A Lightweight Python Client for REDCap"
+description = "A Python client for REDCap with integrated CLI support"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
@@ -13,8 +13,14 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "pandas", 
-    "requests"]
+    "keyring",
+    "pandas",
+    "pyyaml",
+    "requests",
+]
+
+[project.scripts]
+rcl = "redcaplite.cli.main:main"
 
 [project.urls]
 Homepage = "https://github.com/jubilee2/RedcapLite"
