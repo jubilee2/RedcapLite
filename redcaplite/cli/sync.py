@@ -13,7 +13,6 @@ from .helpers import ClientBootstrapError, build_client
 from .output import print_error, print_preview, print_success, print_table
 from .prompts import confirm
 
-_IDENTIFIER_COLUMNS = ("field_name", "form_name")
 _MINIMUM_METADATA_COLUMNS = ("field_name", "form_name", "field_type", "field_label")
 
 
@@ -87,7 +86,7 @@ def compare_metadata(source_metadata: pd.DataFrame, target_metadata: pd.DataFram
     source_records = {_record_key(record): record for record in metadata_to_records(source_metadata)}
     target_records = {_record_key(record): record for record in metadata_to_records(target_metadata)}
     comparison_columns = _comparison_columns(source_records, target_records)
-    detail_columns = [column for column in comparison_columns if column not in _IDENTIFIER_COLUMNS]
+    detail_columns = [column for column in comparison_columns if not _is_identifier_column(column)]
 
     source_keys = set(source_records)
     target_keys = set(target_records)
@@ -162,9 +161,14 @@ def _comparison_columns(
             if column not in discovered_columns:
                 discovered_columns.append(column)
 
-    leading_columns = [column for column in _IDENTIFIER_COLUMNS if column in discovered_columns]
-    trailing_columns = [column for column in discovered_columns if column not in _IDENTIFIER_COLUMNS]
+    leading_columns = [column for column in ("field_name", "form_name") if column in discovered_columns]
+    trailing_columns = [column for column in discovered_columns if not _is_identifier_column(column)]
     return [*leading_columns, *trailing_columns]
+
+
+def _is_identifier_column(column: str) -> bool:
+    """Return whether a metadata column is one of the row alignment identifiers."""
+    return column in {"field_name", "form_name"}
 
 
 def _row_for_display(record: dict[str, Any], columns: list[str]) -> dict[str, Any]:
