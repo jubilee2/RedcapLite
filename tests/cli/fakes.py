@@ -42,6 +42,8 @@ class MetadataClient(FakeClient):
     ) -> pd.DataFrame:
         assert format == "csv"
         metadata = pd.DataFrame(self._metadata)
+        if metadata.empty:
+            metadata = pd.DataFrame(columns=["field_name", "form_name", "field_type", "field_label"])
         if forms:
             metadata = metadata.loc[metadata["form_name"].isin(forms)]
         if fields:
@@ -52,6 +54,12 @@ class MetadataClient(FakeClient):
         self.imported_metadata = data
         self.imported_format = format
         return "1"
+
+
+class SyncMetadataClient(MetadataClient):
+    def __init__(self, url: str, token: str, metadata: list[dict[str, str]]) -> None:
+        super().__init__(url, token)
+        self._metadata = metadata
 
 
 class FailingClient(FakeClient):

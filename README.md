@@ -8,13 +8,13 @@
 
 **A Python client for REDCap with integrated CLI support.**
 
-Current package release: `2.0.0`.
+Current package release: `2.1.0`.
 
 `redcaplite` helps you connect to REDCap projects and perform common API and CLI workflows from one package. Whether you're a researcher automating data pulls or a developer building integrations, `redcaplite` supports both scripted API usage and command-line operations.
 
-## ✨ v2.0.0 – Introducing the RedcapLite CLI
+## ✨ v2.1.0 – Metadata sync workflow
 
-Version 2.0.0 includes `rcl`, a command-line interface for interacting with REDCap projects as part of the standard `redcaplite` installation.
+Version 2.1.0 adds the `sync` workflow to `rcl`, making it easier to compare metadata between saved REDCap profiles and import the source metadata into a target project after review.
 
 The CLI provides:
 - Profile-based access (`rcl <profile> ...`)
@@ -28,7 +28,8 @@ This release provides a unified package for REDCap API access and CLI workflows.
 -   Python client support for the most common REDCap API endpoints.
 -   Integrated `rcl` CLI included in the standard installation.
 -   Fully typed and tested for reliable data exchange.
--   Runtime dependencies include `keyring`, `pandas`, `pyyaml`, and `requests`.
+-   Requires Python 3.11 or newer.
+-   Runtime dependencies include `keyring`, `pandas>=3.0`, `pyyaml`, and `requests`.
 
 ## Prerequisites
 Before using `redcaplite`, you need to obtain two key pieces of information from your REDCap project's API page:
@@ -42,7 +43,7 @@ To install `redcaplite` from the Python Package Index (PyPI), run the following 
 ```sh
 pip install redcaplite
 ```
-This installs the package together with its runtime dependencies: `keyring`, `pandas`, `pyyaml`, and `requests`. This is the recommended installation method for most users, and it includes the `rcl` command for CLI usage:
+This installs the package together with its runtime dependencies: `keyring`, `pandas>=3.0`, `pyyaml`, and `requests`. This is the recommended installation method for most users, and it includes the `rcl` command for CLI usage:
 ```sh
 rcl --help
 ```
@@ -96,9 +97,9 @@ except Exception as e:
 
 ```
 
-## CLI Setup (Phase 2)
+## CLI Commands
 
-The `rcl` command now includes an interactive setup workflow plus the Phase 2 metadata command tree.
+The `rcl` command now includes an interactive setup workflow, a profile-scoped metadata command tree, and a top-level metadata sync command.
 
 > **Important update:** the REDCap CLI is no longer limited to setup alone. You can now use `rcl` to perform REDCap operations directly from the command line, including metadata listing, add/edit workflows, and field removal.
 
@@ -134,7 +135,7 @@ rcl <profile> metadata remove-field <field_name> [--yes]
 
 You can also ask for help at any level of the command tree, such as `rcl demo setup --help`, `rcl demo metadata --help`, or `rcl demo metadata list-fields --help`.
 
-At the root level, `rcl --help` now highlights both entry points explicitly: the `setup` workflow and the profile-scoped `metadata` command tree.
+At the root level, `rcl --help` now highlights all top-level entry points explicitly: `setup`, `metadata`, and `sync`.
 
 Available today:
 
@@ -147,6 +148,20 @@ Available today:
 - `metadata remove-field age [--yes]` exports metadata, validates that the field exists, previews the exact row that will be deleted, confirms unless `--yes` is present, removes the row, and re-imports the updated data dictionary
 
 `metadata add-field` uses sensible defaults when flags are omitted: a generated title-cased label from the field name and the REDCap `text` field type. `metadata edit-field` updates only the columns you specify, so `rcl demo metadata edit-field age --field-label "Participant Age"` leaves all other metadata columns untouched. Additional metadata columns can be passed as CLI flags such as `--field-label "Participant Age"`, `--field-type radio`, or `--required-field`. Standalone flags without a value are imported as `"y"`. When `--field-type` is present during editing, the CLI validates the new type and prints a warning in the preview because REDCap field type changes can require follow-up metadata adjustments. For v1, metadata validation stays intentionally light: the CLI checks profile/token presence, verifies whether a field should exist or be missing, validates allowed field types, and requires non-empty `select_choices_or_calculations` values for basic choice field types (`radio`, `dropdown`, and `checkbox`). It does not yet deeply validate branching logic syntax, advanced REDCap metadata dependencies, or record/data safety concerns. `metadata remove-field` follows the same safe export-preview-confirm-import flow, but deletes exactly one row by `field_name`.
+
+### Sync command
+
+The metadata sync workflow is a top-level command:
+
+```sh
+rcl <source_profile> sync <target_profile> [--yes]
+```
+
+Use `sync` when you want to compare full metadata exports between two saved profiles and optionally import the source metadata into the target project after review.
+
+Available today:
+
+- `sync profile2 [--yes]` exports metadata from both profiles, derives source-only and target-only row sets with paired DataFrame-based all-column anti-joins for review, and then optionally imports the source profile metadata into the target profile
 
 Internally, `redcaplite.metadata_ops.transform` and `redcaplite.metadata_ops.validate` now provide the reusable add/edit/remove helpers for metadata write workflows, including CLI flag-to-row conversion, field-type validation, light choice-field validation, default label generation, and DataFrame-based append/update/remove helpers.
 

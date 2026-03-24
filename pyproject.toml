@@ -1,12 +1,12 @@
 [project]
 name = "redcaplite"
-version = "2.0.0"
+version = "2.1.0"
 authors = [
   { name="Jubilee Tan", email="jubilee2@gmail.com" },
 ]
 description = "A Python client for REDCap with integrated CLI support"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.11"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -14,7 +14,7 @@ classifiers = [
 ]
 dependencies = [
     "keyring",
-    "pandas",
+    "pandas>=3.0",
     "pyyaml",
     "requests",
 ]
