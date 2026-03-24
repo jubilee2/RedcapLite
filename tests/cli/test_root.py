@@ -52,10 +52,10 @@ def test_main_with_metadata_help_prints_metadata_help(capsys) -> None:
 
 
 def test_main_with_metadata_subcommand_help_prints_subcommand_help(capsys) -> None:
-    assert main(["demo", "metadata", "list-fields", "--help"]) == 0
+    assert main(["demo", "metadata", "list", "--help"]) == 0
 
     captured = capsys.readouterr()
-    assert "usage: rcl <profile> metadata list-fields [-h]" in captured.out
+    assert "usage: rcl <profile> metadata list [-h]" in captured.out
     assert "--field FIELD_NAMES" in captured.out
     assert "--form FORM_NAMES" in captured.out
     assert captured.err == ""
@@ -72,22 +72,22 @@ def test_main_returns_error_for_missing_profile_subcommand(capsys) -> None:
 def test_build_parser_supports_metadata_group() -> None:
     parser = build_parser()
 
-    parsed = parser.parse_args(["demo", "metadata", "list-fields"])
+    parsed = parser.parse_args(["demo", "metadata", "list"])
 
     assert parsed.profile == "demo"
     assert parsed.command == "metadata"
-    assert parsed.metadata_command == "list-fields"
+    assert parsed.metadata_command == "list"
 
 
 def test_build_parser_supports_metadata_list_fields_filters() -> None:
     parser = build_parser()
 
     parsed = parser.parse_args(
-        ["demo", "metadata", "list-fields", "--form", "demographics", "--field", "age"]
+        ["demo", "metadata", "list", "--form", "demographics", "--field", "age"]
     )
 
     assert parsed.profile == "demo"
-    assert parsed.metadata_command == "list-fields"
+    assert parsed.metadata_command == "list"
     assert parsed.form_names == ["demographics"]
     assert parsed.field_names == ["age"]
 
@@ -99,7 +99,7 @@ def test_build_parser_supports_metadata_add_field_flags() -> None:
         [
             "demo",
             "metadata",
-            "add-field",
+            "add",
             "age",
             "demographics",
             "--field-type",
@@ -111,7 +111,7 @@ def test_build_parser_supports_metadata_add_field_flags() -> None:
 
     assert parsed.profile == "demo"
     assert parsed.command == "metadata"
-    assert parsed.metadata_command == "add-field"
+    assert parsed.metadata_command == "add"
     assert parsed.field_name == "age"
     assert parsed.form_name == "demographics"
     assert parsed.field_flags == ["--field-type", "text", "--field-label", "Age"]
@@ -120,10 +120,10 @@ def test_build_parser_supports_metadata_add_field_flags() -> None:
 def test_build_parser_supports_metadata_edit_field_flags() -> None:
     parser = build_parser()
 
-    parsed = parser.parse_args(["demo", "metadata", "edit-field", "age", "--field-label", "Participant age"])
+    parsed = parser.parse_args(["demo", "metadata", "edit", "age", "--field-label", "Participant age"])
 
     assert parsed.profile == "demo"
-    assert parsed.metadata_command == "edit-field"
+    assert parsed.metadata_command == "edit"
     assert parsed.field_name == "age"
     assert parsed.field_flags == ["--field-label", "Participant age"]
 
@@ -131,10 +131,10 @@ def test_build_parser_supports_metadata_edit_field_flags() -> None:
 def test_build_parser_supports_metadata_remove_field_confirmation_flag() -> None:
     parser = build_parser()
 
-    parsed = parser.parse_args(["demo", "metadata", "remove-field", "age", "--yes"])
+    parsed = parser.parse_args(["demo", "metadata", "remove", "age", "--yes"])
 
     assert parsed.profile == "demo"
-    assert parsed.metadata_command == "remove-field"
+    assert parsed.metadata_command == "remove"
     assert parsed.field_name == "age"
     assert parsed.yes is True
 
