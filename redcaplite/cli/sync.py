@@ -51,14 +51,14 @@ def run_sync(source_profile: str, target_profile: str, assume_yes: bool = False)
         ]
     )
     _print_comparison_table(
-        "Rows only in source metadata (all columns):",
-        comparison["source_only"],
+        "Fields that will import:",
+        metadata_to_records(comparison["source_only"]),
     )
     _print_comparison_table(
-        "Rows only in target metadata (all columns):",
-        comparison["target_only"],
+        "Fields that will be removed or updated after import:",
+        metadata_to_records(comparison["target_only"]),
     )
-    if not _has_differences(comparison):
+    if comparison["source_only"].empty and comparison["target_only"].empty:
         print_success(f'No metadata differences found between "{source_profile}" and "{target_profile}".')
         return 0
 
@@ -73,14 +73,14 @@ def run_sync(source_profile: str, target_profile: str, assume_yes: bool = False)
     return 0
 
 
-def compare_metadata(source_metadata: pd.DataFrame, target_metadata: pd.DataFrame) -> dict[str, list[dict[str, Any]]]:
+def compare_metadata(source_metadata: pd.DataFrame, target_metadata: pd.DataFrame) -> dict[str, pd.DataFrame]:
     """Return metadata rows that only exist in one export or the other."""
     source_only = _left_anti_rows(source_metadata, target_metadata)
     target_only = _left_anti_rows(target_metadata, source_metadata)
 
     return {
-        "source_only": metadata_to_records(source_only),
-        "target_only": metadata_to_records(target_only),
+        "source_only": source_only,
+        "target_only": target_only,
     }
 
 
@@ -107,26 +107,16 @@ def _left_anti_rows(
         on=columns
     )
 
-
-def _has_differences(comparison: dict[str, list[dict[str, Any]]]) -> bool:
-    """Return whether the comparison payload contains any difference rows."""
-    return any(comparison[group] for group in ("source_only", "target_only"))
-
-
 def _print_comparison_table(title: str, rows: list[dict[str, Any]]) -> None:
     """Print a titled comparison section."""
     print_preview([title])
     if not rows:
         print_preview(["  (none)"])
         return
-    print_table(_normalize_rows_for_table(rows))
+    print_table(_comparison_table_rows(rows))
 
 
-def _normalize_rows_for_table(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Fill missing keys so the table renderer prints every column for every row."""
-    ordered_keys: list[str] = []
-    for row in rows:
-        for key in row:
-            if key not in ordered_keys:
-                ordered_keys.append(key)
-    return [{key: row.get(key, "") for key in ordered_keys} for row in rows]
+def _comparison_table_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Reduce comparison rows to the columns shown in sync output."""
+    columns = ["field_name", "form_name", "field_type"]
+    return [{column: row.get(column, "") for column in columns} for row in rows]
