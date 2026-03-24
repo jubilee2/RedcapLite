@@ -97,9 +97,10 @@ def _comparison_columns(
     source_rows: list[dict[str, Any]],
     target_rows: list[dict[str, Any]],
 ) -> list[str]:
-    """Return ordered metadata columns that should participate in comparison output."""
+    """Return comparison columns using the source export schema when available."""
     discovered_columns: list[str] = []
-    for record in [*source_rows, *target_rows]:
+    rows_to_scan = source_rows if source_rows else target_rows
+    for record in rows_to_scan:
         for column in record:
             if column not in discovered_columns:
                 discovered_columns.append(column)

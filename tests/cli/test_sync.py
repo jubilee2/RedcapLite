@@ -189,3 +189,34 @@ def test_compare_metadata_uses_all_column_anti_join_for_source_and_target_sets()
             "required_field": "",
         }
     ]
+
+
+def test_compare_metadata_uses_source_columns_for_anti_join() -> None:
+    source_metadata = pd.DataFrame(
+        [
+            {
+                "field_name": "age",
+                "form_name": "demographics",
+                "field_type": "text",
+                "field_label": "Age",
+            }
+        ]
+    )
+    target_metadata = pd.DataFrame(
+        [
+            {
+                "field_name": "age",
+                "form_name": "demographics",
+                "field_type": "text",
+                "field_label": "Age",
+                "extra_target_only_column": "ignored",
+            }
+        ]
+    )
+
+    comparison = compare_metadata(source_metadata, target_metadata)
+
+    assert comparison == {
+        "source_only": [],
+        "target_only": [],
+    }
