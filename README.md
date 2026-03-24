@@ -28,7 +28,7 @@ This release provides a unified package for REDCap API access and CLI workflows.
 -   Python client support for the most common REDCap API endpoints.
 -   Integrated `rcl` CLI included in the standard installation.
 -   Fully typed and tested for reliable data exchange.
--   Runtime dependencies include `keyring`, `pandas`, `pyyaml`, and `requests`.
+-   Runtime dependencies include `keyring`, `pandas>=3.0`, `pyyaml`, and `requests`.
 
 ## Prerequisites
 Before using `redcaplite`, you need to obtain two key pieces of information from your REDCap project's API page:
@@ -42,7 +42,7 @@ To install `redcaplite` from the Python Package Index (PyPI), run the following 
 ```sh
 pip install redcaplite
 ```
-This installs the package together with its runtime dependencies: `keyring`, `pandas`, `pyyaml`, and `requests`. This is the recommended installation method for most users, and it includes the `rcl` command for CLI usage:
+This installs the package together with its runtime dependencies: `keyring`, `pandas>=3.0`, `pyyaml`, and `requests`. This is the recommended installation method for most users, and it includes the `rcl` command for CLI usage:
 ```sh
 rcl --help
 ```
@@ -160,7 +160,7 @@ Use `sync` when you want to compare full metadata exports between two saved prof
 
 Available today:
 
-- `sync profile2 [--yes]` exports metadata from both profiles, derives source-only and target-only row sets with paired all-column anti-joins for review, and then optionally imports the source profile metadata into the target profile
+- `sync profile2 [--yes]` exports metadata from both profiles, derives source-only and target-only row sets with paired DataFrame-based all-column anti-joins for review, and then optionally imports the source profile metadata into the target profile
 
 Internally, `redcaplite.metadata_ops.transform` and `redcaplite.metadata_ops.validate` now provide the reusable add/edit/remove helpers for metadata write workflows, including CLI flag-to-row conversion, field-type validation, light choice-field validation, default label generation, and DataFrame-based append/update/remove helpers.
 

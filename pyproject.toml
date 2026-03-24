@@ -14,7 +14,7 @@ classifiers = [
 ]
 dependencies = [
     "keyring",
-    "pandas",
+    "pandas>=3.0",
     "pyyaml",
     "requests",
 ]

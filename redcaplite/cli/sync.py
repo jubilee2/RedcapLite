@@ -75,16 +75,12 @@ def run_sync(source_profile: str, target_profile: str, assume_yes: bool = False)
 
 def compare_metadata(source_metadata: pd.DataFrame, target_metadata: pd.DataFrame) -> dict[str, list[dict[str, Any]]]:
     """Return metadata rows that only exist in one export or the other."""
-    source_rows = metadata_to_records(source_metadata)
-    target_rows = metadata_to_records(target_metadata)
-    comparison_columns = _comparison_columns(source_rows, target_rows)
-
-    source_only = _left_anti_rows(source_rows, target_rows, comparison_columns)
-    target_only = _left_anti_rows(target_rows, source_rows, comparison_columns)
+    source_only = _left_anti_rows(source_metadata, target_metadata)
+    target_only = _left_anti_rows(target_metadata, source_metadata)
 
     return {
-        "source_only": source_only,
-        "target_only": target_only,
+        "source_only": metadata_to_records(source_only),
+        "target_only": metadata_to_records(target_only),
     }
 
 
@@ -93,46 +89,23 @@ def _handle_sync(args: argparse.Namespace) -> int:
     return run_sync(args.profile, args.target_profile, assume_yes=args.yes)
 
 
-def _comparison_columns(
-    source_rows: list[dict[str, Any]],
-    target_rows: list[dict[str, Any]],
-) -> list[str]:
-    """Return comparison columns using the source export schema when available."""
-    discovered_columns: list[str] = []
-    rows_to_scan = source_rows if source_rows else target_rows
-    for record in rows_to_scan:
-        for column in record:
-            if column not in discovered_columns:
-                discovered_columns.append(column)
-    return discovered_columns
-
-
-def _row_for_display(record: dict[str, Any], columns: list[str]) -> dict[str, Any]:
-    """Return a metadata row normalized to the requested display columns."""
-    return {column: record.get(column, "") for column in columns}
-
-
 def _left_anti_rows(
-    left_rows: list[dict[str, Any]],
-    right_rows: list[dict[str, Any]],
-    columns: list[str],
-) -> list[dict[str, Any]]:
+    left_rows: pd.DataFrame,
+    right_rows: pd.DataFrame,
+) -> pd.DataFrame:
     """Return left-only metadata rows using an all-column anti join."""
-    left_frame = pd.DataFrame([_row_for_display(row, columns) for row in left_rows], columns=columns)
-    if left_frame.empty:
-        return []
+    columns = list(left_rows.columns)
+    left_frame = left_rows.copy().fillna("")
+    right_frame = right_rows.copy().fillna("")
 
-    right_frame = pd.DataFrame([_row_for_display(row, columns) for row in right_rows], columns=columns)
-    if right_frame.empty:
-        return left_frame.to_dict(orient="records")
+    if left_frame.empty or right_frame.empty:
+        return left_frame
 
-    anti_join = left_frame.merge(
+    return left_frame.merge(
         right_frame.drop_duplicates(),
-        how="left",
-        on=columns,
-        indicator=True,
+        how="left_anti",
+        on=columns
     )
-    return anti_join.loc[anti_join["_merge"] == "left_only", columns].to_dict(orient="records")
 
 
 def _has_differences(comparison: dict[str, list[dict[str, Any]]]) -> bool:
