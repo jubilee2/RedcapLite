@@ -99,7 +99,7 @@ def test_build_new_field_row_uses_defaults_and_ignores_cli_only_fields() -> None
     args = Namespace(
         profile="demo",
         command="metadata",
-        metadata_command="add-field",
+        metadata_command="add",
         field_name="participant_age",
         form_name="demographics",
         field_type=None,

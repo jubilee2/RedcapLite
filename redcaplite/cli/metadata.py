@@ -27,10 +27,10 @@ from .prompts import confirm
 prompt_confirm = confirm
 
 _METADATA_SUBCOMMANDS = (
-    "list-fields",
-    "add-field",
-    "edit-field",
-    "remove-field",
+    "list",
+    "add",
+    "edit",
+    "remove",
 )
 
 
@@ -49,7 +49,7 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
     # to scan and update as metadata features are added.
     for name in _METADATA_SUBCOMMANDS:
         command_parser = metadata_subparsers.add_parser(name, prog=f"rcl <profile> metadata {name}")
-        if name == "list-fields":
+        if name == "list":
             command_parser.add_argument(
                 "--form",
                 dest="form_names",
@@ -64,9 +64,9 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
             )
             command_parser.set_defaults(handler=_handle_list_fields)
             continue
-        if name in {"add-field", "edit-field", "remove-field"}:
+        if name in {"add", "edit", "remove"}:
             command_parser.add_argument("field_name")
-        if name == "add-field":
+        if name == "add":
             command_parser.add_argument("form_name")
             command_parser.add_argument(
                 "field_flags",
@@ -75,7 +75,7 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
             )
             command_parser.set_defaults(handler=_handle_add_field)
             continue
-        if name == "edit-field":
+        if name == "edit":
             command_parser.add_argument(
                 "field_flags",
                 nargs=argparse.REMAINDER,
@@ -83,7 +83,7 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
             )
             command_parser.set_defaults(handler=_handle_edit_field)
             continue
-        if name == "remove-field":
+        if name == "remove":
             command_parser.add_argument(
                 "--yes",
                 action="store_true",
@@ -141,7 +141,7 @@ def run_add_field(
     field_flags: list[str],
 ) -> int:
     """Append a new metadata field and import the updated metadata."""
-    # ``add-field`` accepts arbitrary metadata flags after the required
+    # ``add`` accepts arbitrary metadata flags after the required
     # positional arguments, so strip out the CLI-only confirmation flag before
     # passing the remainder into metadata parsing.
     assume_yes, metadata_flag_tokens = _split_confirmation_flag(field_flags)
@@ -220,17 +220,17 @@ def run_edit_field(profile: str, field_name: str, field_flags: list[str]) -> int
 
 
 def _handle_list_fields(args: argparse.Namespace) -> int:
-    """CLI handler for ``metadata list-fields``."""
+    """CLI handler for ``metadata list``."""
     return run_list_fields(args.profile, forms=args.form_names, fields=args.field_names)
 
 
 def _handle_add_field(args: argparse.Namespace) -> int:
-    """CLI handler for ``metadata add-field``."""
+    """CLI handler for ``metadata add``."""
     return run_add_field(args.profile, args.field_name, args.form_name, args.field_flags)
 
 
 def _handle_edit_field(args: argparse.Namespace) -> int:
-    """CLI handler for ``metadata edit-field``."""
+    """CLI handler for ``metadata edit``."""
     return run_edit_field(args.profile, args.field_name, args.field_flags)
 
 
@@ -261,7 +261,7 @@ def run_remove_field(profile: str, field_name: str, assume_yes: bool = False) ->
 
 
 def _handle_remove_field(args: argparse.Namespace) -> int:
-    """CLI handler for ``metadata remove-field``."""
+    """CLI handler for ``metadata remove``."""
     return run_remove_field(args.profile, args.field_name, assume_yes=args.yes)
 
 
@@ -277,7 +277,7 @@ def _ensure_metadata_frame(metadata: Any) -> pd.DataFrame:
 
 
 def _split_confirmation_flag(field_flags: list[str]) -> tuple[bool, list[str]]:
-    """Extract ``--yes`` from metadata add-field flag tokens."""
+    """Extract ``--yes`` from metadata add flag tokens."""
     # ``argparse.REMAINDER`` treats every remaining token as metadata input, so
     # we manually peel off ``--yes`` instead of declaring it as a normal option.
     assume_yes = "--yes" in field_flags
