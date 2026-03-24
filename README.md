@@ -28,6 +28,7 @@ This release provides a unified package for REDCap API access and CLI workflows.
 -   Python client support for the most common REDCap API endpoints.
 -   Integrated `rcl` CLI included in the standard installation.
 -   Fully typed and tested for reliable data exchange.
+-   Requires Python 3.11 or newer.
 -   Runtime dependencies include `keyring`, `pandas>=3.0`, `pyyaml`, and `requests`.
 
 ## Prerequisites
