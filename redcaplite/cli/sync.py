@@ -32,6 +32,10 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
 
 def run_sync(source_profile: str, target_profile: str, assume_yes: bool = False) -> int:
     """Compare source metadata to target metadata and optionally import source into target."""
+    if source_profile == target_profile:
+        print_error("Source and target profiles cannot be the same.")
+        return 1
+
     try:
         source_client = build_client(source_profile)
         target_client = build_client(target_profile)
