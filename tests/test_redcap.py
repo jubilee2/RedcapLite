@@ -403,6 +403,20 @@ def test_redcap_client_get_metadata_with_kwargs(client):
                                 'fields[0]': 'abc', 'fields[1]': 'def', 'returnFormat': 'json', 'token': 'token'},
     )
 
+def test_redcap_client_export_metadata_raw_csv(client):
+    """Test RedcapClient export_metadata_raw method."""
+    mock_response = mock_response_factory(return_text="field_name,form_name\nfoo,bar\n")
+    mock_redcap_client_post(
+        client,
+        'export_metadata_raw',
+        method_kwargs={},
+        mock_response=mock_response,
+        expected_json=None,
+        expected_text="field_name,form_name\nfoo,bar\n",
+        expected_requests_data={
+            'content': 'metadata', 'format': 'csv', 'returnFormat': 'json', 'token': 'token'},
+    )
+
 
 def test_redcap_client_import_metadata_json(client):
     """Test RedcapClient import_metadata method"""

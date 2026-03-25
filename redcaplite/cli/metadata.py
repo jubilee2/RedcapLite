@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
@@ -62,6 +63,16 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
                 action="append",
                 help="Limit results to one or more REDCap field names. Repeat to pass multiple fields.",
             )
+            command_parser.add_argument(
+                "--raw-output",
+                help="Write the raw metadata export payload to a file instead of printing a parsed table.",
+            )
+            command_parser.add_argument(
+                "--raw-format",
+                choices=("csv", "json"),
+                default="csv",
+                help="Format to request when using --raw-output (default: csv).",
+            )
             command_parser.set_defaults(handler=_handle_list_fields)
             continue
         if name in {"add", "edit", "remove"}:
@@ -98,10 +109,23 @@ def run_list_fields(
     profile: str,
     forms: list[str] | None = None,
     fields: list[str] | None = None,
+    raw_output: str | None = None,
+    raw_format: str = "csv",
 ) -> int:
     """List metadata fields for a profile, optionally filtered by API-supported selectors."""
     try:
         client = build_client(profile)
+        if raw_output:
+            raw_metadata = client.export_metadata_raw(
+                fields=fields or [],
+                forms=forms or [],
+                format=raw_format,
+            )
+            output_path = Path(raw_output)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            output_path.write_text(raw_metadata, encoding="utf-8")
+            print_success(f'Wrote raw metadata export ({raw_format}) to "{output_path}".')
+            return 0
         metadata = client.get_metadata(
             fields=fields or [],
             forms=forms or [],
@@ -221,7 +245,13 @@ def run_edit_field(profile: str, field_name: str, field_flags: list[str]) -> int
 
 def _handle_list_fields(args: argparse.Namespace) -> int:
     """CLI handler for ``metadata list``."""
-    return run_list_fields(args.profile, forms=args.form_names, fields=args.field_names)
+    return run_list_fields(
+        args.profile,
+        forms=args.form_names,
+        fields=args.field_names,
+        raw_output=args.raw_output,
+        raw_format=args.raw_format,
+    )
 
 
 def _handle_add_field(args: argparse.Namespace) -> int:

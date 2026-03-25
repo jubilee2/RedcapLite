@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from redcaplite.cli.main import main
 from tests.cli.fakes import MetadataClient
 
@@ -30,6 +32,40 @@ def test_main_metadata_list_fields_supports_field_filter(monkeypatch, capsys) ->
     captured = capsys.readouterr()
     assert "record_id" in captured.out
     assert "age" not in captured.out
+    assert captured.err == ""
+
+
+def test_main_metadata_list_fields_can_write_raw_csv(monkeypatch, tmp_path, capsys) -> None:
+    monkeypatch.setattr(
+        "redcaplite.cli.metadata.build_client",
+        lambda profile: MetadataClient("https://redcap.example.edu/api/", "secret-token"),
+    )
+    output_path = tmp_path / "exports" / "metadata.csv"
+
+    assert main(["demo", "metadata", "list", "--raw-output", str(output_path)]) == 0
+
+    captured = capsys.readouterr()
+    assert output_path.exists()
+    assert "field_name,form_name,field_type,field_label,required_field" in output_path.read_text(encoding="utf-8")
+    assert "Wrote raw metadata export (csv)" in captured.out
+    assert "record_id" not in captured.out
+    assert captured.err == ""
+
+
+def test_main_metadata_list_fields_can_write_raw_json(monkeypatch, tmp_path, capsys) -> None:
+    monkeypatch.setattr(
+        "redcaplite.cli.metadata.build_client",
+        lambda profile: MetadataClient("https://redcap.example.edu/api/", "secret-token"),
+    )
+    output_path = tmp_path / "metadata.json"
+
+    assert main(["demo", "metadata", "list", "--raw-output", str(output_path), "--raw-format", "json"]) == 0
+
+    captured = capsys.readouterr()
+    raw_json = json.loads(output_path.read_text(encoding="utf-8"))
+    assert isinstance(raw_json, list)
+    assert raw_json[0]["field_name"] == "record_id"
+    assert "Wrote raw metadata export (json)" in captured.out
     assert captured.err == ""
 
 

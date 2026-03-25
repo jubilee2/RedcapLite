@@ -129,7 +129,7 @@ rcl data_project setup
 The CLI now supports metadata inspection plus add/edit/remove metadata write workflows:
 
 ```sh
-rcl <profile> metadata list [--form <form_name>] [--field <field_name>]
+rcl <profile> metadata list [--form <form_name>] [--field <field_name>] [--raw-output <path> --raw-format <csv|json>]
 rcl <profile> metadata add <field_name> <form_name> [flags]
 rcl <profile> metadata edit <field_name> [flags]
 rcl <profile> metadata remove <field_name> [--yes]
@@ -145,6 +145,7 @@ Available today:
 - `metadata list --form demographics` limits the table to one REDCap form
 - `metadata list --field age` limits the table to one REDCap field
 - `metadata list` forwards repeated `--form` and `--field` filters directly to the REDCap metadata export API instead of filtering after export
+- `metadata list --raw-output ./metadata.csv` writes the raw metadata export payload to disk (without table parsing); use `--raw-format json` to request raw JSON instead of CSV
 - `metadata add age demographics [flags]` exports metadata, validates that the field is new, inserts the row after the last existing field in the same form when that form already exists (otherwise appending it), previews the generated row, confirms unless `--yes` is present, and re-imports the updated data dictionary
 - `metadata edit age [flags]` exports metadata, validates that the field exists, builds a patch from only the flags you pass, previews only the changed values, confirms unless `--yes` is present, and re-imports the updated data dictionary
 - `metadata remove age [--yes]` exports metadata, validates that the field exists, previews the exact row that will be deleted, confirms unless `--yes` is present, removes the row, and re-imports the updated data dictionary

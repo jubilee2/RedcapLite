@@ -537,6 +537,27 @@ class RedcapClient(Client):
             pd_read_csv_kwargs=read_csv_kwargs,
         )
 
+    def export_metadata_raw(
+        self,
+        fields: List[str] = [],
+        forms: List[str] = [],
+        format: Literal["json", "csv"] = "csv",
+    ) -> str:
+        """
+        Export metadata as the raw API response body without parsing.
+
+        Args:
+            fields (List[str]): Specific fields to export metadata for.
+            forms (List[str]): Specific forms to export metadata for.
+            format (Literal["json", "csv"]): Raw response format to request.
+
+        Returns:
+            str: The raw API response payload.
+        """
+        return self.text_api(
+            api.get_metadata({"fields": fields, "forms": forms, "format": format})
+        )
+
     def import_metadata(
         self,
         data: Union[pd.DataFrame, List[Dict[str, Any]], str],

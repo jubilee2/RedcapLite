@@ -55,6 +55,17 @@ class MetadataClient(FakeClient):
         self.imported_format = format
         return "1"
 
+    def export_metadata_raw(
+        self,
+        fields: list[str] | None = None,
+        forms: list[str] | None = None,
+        format: str = "csv",
+    ) -> str:
+        metadata = self.get_metadata(fields=fields, forms=forms, format="csv")
+        if format == "json":
+            return metadata.to_json(orient="records")
+        return metadata.to_csv(index=False)
+
 
 class SyncMetadataClient(MetadataClient):
     def __init__(self, url: str, token: str, metadata: list[dict[str, str]]) -> None:
