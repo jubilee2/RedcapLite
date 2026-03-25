@@ -287,6 +287,31 @@ This feature is particularly useful for maintaining data consistency, especially
 
 We hope this new feature helps you to work more efficiently and effectively with your REDCap data!
 
+### Advanced: Saving Export Output with `output_file`
+
+Export-style APIs such as `export_records()`, `get_report()`, `get_metadata()`, and `get_project_xml()` also accept an `output_file` parameter. When provided, `redcaplite` saves the raw API response to that path and still returns the usual parsed result in memory.
+
+```python
+records = client.export_records(
+    format='csv',
+    output_file='exports/records.csv',
+)
+
+report = client.get_report(
+    report_id=123,
+    format='json',
+    output_file='exports/report.json',
+)
+
+project_xml = client.get_project_xml(
+    output_file='exports/project.xml',
+)
+```
+
+For CSV exports, the file contains the original CSV returned by REDCap while the method still returns a `pandas.DataFrame`. For JSON and XML/text-style exports, the saved file contains the raw response body.
+
+This is useful when you want both the normal return value for code and a copy of the exported payload on disk.
+
 ## Contributing
 
 Contributions to `redcaplite` are welcome! If you would like to contribute, please fork the repository, make your changes, and submit a pull request.

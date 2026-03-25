@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import Mock, patch, mock_open
 from redcaplite.http.error import APIException
-from redcaplite.http import response_error_handler, csv_handler, json_handler, file_download_handler, file_upload_handler
+from redcaplite.http import response_error_handler, output_handler, csv_handler, json_handler, text_handler, file_download_handler, file_upload_handler
 import os
 import pandas as pd
 import tempfile
@@ -144,6 +144,30 @@ def test_csv_handler_with_pd_read_csv_kwargs():
         {'csv data': ['04'], 'date': ['005']}))
 
 
+def test_csv_handler_with_output_file():
+    mock_func = Mock(return_value=Mock(text='csv data,date\n04,005'))
+    decorated_func = csv_handler(output_handler(mock_func))
+    with tempfile.TemporaryDirectory() as tmpdir:
+        output_file = os.path.join(tmpdir, 'records.csv')
+        response = decorated_func(None, {}, output_file=output_file)
+        assert isinstance(response, pd.DataFrame)
+        assert mock_func.call_args[0][1] == {"format": "csv"}
+        with open(output_file, 'r', encoding='utf-8') as file_obj:
+            assert file_obj.read() == 'csv data,date\n04,005'
+
+
+def test_output_handler_with_output_file():
+    """Test output_handler decorator writes raw response text"""
+    mock_func = Mock(return_value=Mock(text='raw content'))
+    decorated_func = output_handler(mock_func)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        output_file = os.path.join(tmpdir, 'output.txt')
+        response = decorated_func(None, {}, output_file=output_file)
+        assert response.text == 'raw content'
+        with open(output_file, 'r', encoding='utf-8') as file_obj:
+            assert file_obj.read() == 'raw content'
+
+
 def test_json_handler():
     """Test json_handler decorator"""
     mock_func = Mock(return_value=Mock(json=lambda: {'key': 'value'}))
@@ -151,6 +175,34 @@ def test_json_handler():
     response = decorated_func(None, {})
     assert response == {'key': 'value'}
     assert mock_func.call_args[0][1]['format'] == 'json'
+
+
+def test_json_handler_with_output_file():
+    """Test json_handler decorator with output file"""
+    mock_func = Mock(return_value=Mock(
+        text='{"key": "value"}',
+        json=lambda: {'key': 'value'},
+    ))
+    decorated_func = json_handler(output_handler(mock_func))
+    with tempfile.TemporaryDirectory() as tmpdir:
+        output_file = os.path.join(tmpdir, 'records.json')
+        response = decorated_func(None, {}, output_file=output_file)
+        assert response == {'key': 'value'}
+        assert mock_func.call_args[0][1]['format'] == 'json'
+        with open(output_file, 'r', encoding='utf-8') as file_obj:
+            assert file_obj.read() == '{"key": "value"}'
+
+
+def test_text_handler_with_output_file():
+    """Test text_handler decorator with output file"""
+    mock_func = Mock(return_value=Mock(text='plain text'))
+    decorated_func = text_handler(output_handler(mock_func))
+    with tempfile.TemporaryDirectory() as tmpdir:
+        output_file = os.path.join(tmpdir, 'output.txt')
+        response = decorated_func(None, {}, output_file=output_file)
+        assert response == 'plain text'
+        with open(output_file, 'r', encoding='utf-8') as file_obj:
+            assert file_obj.read() == 'plain text'
 
 
 def test_file_download_handler():

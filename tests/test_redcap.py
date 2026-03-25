@@ -5,6 +5,8 @@ import pandas as pd
 import numpy as np
 from pandas.testing import assert_frame_equal
 import json
+import tempfile
+from pathlib import Path
 
 
 @pytest.fixture
@@ -490,6 +492,22 @@ def test_export_records_with_kwargs(client):
         expected_requests_data={'content': 'record', 'action': 'export', 'type': 'flat', 'format': 'csv', 'rawOrLabel': 'raw',
                                 'fields[0]': 'foo', 'fields[1]': 'bar', 'returnFormat': 'json', 'token': 'token'}
     )
+
+
+def test_export_records_with_output_file(client):
+    with tempfile.TemporaryDirectory() as tmpdir:
+        output_file = Path(tmpdir) / 'records.csv'
+        mock_redcap_client_post(
+            client,
+            'export_records',
+            method_kwargs={'output_file': str(output_file)},
+            mock_response=mock_response_factory(return_text='record_id\n1'),
+            expected_json=None,
+            expected_df=pd.DataFrame({'record_id': [1]}),
+            expected_requests_data={'content': 'record', 'action': 'export', 'rawOrLabel': 'raw',
+                                    'type': 'flat', 'format': 'csv', 'returnFormat': 'json', 'token': 'token'}
+        )
+        assert output_file.read_text(encoding='utf-8') == 'record_id\n1'
 
 
 def test_import_records_with_kwargs(client):

@@ -2,6 +2,26 @@ from .error import APIException
 import os
 import io
 import pandas as pd
+from pathlib import Path
+from typing import Optional, Union
+
+
+def output_handler(func):
+    def wrapper(
+        obj,
+        data,
+        *args,
+        output_file: Optional[Union[str, os.PathLike[str]]] = None,
+        **kwargs,
+    ):
+        response = func(obj, data, *args, **kwargs)
+        if output_file is not None:
+            output_path = Path(output_file)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            output_path.write_text(response.text, encoding="utf-8")
+        return response
+
+    return wrapper
 
 
 def response_error_handler(func):
@@ -37,11 +57,11 @@ def response_error_handler(func):
 
 
 def csv_handler(func):
-    def wrapper(obj, data, pd_read_csv_kwargs=None):
+    def wrapper(obj, data, pd_read_csv_kwargs=None, output_file=None):
         if pd_read_csv_kwargs is None:
             pd_read_csv_kwargs = {}
         data['format'] = 'csv'
-        response = func(obj, data)
+        response = func(obj, data, output_file=output_file)
         if 'returnContent' in data and data['returnContent'] == 'ids':
             return response.json()
         if response.text.strip() == '':
@@ -56,16 +76,16 @@ def csv_handler(func):
 
 
 def json_handler(func):
-    def wrapper(obj, data):
+    def wrapper(obj, data, output_file=None):
         data['format'] = 'json'
-        response = func(obj, data)
+        response = func(obj, data, output_file=output_file)
         return response.json()
     return wrapper
 
 
 def text_handler(func):
-    def wrapper(obj, data):
-        response = func(obj, data)
+    def wrapper(obj, data, output_file=None):
+        response = func(obj, data, output_file=output_file)
         return response.text
     return wrapper
 

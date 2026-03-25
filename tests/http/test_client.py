@@ -27,14 +27,31 @@ def test_client_post_csv():
         response = client.post({'format': 'csv'})
         assert response == mock_response
         mock_csv_api.assert_called_once_with(
-            {'format': 'csv'}, pd_read_csv_kwargs={})
+            {'format': 'csv'}, pd_read_csv_kwargs={}, output_file=None)
 
     with patch.object(client, '_Client__csv_api', return_value=mock_response) as mock_csv_api:
         response = client.post(
             {'format': 'csv'}, pd_read_csv_kwargs={"foo": []})
         assert response == mock_response
         mock_csv_api.assert_called_once_with(
-            {'format': 'csv'}, pd_read_csv_kwargs={"foo": []})
+            {'format': 'csv'}, pd_read_csv_kwargs={"foo": []}, output_file=None)
+
+    with patch.object(client, '_Client__csv_api', return_value=mock_response) as mock_csv_api:
+        response = client.post({'format': 'csv'}, output_file='records.csv')
+        assert response == mock_response
+        mock_csv_api.assert_called_once_with(
+            {'format': 'csv'}, pd_read_csv_kwargs={}, output_file='records.csv')
+
+
+def test_client_post_json_with_output_file():
+    """Test Client post method with JSON output file"""
+    client = Client('https://example.com', 'token')
+    mock_response = Mock()
+    with patch.object(client, '_Client__json_api', return_value=mock_response) as mock_json_api:
+        response = client.post({'format': 'json'}, output_file='records.json')
+        assert response == mock_response
+        mock_json_api.assert_called_once_with(
+            {'format': 'json'}, output_file='records.json')
 
 
 def test_client_post_default_format():
@@ -44,6 +61,16 @@ def test_client_post_default_format():
     with patch.object(client, 'text_api', return_value=mock_response):
         response = client.post({})
         assert response == mock_response
+
+
+def test_client_post_default_format_with_output_file():
+    """Test Client post method with output file and default format"""
+    client = Client('https://example.com', 'token')
+    mock_response = Mock()
+    with patch.object(client, 'text_api', return_value=mock_response) as mock_text_api:
+        response = client.post({}, output_file='output.txt')
+        assert response == mock_response
+        mock_text_api.assert_called_once_with({}, output_file='output.txt')
 
 
 def test_client__post():
