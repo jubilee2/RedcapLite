@@ -4,6 +4,23 @@ from redcaplite.cli.main import main
 from tests.cli.fakes import MetadataClient
 
 
+def test_main_metadata_pull_saves_export_and_prints_summary(monkeypatch, capsys) -> None:
+    client = MetadataClient("https://redcap.example.edu/api/", "secret-token")
+    monkeypatch.setattr("redcaplite.cli.metadata.build_client", lambda profile: client)
+    monkeypatch.setattr(
+        "redcaplite.cli.metadata._build_metadata_pull_output_file",
+        lambda profile: f"{profile}_metadata_20260325_120000.cav",
+    )
+
+    assert main(["demo", "metadata", "pull"]) == 0
+
+    captured = capsys.readouterr()
+    assert "Saved metadata export to demo_metadata_20260325_120000.cav" in captured.out
+    assert "Total fields: 2" in captured.out
+    assert captured.err == ""
+    assert client.exported_metadata_output_file == "demo_metadata_20260325_120000.cav"
+
+
 def test_main_metadata_list_fields_prints_table(tmp_path, monkeypatch, capsys) -> None:
     monkeypatch.setattr(
         "redcaplite.cli.metadata.build_client",

@@ -61,6 +61,14 @@ def test_main_with_metadata_subcommand_help_prints_subcommand_help(capsys) -> No
     assert captured.err == ""
 
 
+def test_main_with_metadata_pull_help_prints_subcommand_help(capsys) -> None:
+    assert main(["demo", "metadata", "pull", "--help"]) == 0
+
+    captured = capsys.readouterr()
+    assert "usage: rcl <profile> metadata pull [-h]" in captured.out
+    assert captured.err == ""
+
+
 def test_main_returns_error_for_missing_profile_subcommand(capsys) -> None:
     assert main(["demo"]) == 2
 
@@ -77,6 +85,16 @@ def test_build_parser_supports_metadata_group() -> None:
     assert parsed.profile == "demo"
     assert parsed.command == "metadata"
     assert parsed.metadata_command == "list"
+
+
+def test_build_parser_supports_metadata_pull() -> None:
+    parser = build_parser()
+
+    parsed = parser.parse_args(["demo", "metadata", "pull"])
+
+    assert parsed.profile == "demo"
+    assert parsed.command == "metadata"
+    assert parsed.metadata_command == "pull"
 
 
 def test_build_parser_supports_metadata_list_fields_filters() -> None:

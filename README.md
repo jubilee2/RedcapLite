@@ -8,8 +8,6 @@
 
 **A Python client for REDCap with integrated CLI support.**
 
-Current package release: `2.1.0`.
-
 `redcaplite` helps you connect to REDCap projects and perform common API and CLI workflows from one package. Whether you're a researcher automating data pulls or a developer building integrations, `redcaplite` supports both scripted API usage and command-line operations.
 
 ## ✨ v2.1.0 – Metadata sync workflow
@@ -126,9 +124,10 @@ rcl data_project setup
 
 ### Metadata command tree
 
-The CLI now supports metadata inspection plus add/edit/remove metadata write workflows:
+The CLI now supports metadata inspection, export, plus add/edit/remove metadata write workflows:
 
 ```sh
+rcl <profile> metadata pull
 rcl <profile> metadata list [--form <form_name>] [--field <field_name>]
 rcl <profile> metadata add <field_name> <form_name> [flags]
 rcl <profile> metadata edit <field_name> [flags]
@@ -141,6 +140,7 @@ At the root level, `rcl --help` now highlights all top-level entry points explic
 
 Available today:
 
+- `metadata pull` exports project metadata to a timestamped file named `<profile>_metadata_<timestamp>.cav`, then prints the saved file name and total field count
 - `metadata list` prints a read-only table of `field_name`, `form_name`, `field_type`, and `field_label`
 - `metadata list --form demographics` limits the table to one REDCap form
 - `metadata list --field age` limits the table to one REDCap field
