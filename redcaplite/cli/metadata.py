@@ -305,7 +305,7 @@ def _ensure_metadata_frame(metadata: Any) -> pd.DataFrame:
 def _build_metadata_pull_output_file(profile: str) -> str:
     """Return the default file name for ``metadata pull`` exports."""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    return f"{profile}_metadata_{timestamp}.cav"
+    return f"{profile}_metadata_{timestamp}.csv"
 
 
 def _split_confirmation_flag(field_flags: list[str]) -> tuple[bool, list[str]]:
