@@ -17,6 +17,7 @@ class MetadataClient(FakeClient):
         super().__init__(url, token)
         self.imported_metadata: pd.DataFrame | None = None
         self.imported_format: str | None = None
+        self.exported_metadata_output_file: str | None = None
         self._metadata = [
             {
                 "field_name": "record_id",
@@ -39,8 +40,10 @@ class MetadataClient(FakeClient):
         fields: list[str] | None = None,
         forms: list[str] | None = None,
         format: str = "csv",
+        output_file: str | None = None,
     ) -> pd.DataFrame:
         assert format == "csv"
+        self.exported_metadata_output_file = output_file
         metadata = pd.DataFrame(self._metadata)
         if metadata.empty:
             metadata = pd.DataFrame(columns=["field_name", "form_name", "field_type", "field_label"])

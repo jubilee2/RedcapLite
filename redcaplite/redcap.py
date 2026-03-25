@@ -24,17 +24,18 @@ class RedcapClient(Client):
         super().__init__(url, token)
 
     # arms
-    def get_arms(self, arms: List[int] = []):
+    def get_arms(self, arms: List[int] = [], output_file: Optional[str] = None):
         """
         Get arm information from the project.
 
         Args:
             arms (List[int], optional): List of arm numbers to fetch. Defaults to an empty list (all arms).
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             The response from the API containing arm information.
         """
-        return self.post(api.get_arms({"arms": arms}))
+        return self.post(api.get_arms({"arms": arms}), output_file=output_file)
 
     def import_arms(
         self, data: RedcapDataType, override: Optional[Literal[0, 1]] = None
@@ -64,14 +65,17 @@ class RedcapClient(Client):
         return self.post(api.delete_arms({"arms": arms}))
 
     # dags
-    def get_dags(self):
+    def get_dags(self, output_file: Optional[str] = None):
         """
         Get all Data Access Groups (DAGs) for the project.
+
+        Args:
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             The response from the API containing DAG information.
         """
-        return self.post(api.get_dags({}))
+        return self.post(api.get_dags({}), output_file=output_file)
 
     def import_dags(self, data: RedcapDataType):
         """
@@ -110,14 +114,17 @@ class RedcapClient(Client):
         return self.post(api.switch_dag({"dag": dag}))
 
     # user_dag_mapping
-    def get_user_dag_mappings(self):
+    def get_user_dag_mappings(self, output_file: Optional[str] = None):
         """
         Get the user-DAG mappings for the project.
+
+        Args:
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             The response from the API containing user-DAG mapping information.
         """
-        return self.post(api.get_user_dag_mappings({}))
+        return self.post(api.get_user_dag_mappings({}), output_file=output_file)
 
     def import_user_dag_mappings(self, data: RedcapDataType):
         """
@@ -132,17 +139,18 @@ class RedcapClient(Client):
         return self.post(api.import_user_dag_mappings({"data": data}))
 
     # events
-    def get_events(self, arms: List[int] = []):
+    def get_events(self, arms: List[int] = [], output_file: Optional[str] = None):
         """
         Get events for the specified arms.
 
         Args:
             arms (List[int], optional): List of arm numbers to fetch events for. Defaults to an empty list (all arms).
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             The response from the API containing event information.
         """
-        return self.post(api.get_events({"arms": arms}))
+        return self.post(api.get_events({"arms": arms}), output_file=output_file)
 
     def import_events(self, data: RedcapDataType):
         """
@@ -169,17 +177,23 @@ class RedcapClient(Client):
         return self.post(api.delete_events({"events": events}))
 
     # field_names
-    def get_field_names(self, field: Optional[str] = None):
+    def get_field_names(
+        self, field: Optional[str] = None, output_file: Optional[str] = None
+    ):
         """
         Get a list of the project's field names.
 
         Args:
             field (Optional[str]): A specific field name to return information about.
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             The response from the API containing field name information.
         """
-        return self.post(api.get_field_names({"field": field}))
+        return self.post(
+            api.get_field_names({"field": field}),
+            output_file=output_file,
+        )
 
     # file
     def get_file(
@@ -366,14 +380,17 @@ class RedcapClient(Client):
         return self.post(api.delete_file_repository({"doc_id": doc_id}))
 
     # instrument
-    def get_instruments(self):
+    def get_instruments(self, output_file: Optional[str] = None):
         """
         Get a list of the project's instruments (data collection instruments).
+
+        Args:
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             The response from the API containing instrument information.
         """
-        return self.post(api.get_instruments({}))
+        return self.post(api.get_instruments({}), output_file=output_file)
 
     # pdf
     def export_pdf(
@@ -416,17 +433,23 @@ class RedcapClient(Client):
         )
 
     # form_event_mapping
-    def get_form_event_mappings(self, arms: List[int] = []):
+    def get_form_event_mappings(
+        self, arms: List[int] = [], output_file: Optional[str] = None
+    ):
         """
         Get form-event mappings for the specified arms.
 
         Args:
             arms (List[int], optional): List of arm numbers to fetch mappings for. Defaults to an empty list (all arms).
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             The response from the API containing form-event mapping information.
         """
-        return self.post(api.get_form_event_mappings({"arms": arms}))
+        return self.post(
+            api.get_form_event_mappings({"arms": arms}),
+            output_file=output_file,
+        )
 
     def import_form_event_mappings(self, data: RedcapDataType):
         """
@@ -463,6 +486,7 @@ class RedcapClient(Client):
         beginTime: Optional[datetime] = None,
         endTime: Optional[datetime] = None,
         pd_read_csv_kwargs: Optional[Dict[str, Any]] = {},
+        output_file: Optional[str] = None,
     ):
         """
         Export logs from the project.
@@ -476,6 +500,7 @@ class RedcapClient(Client):
             beginTime (Optional[datetime]): Filter logs by start time.
             endTime (Optional[datetime]): Filter logs by end time.
             pd_read_csv_kwargs (Optional[Dict[str, Any]]): Additional keyword arguments to pass to pandas' `read_csv` function when format is 'csv'. Defaults to {}.
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             The response from the API containing the log data.
@@ -493,6 +518,7 @@ class RedcapClient(Client):
                 }
             ),
             pd_read_csv_kwargs=pd_read_csv_kwargs,
+            output_file=output_file,
         )
 
     # metadata
@@ -502,6 +528,7 @@ class RedcapClient(Client):
         forms: List[str] = [],
         format: Literal["json", "csv"] = "csv",
         pd_read_csv_kwargs: Optional[Dict[str, Any]] = None,
+        output_file: Optional[str] = None,
     ):
         """
         Export metadata (data dictionary) from the project.
@@ -511,6 +538,7 @@ class RedcapClient(Client):
             forms (List[str]): Specific forms to export metadata for.
             format (Literal["json", "csv"]): The format of the exported data.
             pd_read_csv_kwargs (Optional[Dict[str, Any]]): Additional keyword arguments to pass to pandas' `read_csv` function when format is 'csv'. Defaults to {}.
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             The response from the API containing the metadata.
@@ -535,6 +563,7 @@ class RedcapClient(Client):
             api.get_metadata(
                 {"fields": fields, "forms": forms, "format": format}),
             pd_read_csv_kwargs=read_csv_kwargs,
+            output_file=output_file,
         )
 
     def import_metadata(
@@ -567,14 +596,17 @@ class RedcapClient(Client):
         """
         return self.post(api.create_project({"data": data}))
 
-    def get_project(self):
+    def get_project(self, output_file: Optional[str] = None):
         """
         Export project information.
+
+        Args:
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             The response from the API containing project information.
         """
-        return self.post(api.get_project({}))
+        return self.post(api.get_project({}), output_file=output_file)
 
     def get_project_xml(
         self,
@@ -586,6 +618,7 @@ class RedcapClient(Client):
         exportDataAccessGroups: bool = False,
         filterLogic: Optional[str] = None,
         exportFiles: bool = False,
+        output_file: Optional[str] = None,
     ):
         """
         Export the entire project as an XML file.
@@ -599,6 +632,7 @@ class RedcapClient(Client):
             exportDataAccessGroups (bool): Whether to export Data Access Groups.
             filterLogic (Optional[str]): Logic to filter the data.
             exportFiles (bool): Whether to export files.
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             The response from the API containing the project XML.
@@ -615,7 +649,8 @@ class RedcapClient(Client):
                     "filterLogic": filterLogic,
                     "exportFiles": exportFiles,
                 }
-            )
+            ),
+            output_file=output_file,
         )
 
     def import_project_settings(self, data: RedcapDataType):
@@ -650,6 +685,7 @@ class RedcapClient(Client):
         decimalCharacter: Optional[str] = None,
         exportBlankForGrayFormStatus: Optional[bool] = None,
         pd_read_csv_kwargs: Optional[Dict[str, Any]] = {},
+        output_file: Optional[str] = None,
     ):
         """
         Export records from the project.
@@ -672,6 +708,7 @@ class RedcapClient(Client):
             decimalCharacter (Optional[str]): Decimal character for number fields.
             exportBlankForGrayFormStatus (Optional[bool]): Whether to export blank for gray form status.
             pd_read_csv_kwargs (Optional[Dict[str, Any]]): Additional keyword arguments to pass to pandas' `read_csv` function when format is 'csv'. Defaults to {}.
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             The response from the API containing the exported records.
@@ -698,6 +735,7 @@ class RedcapClient(Client):
                 }
             ),
             pd_read_csv_kwargs=pd_read_csv_kwargs,
+            output_file=output_file,
         )
 
     def import_records(
@@ -805,24 +843,36 @@ class RedcapClient(Client):
             )
         )
 
-    def generate_next_record_name(self):
+    def generate_next_record_name(self, output_file: Optional[str] = None):
         """
         Generate the next record name.
+
+        Args:
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             The response from the API containing the next record name.
         """
-        return self.post(api.generate_next_record_name({}))
+        return self.post(
+            api.generate_next_record_name({}),
+            output_file=output_file,
+        )
 
     # repeating_forms_events
-    def get_repeating_forms_events(self):
+    def get_repeating_forms_events(self, output_file: Optional[str] = None):
         """
         Export repeating forms events.
+
+        Args:
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             The response from the API containing repeating forms events.
         """
-        return self.post(api.get_repeating_forms_events({}))
+        return self.post(
+            api.get_repeating_forms_events({}),
+            output_file=output_file,
+        )
 
     def import_repeating_forms_events(self, data: RedcapDataType):
         """
@@ -847,6 +897,7 @@ class RedcapClient(Client):
         csvDelimiter: str = ",",
         decimalCharacter: Optional[str] = None,
         pd_read_csv_kwargs: Optional[Dict[str, Any]] = {},
+        output_file: Optional[str] = None,
     ):
         """
         Retrieve a report from REDCap.
@@ -860,6 +911,7 @@ class RedcapClient(Client):
             csvDelimiter (str, optional): The delimiter for CSV format. Defaults to ",".
             decimalCharacter (Optional[str], optional): The decimal character for numeric data. Defaults to None.
             pd_read_csv_kwargs (Optional[Dict[str, Any]]): Additional keyword arguments to pass to pandas' `read_csv` function when format is 'csv'. Defaults to {}.
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             The report data in the specified format.
@@ -877,17 +929,21 @@ class RedcapClient(Client):
                 }
             ),
             pd_read_csv_kwargs=pd_read_csv_kwargs,
+            output_file=output_file,
         )
 
     # version
-    def get_version(self):
+    def get_version(self, output_file: Optional[str] = None):
         """
         Get the version of the REDCap instance.
+
+        Args:
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             str: The version number of the REDCap instance.
         """
-        return self.text_api(api.get_version({}))
+        return self.text_api(api.get_version({}), output_file=output_file)
 
     # survey
     def get_survey_link(
@@ -896,6 +952,7 @@ class RedcapClient(Client):
         instrument: str,
         event: Optional[str] = None,
         repeat_instance: Optional[int] = None,
+        output_file: Optional[str] = None,
     ):
         """
         Get a survey link for a specific record and instrument.
@@ -905,6 +962,7 @@ class RedcapClient(Client):
             instrument (str): The name of the instrument (form).
             event (Optional[str], optional): The unique event name. Defaults to None.
             repeat_instance (Optional[int], optional): The repeat instance number. Defaults to None.
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             str: The survey link URL.
@@ -917,7 +975,8 @@ class RedcapClient(Client):
                     "event": event,
                     "repeat_instance": repeat_instance,
                 }
-            )
+            ),
+            output_file=output_file,
         )
 
     def get_participant_list(
@@ -926,6 +985,7 @@ class RedcapClient(Client):
         event: Optional[str] = None,
         format: Literal["json", "csv"] = "csv",
         pd_read_csv_kwargs: Optional[Dict[str, Any]] = {},
+        output_file: Optional[str] = None,
     ):
         """
         Get the participant list for a specific instrument.
@@ -935,6 +995,7 @@ class RedcapClient(Client):
             event (Optional[str], optional): The unique event name. Defaults to None.
             format (Literal["json", "csv"], optional): The format of the returned data. Defaults to "csv".
             pd_read_csv_kwargs (Optional[Dict[str, Any]]): Additional keyword arguments to pass to pandas' `read_csv` function when format is 'csv'. Defaults to {}.
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             The participant list in the specified format.
@@ -948,17 +1009,20 @@ class RedcapClient(Client):
                 }
             ),
             pd_read_csv_kwargs=pd_read_csv_kwargs,
+            output_file=output_file,
         )
 
     def get_survey_queue_link(
         self,
         record: str,
+        output_file: Optional[str] = None,
     ):
         """
         Get the survey queue link for a specific record.
 
         Args:
             record (str): The record ID.
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             str: The survey queue link URL.
@@ -968,7 +1032,8 @@ class RedcapClient(Client):
                 {
                     "record": record,
                 }
-            )
+            ),
+            output_file=output_file,
         )
 
     def get_survey_return_code(
@@ -977,6 +1042,7 @@ class RedcapClient(Client):
         instrument: str,
         event: Optional[str] = None,
         repeat_instance: Optional[int] = None,
+        output_file: Optional[str] = None,
     ):
         """
         Get the survey return code for a specific record and instrument.
@@ -986,6 +1052,7 @@ class RedcapClient(Client):
             instrument (str): The name of the instrument (form).
             event (Optional[str], optional): The unique event name. Defaults to None.
             repeat_instance (Optional[int], optional): The repeat instance number. Defaults to None.
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             str: The survey return code.
@@ -998,18 +1065,22 @@ class RedcapClient(Client):
                     "event": event,
                     "repeat_instance": repeat_instance,
                 }
-            )
+            ),
+            output_file=output_file,
         )
 
     # user
-    def get_users(self):
+    def get_users(self, output_file: Optional[str] = None):
         """
         Get a list of all users in the project.
+
+        Args:
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             List[Dict]: A list of dictionaries containing user information.
         """
-        return self.post(api.get_users({}))
+        return self.post(api.get_users({}), output_file=output_file)
 
     def import_users(self, data: RedcapDataType):
         """
@@ -1036,14 +1107,17 @@ class RedcapClient(Client):
         return self.post(api.delete_users({"users": users}))
 
     # user_role
-    def get_user_roles(self):
+    def get_user_roles(self, output_file: Optional[str] = None):
         """
         Get a list of all user roles defined in the project.
+
+        Args:
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             List[Dict]: A list of dictionaries containing user role information.
         """
-        return self.post(api.get_user_roles({}))
+        return self.post(api.get_user_roles({}), output_file=output_file)
 
     def import_user_roles(self, data: RedcapDataType):
         """
@@ -1070,14 +1144,20 @@ class RedcapClient(Client):
         return self.post(api.delete_user_roles({"roles": roles}))
 
     #  user_role_mappings
-    def get_user_role_mappings(self):
+    def get_user_role_mappings(self, output_file: Optional[str] = None):
         """
         Get a list of all user-role assignments in the project.
+
+        Args:
+            output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             List[Dict]: A list of dictionaries containing user-role assignment information.
         """
-        return self.post(api.get_user_role_mappings({}))
+        return self.post(
+            api.get_user_role_mappings({}),
+            output_file=output_file,
+        )
 
     def import_user_role_mappings(self, data: RedcapDataType):
         """

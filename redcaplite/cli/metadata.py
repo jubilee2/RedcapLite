@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from datetime import datetime
 from types import SimpleNamespace
 from typing import Any
 
@@ -27,6 +28,7 @@ from .prompts import confirm
 prompt_confirm = confirm
 
 _METADATA_SUBCOMMANDS = (
+    "pull",
     "list",
     "add",
     "edit",
@@ -49,6 +51,9 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
     # to scan and update as metadata features are added.
     for name in _METADATA_SUBCOMMANDS:
         command_parser = metadata_subparsers.add_parser(name, prog=f"rcl <profile> metadata {name}")
+        if name == "pull":
+            command_parser.set_defaults(handler=_handle_pull_metadata)
+            continue
         if name == "list":
             command_parser.add_argument(
                 "--form",
@@ -131,6 +136,22 @@ def run_list_fields(
             for record in records
         ]
     )
+    return 0
+
+
+def run_pull_metadata(profile: str) -> int:
+    """Export metadata to a timestamped file and print the file name and row count."""
+    try:
+        client = build_client(profile)
+        output_file = _build_metadata_pull_output_file(profile)
+        metadata = client.get_metadata(format="csv", output_file=output_file)
+        metadata_frame = _ensure_metadata_frame(metadata)
+    except (ClientBootstrapError, ValueError) as exc:
+        print_error(str(exc))
+        return 1
+
+    print_success(f"Saved metadata export to {output_file}")
+    print_success(f"Total fields: {len(metadata_frame.index)}")
     return 0
 
 
@@ -224,6 +245,11 @@ def _handle_list_fields(args: argparse.Namespace) -> int:
     return run_list_fields(args.profile, forms=args.form_names, fields=args.field_names)
 
 
+def _handle_pull_metadata(args: argparse.Namespace) -> int:
+    """CLI handler for ``metadata pull``."""
+    return run_pull_metadata(args.profile)
+
+
 def _handle_add_field(args: argparse.Namespace) -> int:
     """CLI handler for ``metadata add``."""
     return run_add_field(args.profile, args.field_name, args.form_name, args.field_flags)
@@ -274,6 +300,12 @@ def _ensure_metadata_frame(metadata: Any) -> pd.DataFrame:
     if isinstance(metadata, list):
         return pd.DataFrame(metadata)
     raise ValueError("Metadata export returned an unexpected response type.")
+
+
+def _build_metadata_pull_output_file(profile: str) -> str:
+    """Return the default file name for ``metadata pull`` exports."""
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    return f"{profile}_metadata_{timestamp}.csv"
 
 
 def _split_confirmation_flag(field_flags: list[str]) -> tuple[bool, list[str]]:
