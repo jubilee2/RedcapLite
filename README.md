@@ -140,7 +140,7 @@ At the root level, `rcl --help` now highlights all top-level entry points explic
 
 Available today:
 
-- `metadata pull` exports project metadata to a timestamped file named `<profile>_metadata_<timestamp>.cav`, then prints the saved file name and total field count
+- `metadata pull` exports project metadata to a timestamped file named `<profile>_metadata_<timestamp>.csv`, then prints the saved file name and total field count
 - `metadata list` prints a read-only table of `field_name`, `form_name`, `field_type`, and `field_label`
 - `metadata list --form demographics` limits the table to one REDCap form
 - `metadata list --field age` limits the table to one REDCap field
