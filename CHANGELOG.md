@@ -18,7 +18,7 @@ The format is based on Keep a Changelog, with entries listed in reverse chronolo
 
 ### Added
 - Added `output_file` support for export and get APIs that return CSV, JSON, XML, or text responses.
-- Added `rcl metadata <profile> pull` to export project metadata to a timestamped file and print the saved file name and total field count.
+- Added `rcl <profile> metadata pull` to export project metadata to a timestamped file and print the saved file name and total field count.
 - Added tests covering saved output behavior for the shared HTTP handlers and client export flow.
 
 ### Changed
