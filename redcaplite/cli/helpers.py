@@ -37,14 +37,14 @@ def build_client(
     profile = active_profile_store.get(profile_name)
     if profile is None:
         raise ProfileNotFoundError(
-            f'Profile "{profile_name}" was not found. Run "rcl {profile_name} setup" first.'
+            f'Profile "{profile_name}" was not found. Run "rcl setup {profile_name}" first.'
         )
 
     token = active_token_store.get_token(profile_name)
     if token is None:
         raise TokenNotFoundError(
             f'Access token for profile "{profile_name}" was not found. '
-            f'Run "rcl {profile_name} setup" first.'
+            f'Run "rcl setup {profile_name}" first.'
         )
 
     return client_factory(profile.url, token)

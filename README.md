@@ -15,7 +15,7 @@
 Version 2.1.0 adds the `sync` workflow to `rcl`, making it easier to compare metadata between saved REDCap profiles and import the source metadata into a target project after review.
 
 The CLI provides:
-- Profile-based access (`rcl <profile> ...`)
+- Profile-based access (`rcl <command> <profile> ...`)
 - Structured metadata management commands
 - Automation-friendly workflows for scripting and pipelines
 
@@ -107,7 +107,7 @@ Internally, CLI commands can now share a single bootstrap helper, `redcaplite.cl
 
 ### Setup profiles
 
-Use `rcl <profile> setup` to create or update a stored REDCap connection profile. The command will:
+Use `rcl setup <profile>` to create or update a stored REDCap connection profile. The command will:
 
 - load the requested profile from the saved CLI config
 - prompt for the REDCap API URL and create the profile when it does not already exist
@@ -119,7 +119,7 @@ Use `rcl <profile> setup` to create or update a stored REDCap connection profile
 Example:
 
 ```sh
-rcl data_project setup
+rcl setup data_project
 ```
 
 ### Metadata command tree
@@ -127,16 +127,16 @@ rcl data_project setup
 The CLI now supports metadata inspection, export, plus add/edit/remove metadata write workflows:
 
 ```sh
-rcl <profile> metadata pull
-rcl <profile> metadata list [--form <form_name>] [--field <field_name>]
-rcl <profile> metadata add <field_name> <form_name> [flags]
-rcl <profile> metadata edit <field_name> [flags]
-rcl <profile> metadata remove <field_name> [--yes]
+rcl metadata <profile> pull
+rcl metadata <profile> list [--form <form_name>] [--field <field_name>]
+rcl metadata <profile> add <field_name> <form_name> [flags]
+rcl metadata <profile> edit <field_name> [flags]
+rcl metadata <profile> remove <field_name> [--yes]
 ```
 
-You can also ask for help at any level of the command tree, such as `rcl demo setup --help`, `rcl demo metadata --help`, or `rcl demo metadata list --help`.
+You can also ask for help at any level of the command tree, such as `rcl setup demo --help`, `rcl metadata demo --help`, or `rcl metadata demo list --help`.
 
-At the root level, `rcl --help` now highlights all top-level entry points explicitly: `setup`, `metadata`, and `sync`.
+At the root level, `rcl --help` now highlights all top-level entry points explicitly: `setup`, `metadata`, and `sync`, each expecting command-first usage.
 
 Available today:
 
@@ -149,21 +149,21 @@ Available today:
 - `metadata edit age [flags]` exports metadata, validates that the field exists, builds a patch from only the flags you pass, previews only the changed values, confirms unless `--yes` is present, and re-imports the updated data dictionary
 - `metadata remove age [--yes]` exports metadata, validates that the field exists, previews the exact row that will be deleted, confirms unless `--yes` is present, removes the row, and re-imports the updated data dictionary
 
-`metadata add` uses sensible defaults when flags are omitted: a generated title-cased label from the field name and the REDCap `text` field type. `metadata edit` updates only the columns you specify, so `rcl demo metadata edit age --field-label "Participant Age"` leaves all other metadata columns untouched. Additional metadata columns can be passed as CLI flags such as `--field-label "Participant Age"`, `--field-type radio`, or `--required-field`. Standalone flags without a value are imported as `"y"`. When `--field-type` is present during editing, the CLI validates the new type and prints a warning in the preview because REDCap field type changes can require follow-up metadata adjustments. For v1, metadata validation stays intentionally light: the CLI checks profile/token presence, verifies whether a field should exist or be missing, validates allowed field types, and requires non-empty `select_choices_or_calculations` values for basic choice field types (`radio`, `dropdown`, and `checkbox`). It does not yet deeply validate branching logic syntax, advanced REDCap metadata dependencies, or record/data safety concerns. `metadata remove` follows the same safe export-preview-confirm-import flow, but deletes exactly one row by `field_name`.
+`metadata add` uses sensible defaults when flags are omitted: a generated title-cased label from the field name and the REDCap `text` field type. `metadata edit` updates only the columns you specify, so `rcl metadata demo edit age --field-label "Participant Age"` leaves all other metadata columns untouched. Additional metadata columns can be passed as CLI flags such as `--field-label "Participant Age"`, `--field-type radio`, or `--required-field`. Standalone flags without a value are imported as `"y"`. When `--field-type` is present during editing, the CLI validates the new type and prints a warning in the preview because REDCap field type changes can require follow-up metadata adjustments. For v1, metadata validation stays intentionally light: the CLI checks profile/token presence, verifies whether a field should exist or be missing, validates allowed field types, and requires non-empty `select_choices_or_calculations` values for basic choice field types (`radio`, `dropdown`, and `checkbox`). It does not yet deeply validate branching logic syntax, advanced REDCap metadata dependencies, or record/data safety concerns. `metadata remove` follows the same safe export-preview-confirm-import flow, but deletes exactly one row by `field_name`.
 
 ### Sync command
 
 The metadata sync workflow is a top-level command:
 
 ```sh
-rcl <source_profile> sync <target_profile> [--yes]
+rcl sync <source_profile> <target_profile> [--yes]
 ```
 
 Use `sync` when you want to compare full metadata exports between two saved profiles and optionally import the source metadata into the target project after review.
 
 Available today:
 
-- `sync profile2 [--yes]` exports metadata from both profiles, derives source-only and target-only row sets with paired DataFrame-based all-column anti-joins for review, and then optionally imports the source profile metadata into the target profile
+- `sync <target_profile> [--yes]` exports metadata from both profiles, derives source-only and target-only row sets with paired DataFrame-based all-column anti-joins for review, and then optionally imports the source profile metadata into the target profile
 
 Internally, `redcaplite.metadata_ops.transform` and `redcaplite.metadata_ops.validate` now provide the reusable add/edit/remove helpers for metadata write workflows, including CLI flag-to-row conversion, field-type validation, light choice-field validation, default label generation, and DataFrame-based append/update/remove helpers.
 
