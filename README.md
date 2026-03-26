@@ -10,9 +10,9 @@
 
 `redcaplite` helps you connect to REDCap projects and perform common API and CLI workflows from one package. Whether you're a researcher automating data pulls or a developer building integrations, `redcaplite` supports both scripted API usage and command-line operations.
 
-## ✨ v2.1.0 – Metadata sync workflow
+## ✨ v2.2.0 – Command-first CLI improvements
 
-Version 2.1.0 adds the `sync` workflow to `rcl`, making it easier to compare metadata between saved REDCap profiles and import the source metadata into a target project after review.
+Version 2.2.0 continues the command-first CLI design and adds `rcl profiles` for quickly listing saved profile names and URLs. The command style is `rcl <command> <profile> ...` (for example: `rcl metadata demo list`).
 
 The CLI provides:
 - Profile-based access (`rcl <command> <profile> ...`)
@@ -99,7 +99,9 @@ except Exception as e:
 
 ## CLI Commands
 
-The `rcl` command now includes an interactive setup workflow, a profile-scoped metadata command tree, and a top-level metadata sync command.
+> **CLI style note:** The CLI uses command-first ordering: `rcl <command> <profile> ...` (not `rcl <profile> <command>`).
+
+The `rcl` command now includes an interactive setup workflow, a profile-scoped metadata command tree, a profile listing command, and a top-level metadata sync command.
 
 > **Important update:** the REDCap CLI is no longer limited to setup alone. You can now use `rcl` to perform REDCap operations directly from the command line, including metadata listing, add/edit workflows, and field removal.
 
@@ -136,7 +138,7 @@ rcl metadata <profile> remove <field_name> [--yes]
 
 You can also ask for help at any level of the command tree, such as `rcl setup demo --help`, `rcl metadata demo --help`, or `rcl metadata demo list --help`.
 
-At the root level, `rcl --help` now highlights all top-level entry points explicitly: `setup`, `metadata`, and `sync`, each expecting command-first usage.
+At the root level, `rcl --help` now highlights all top-level entry points explicitly: `setup`, `metadata`, `profiles`, and `sync`, each expecting command-first usage.
 
 Available today:
 
@@ -150,6 +152,15 @@ Available today:
 - `metadata remove age [--yes]` exports metadata, validates that the field exists, previews the exact row that will be deleted, confirms unless `--yes` is present, removes the row, and re-imports the updated data dictionary
 
 `metadata add` uses sensible defaults when flags are omitted: a generated title-cased label from the field name and the REDCap `text` field type. `metadata edit` updates only the columns you specify, so `rcl metadata demo edit age --field-label "Participant Age"` leaves all other metadata columns untouched. Additional metadata columns can be passed as CLI flags such as `--field-label "Participant Age"`, `--field-type radio`, or `--required-field`. Standalone flags without a value are imported as `"y"`. When `--field-type` is present during editing, the CLI validates the new type and prints a warning in the preview because REDCap field type changes can require follow-up metadata adjustments. For v1, metadata validation stays intentionally light: the CLI checks profile/token presence, verifies whether a field should exist or be missing, validates allowed field types, and requires non-empty `select_choices_or_calculations` values for basic choice field types (`radio`, `dropdown`, and `checkbox`). It does not yet deeply validate branching logic syntax, advanced REDCap metadata dependencies, or record/data safety concerns. `metadata remove` follows the same safe export-preview-confirm-import flow, but deletes exactly one row by `field_name`.
+
+
+### Profiles command
+
+Use `rcl profiles` to list all saved profile names and their configured REDCap API URLs:
+
+```sh
+rcl profiles
+```
 
 ### Sync command
 
