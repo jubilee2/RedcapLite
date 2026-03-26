@@ -163,7 +163,7 @@ Use `sync` when you want to compare full metadata exports between two saved prof
 
 Available today:
 
-- `sync <target_profile> [--yes]` exports metadata from both profiles, derives source-only and target-only row sets with paired DataFrame-based all-column anti-joins for review, and then optionally imports the source profile metadata into the target profile
+- `sync <source_profile> <target_profile> [--yes]` exports metadata from both profiles, derives source-only and target-only row sets with paired DataFrame-based all-column anti-joins for review, and then optionally imports the source profile metadata into the target profile
 
 Internally, `redcaplite.metadata_ops.transform` and `redcaplite.metadata_ops.validate` now provide the reusable add/edit/remove helpers for metadata write workflows, including CLI flag-to-row conversion, field-type validation, light choice-field validation, default label generation, and DataFrame-based append/update/remove helpers.
 
