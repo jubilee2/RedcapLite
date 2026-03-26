@@ -4,11 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, with entries listed in reverse chronological order.
 
+## [2.2.0]
+
+### Added
+- Added `rcl profiles` to list saved profile names and configured API URLs.
+
+### Changed
+- Standardized CLI documentation on command-first usage: `rcl <command> <profile> ...`.
+- Corrected legacy command-order wording from `rcl <profile> metadata pull` to `rcl metadata <profile> pull`.
+- Clarified command examples and release notes for the command-first style (for example, `rcl metadata <profile> pull`).
+
 ## [2.1.1]
 
 ### Added
 - Added `output_file` support for export and get APIs that return CSV, JSON, XML, or text responses.
-- Added `rcl <profile> metadata pull` to export project metadata to a timestamped file and print the saved file name and total field count.
+- Added `rcl metadata <profile> pull` to export project metadata to a timestamped file and print the saved file name and total field count.
 - Added tests covering saved output behavior for the shared HTTP handlers and client export flow.
 
 ### Changed
