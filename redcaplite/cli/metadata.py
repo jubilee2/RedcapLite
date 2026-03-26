@@ -40,17 +40,18 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
     """Attach the ``metadata`` command group to the CLI root."""
     metadata_parser = subparsers.add_parser(
         "metadata",
-        prog="rcl <profile> metadata",
+        prog="rcl metadata <profile>",
         help="Inspect and edit project metadata.",
         description="Inspect and edit project metadata.",
     )
+    metadata_parser.add_argument("profile", metavar="<profile>", help="Profile name.")
     metadata_subparsers = metadata_parser.add_subparsers(dest="metadata_command")
     metadata_subparsers.required = True
 
     # Keep subcommand registration in one loop so the public CLI surface is easy
     # to scan and update as metadata features are added.
     for name in _METADATA_SUBCOMMANDS:
-        command_parser = metadata_subparsers.add_parser(name, prog=f"rcl <profile> metadata {name}")
+        command_parser = metadata_subparsers.add_parser(name, prog=f"rcl metadata <profile> {name}")
         if name == "pull":
             command_parser.set_defaults(handler=_handle_pull_metadata)
             continue

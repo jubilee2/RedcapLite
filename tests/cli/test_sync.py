@@ -68,7 +68,7 @@ def test_main_sync_prints_differences_and_imports_source_metadata(monkeypatch, c
         lambda profile: source_client if profile == "profile1" else target_client,
     )
 
-    assert main(["profile1", "sync", "profile2", "--yes"]) == 0
+    assert main(["sync", "profile1", "profile2", "--yes"]) == 0
 
     captured = capsys.readouterr()
     assert 'Metadata comparison: source "profile1" -> target "profile2"' in captured.out
@@ -113,7 +113,7 @@ def test_main_sync_prompts_before_import(monkeypatch, capsys) -> None:
     )
     monkeypatch.setattr("redcaplite.cli.sync.confirm", lambda prompt: False)
 
-    assert main(["profile1", "sync", "profile2"]) == 1
+    assert main(["sync", "profile1", "profile2"]) == 1
 
     captured = capsys.readouterr()
     assert "Fields that will import:" in captured.out
@@ -143,7 +143,7 @@ def test_main_sync_reports_when_metadata_matches(monkeypatch, capsys) -> None:
         lambda profile: source_client if profile == "profile1" else target_client,
     )
 
-    assert main(["profile1", "sync", "profile2"]) == 0
+    assert main(["sync", "profile1", "profile2"]) == 0
 
     captured = capsys.readouterr()
     assert 'No metadata differences found between "profile1" and "profile2".' in captured.out

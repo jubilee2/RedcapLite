@@ -7,7 +7,7 @@ def test_main_without_args_prints_help(capsys) -> None:
     assert main([]) == 0
 
     captured = capsys.readouterr()
-    assert "usage: rcl <profile> [-h] {setup,metadata,sync} ..." in captured.out
+    assert "usage: rcl [-h] {setup,metadata,sync} ..." in captured.out
     assert "setup" in captured.out
     assert "metadata" in captured.out
     assert "sync" in captured.out
@@ -27,60 +27,67 @@ def test_main_with_root_help_flag_prints_root_help(capsys) -> None:
     assert main(["--help"]) == 0
 
     captured = capsys.readouterr()
-    assert "usage: rcl <profile> [-h] {setup,metadata,sync} ..." in captured.out
+    assert "usage: rcl [-h] {setup,metadata,sync} ..." in captured.out
     assert "Create or update stored access for a REDCap profile." in captured.out
     assert "sync" in captured.out
     assert captured.err == ""
 
 
 def test_main_with_setup_help_prints_setup_help(capsys) -> None:
-    assert main(["demo", "setup", "--help"]) == 0
+    assert main(["setup", "demo", "--help"]) == 0
 
     captured = capsys.readouterr()
-    assert "usage: rcl <profile> setup [-h]" in captured.out
+    assert "usage: rcl setup <profile> [-h]" in captured.out
     assert "Create or update stored access for a REDCap profile." in captured.out
     assert captured.err == ""
 
 
 def test_main_with_metadata_help_prints_metadata_help(capsys) -> None:
-    assert main(["demo", "metadata", "--help"]) == 0
+    assert main(["metadata", "demo", "--help"]) == 0
 
     captured = capsys.readouterr()
-    assert "usage: rcl <profile> metadata [-h]" in captured.out
+    assert "usage: rcl metadata <profile> [-h]" in captured.out
     assert "Inspect and edit project metadata." in captured.out
     assert captured.err == ""
 
 
 def test_main_with_metadata_subcommand_help_prints_subcommand_help(capsys) -> None:
-    assert main(["demo", "metadata", "list", "--help"]) == 0
+    assert main(["metadata", "demo", "list", "--help"]) == 0
 
     captured = capsys.readouterr()
-    assert "usage: rcl <profile> metadata list [-h]" in captured.out
+    assert "usage: rcl metadata <profile> list [-h]" in captured.out
     assert "--field FIELD_NAMES" in captured.out
     assert "--form FORM_NAMES" in captured.out
     assert captured.err == ""
 
 
 def test_main_with_metadata_pull_help_prints_subcommand_help(capsys) -> None:
-    assert main(["demo", "metadata", "pull", "--help"]) == 0
+    assert main(["metadata", "demo", "pull", "--help"]) == 0
 
     captured = capsys.readouterr()
-    assert "usage: rcl <profile> metadata pull [-h]" in captured.out
+    assert "usage: rcl metadata <profile> pull [-h]" in captured.out
     assert captured.err == ""
 
 
-def test_main_returns_error_for_missing_profile_subcommand(capsys) -> None:
-    assert main(["demo"]) == 2
+def test_main_returns_error_for_missing_command(capsys) -> None:
+    assert main([]) == 0
+
+    captured = capsys.readouterr()
+    assert captured.err == ""
+
+
+def test_main_returns_error_for_missing_profile_for_setup(capsys) -> None:
+    assert main(["setup"]) == 2
 
     captured = capsys.readouterr()
     assert captured.out == ""
-    assert "the following arguments are required: command" in captured.err
+    assert "the following arguments are required: <profile>" in captured.err
 
 
 def test_build_parser_supports_metadata_group() -> None:
     parser = build_parser()
 
-    parsed = parser.parse_args(["demo", "metadata", "list"])
+    parsed = parser.parse_args(["metadata", "demo", "list"])
 
     assert parsed.profile == "demo"
     assert parsed.command == "metadata"
@@ -90,7 +97,7 @@ def test_build_parser_supports_metadata_group() -> None:
 def test_build_parser_supports_metadata_pull() -> None:
     parser = build_parser()
 
-    parsed = parser.parse_args(["demo", "metadata", "pull"])
+    parsed = parser.parse_args(["metadata", "demo", "pull"])
 
     assert parsed.profile == "demo"
     assert parsed.command == "metadata"
@@ -101,7 +108,7 @@ def test_build_parser_supports_metadata_list_fields_filters() -> None:
     parser = build_parser()
 
     parsed = parser.parse_args(
-        ["demo", "metadata", "list", "--form", "demographics", "--field", "age"]
+        ["metadata", "demo", "list", "--form", "demographics", "--field", "age"]
     )
 
     assert parsed.profile == "demo"
@@ -115,8 +122,8 @@ def test_build_parser_supports_metadata_add_field_flags() -> None:
 
     parsed = parser.parse_args(
         [
-            "demo",
             "metadata",
+            "demo",
             "add",
             "age",
             "demographics",
@@ -138,7 +145,7 @@ def test_build_parser_supports_metadata_add_field_flags() -> None:
 def test_build_parser_supports_metadata_edit_field_flags() -> None:
     parser = build_parser()
 
-    parsed = parser.parse_args(["demo", "metadata", "edit", "age", "--field-label", "Participant age"])
+    parsed = parser.parse_args(["metadata", "demo", "edit", "age", "--field-label", "Participant age"])
 
     assert parsed.profile == "demo"
     assert parsed.metadata_command == "edit"
@@ -149,7 +156,7 @@ def test_build_parser_supports_metadata_edit_field_flags() -> None:
 def test_build_parser_supports_metadata_remove_field_confirmation_flag() -> None:
     parser = build_parser()
 
-    parsed = parser.parse_args(["demo", "metadata", "remove", "age", "--yes"])
+    parsed = parser.parse_args(["metadata", "demo", "remove", "age", "--yes"])
 
     assert parsed.profile == "demo"
     assert parsed.metadata_command == "remove"
@@ -160,7 +167,7 @@ def test_build_parser_supports_metadata_remove_field_confirmation_flag() -> None
 def test_build_parser_supports_setup_command() -> None:
     parser = build_parser()
 
-    parsed = parser.parse_args(["demo", "setup"])
+    parsed = parser.parse_args(["setup", "demo"])
 
     assert parsed.profile == "demo"
     assert parsed.command == "setup"
@@ -170,7 +177,7 @@ def test_build_parser_supports_setup_command() -> None:
 def test_build_parser_supports_sync_command() -> None:
     parser = build_parser()
 
-    parsed = parser.parse_args(["profile1", "sync", "profile2", "--yes"])
+    parsed = parser.parse_args(["sync", "profile1", "profile2", "--yes"])
 
     assert parsed.profile == "profile1"
     assert parsed.command == "sync"

@@ -12,7 +12,7 @@ def test_main_metadata_pull_saves_export_and_prints_summary(monkeypatch, capsys)
         lambda profile: f"{profile}_metadata_20260325_120000.csv",
     )
 
-    assert main(["demo", "metadata", "pull"]) == 0
+    assert main(["metadata", "demo", "pull"]) == 0
 
     captured = capsys.readouterr()
     assert "Saved metadata export to demo_metadata_20260325_120000.csv" in captured.out
@@ -27,7 +27,7 @@ def test_main_metadata_list_fields_prints_table(tmp_path, monkeypatch, capsys) -
         lambda profile: MetadataClient("https://redcap.example.edu/api/", "secret-token"),
     )
 
-    assert main(["demo", "metadata", "list", "--form", "demographics"]) == 0
+    assert main(["metadata", "demo", "list", "--form", "demographics"]) == 0
 
     captured = capsys.readouterr()
     assert "field_name" in captured.out
@@ -42,7 +42,7 @@ def test_main_metadata_list_fields_supports_field_filter(monkeypatch, capsys) ->
         lambda profile: MetadataClient("https://redcap.example.edu/api/", "secret-token"),
     )
 
-    assert main(["demo", "metadata", "list", "--field", "record_id"]) == 0
+    assert main(["metadata", "demo", "list", "--field", "record_id"]) == 0
 
     captured = capsys.readouterr()
     assert "record_id" in captured.out
@@ -56,8 +56,8 @@ def test_main_metadata_add_field_imports_metadata(monkeypatch, capsys) -> None:
 
     assert main(
         [
-            "demo",
             "metadata",
+            "demo",
             "add",
             "height",
             "demographics",
@@ -85,8 +85,8 @@ def test_main_metadata_add_field_imports_choice_metadata(monkeypatch, capsys) ->
 
     assert main(
         [
-            "demo",
             "metadata",
+            "demo",
             "add",
             "age",
             "demographics",
@@ -114,8 +114,8 @@ def test_main_metadata_add_field_requires_choices_for_choice_types(monkeypatch, 
     assert (
         main(
             [
-                "demo",
                 "metadata",
+                "demo",
                 "add",
                 "height",
                 "demographics",
@@ -137,7 +137,7 @@ def test_main_metadata_add_field_prompts_before_import(monkeypatch, capsys) -> N
     monkeypatch.setattr("redcaplite.cli.metadata.build_client", lambda profile: client)
     monkeypatch.setattr("redcaplite.cli.metadata.prompt_confirm", lambda prompt: False)
 
-    assert main(["demo", "metadata", "add", "height", "demographics"]) == 1
+    assert main(["metadata", "demo", "add", "height", "demographics"]) == 1
 
     captured = capsys.readouterr()
     assert "Preview of field to add:" in captured.out
@@ -151,8 +151,8 @@ def test_main_metadata_edit_field_imports_changed_values_only(monkeypatch, capsy
     assert (
         main(
             [
-                "demo",
                 "metadata",
+                "demo",
                 "edit",
                 "age",
                 "--field-label",
@@ -187,8 +187,8 @@ def test_main_metadata_edit_field_warns_for_type_changes(monkeypatch, capsys) ->
     assert (
         main(
             [
-                "demo",
                 "metadata",
+                "demo",
                 "edit",
                 "age",
                 "--field-type",
@@ -219,8 +219,8 @@ def test_main_metadata_add_field_yes_flag_in_field_flags_skips_prompt(monkeypatc
     assert (
         main(
             [
-                "demo",
                 "metadata",
+                "demo",
                 "add",
                 "height",
                 "demographics",
@@ -250,8 +250,8 @@ def test_main_metadata_edit_field_yes_flag_in_field_flags_skips_prompt(monkeypat
     assert (
         main(
             [
-                "demo",
                 "metadata",
+                "demo",
                 "edit",
                 "age",
                 "--field-label",
@@ -275,7 +275,7 @@ def test_main_metadata_edit_field_requires_choices_for_choice_types(monkeypatch,
     client = MetadataClient("https://redcap.example.edu/api/", "secret-token")
     monkeypatch.setattr("redcaplite.cli.metadata.build_client", lambda profile: client)
 
-    assert main(["demo", "metadata", "edit", "age", "--field-type", "radio", "--yes"]) == 1
+    assert main(["metadata", "demo", "edit", "age", "--field-type", "radio", "--yes"]) == 1
 
     captured = capsys.readouterr()
     assert 'Error: Field type "radio" requires non-empty "select_choices_or_calculations".' in captured.err
@@ -287,7 +287,7 @@ def test_main_metadata_edit_field_prompts_before_import(monkeypatch, capsys) -> 
     monkeypatch.setattr("redcaplite.cli.metadata.build_client", lambda profile: client)
     monkeypatch.setattr("redcaplite.cli.metadata.prompt_confirm", lambda prompt: False)
 
-    assert main(["demo", "metadata", "edit", "age", "--field-label", "Participant Age"]) == 1
+    assert main(["metadata", "demo", "edit", "age", "--field-label", "Participant Age"]) == 1
 
     captured = capsys.readouterr()
     assert "Preview of field changes:" in captured.out
@@ -299,7 +299,7 @@ def test_main_metadata_edit_field_requires_patch_flags(monkeypatch, capsys) -> N
     client = MetadataClient("https://redcap.example.edu/api/", "secret-token")
     monkeypatch.setattr("redcaplite.cli.metadata.build_client", lambda profile: client)
 
-    assert main(["demo", "metadata", "edit", "age"]) == 1
+    assert main(["metadata", "demo", "edit", "age"]) == 1
 
     captured = capsys.readouterr()
     assert "Error: No metadata changes were provided. Pass at least one --flag to update." in captured.err
@@ -310,7 +310,7 @@ def test_main_metadata_remove_field_imports_metadata(monkeypatch, capsys) -> Non
     client = MetadataClient("https://redcap.example.edu/api/", "secret-token")
     monkeypatch.setattr("redcaplite.cli.metadata.build_client", lambda profile: client)
 
-    assert main(["demo", "metadata", "remove", "age", "--yes"]) == 0
+    assert main(["metadata", "demo", "remove", "age", "--yes"]) == 0
 
     captured = capsys.readouterr()
     assert "Preview of field to remove:" in captured.out
@@ -328,7 +328,7 @@ def test_main_metadata_remove_field_prompts_before_import(monkeypatch, capsys) -
     monkeypatch.setattr("redcaplite.cli.metadata.build_client", lambda profile: client)
     monkeypatch.setattr("redcaplite.cli.metadata.prompt_confirm", lambda prompt: False)
 
-    assert main(["demo", "metadata", "remove", "age"]) == 1
+    assert main(["metadata", "demo", "remove", "age"]) == 1
 
     captured = capsys.readouterr()
     assert "Preview of field to remove:" in captured.out

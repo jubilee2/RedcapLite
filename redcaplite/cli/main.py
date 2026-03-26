@@ -17,7 +17,6 @@ def build_parser() -> argparse.ArgumentParser:
         description="Command-line interface for the redcaplite package.",
     )
     parser.add_argument("--version", action="store_true", help="Show the CLI version and exit.")
-    parser.add_argument("profile", metavar="<profile>", help="Profile name.")
     subparsers = parser.add_subparsers(dest="command")
     subparsers.required = True
 
@@ -25,7 +24,7 @@ def build_parser() -> argparse.ArgumentParser:
         module.register_parser(subparsers)
 
     command_names = ",".join(subparsers.choices)
-    parser.usage = f"%(prog)s <profile> [-h] {{{command_names}}} ..."
+    parser.usage = f"%(prog)s [-h] {{{command_names}}} ..."
     return parser
 
 

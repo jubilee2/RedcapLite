@@ -22,7 +22,7 @@ def test_main_setup_command_creates_profile(tmp_path, monkeypatch, capsys) -> No
     monkeypatch.setattr("redcaplite.cli.setup.prompt_secret", lambda _: "secret-token")
     monkeypatch.setattr("redcaplite.cli.setup.SetupCommand", lambda: command)
 
-    assert main(["data_project", "setup"]) == 0
+    assert main(["setup", "data_project"]) == 0
 
     captured = capsys.readouterr()
     assert 'Profile "data_project" created.' in captured.out
@@ -103,7 +103,7 @@ def test_main_setup_command_keeps_url_and_replaces_token(tmp_path, monkeypatch, 
     monkeypatch.setattr("redcaplite.cli.setup.prompt_secret", lambda _: "new-token")
     monkeypatch.setattr("redcaplite.cli.setup.SetupCommand", lambda: command)
 
-    assert main(["demo", "setup"]) == 0
+    assert main(["setup", "demo"]) == 0
 
     captured = capsys.readouterr()
     assert captured.err == ""
@@ -137,7 +137,7 @@ def test_main_setup_command_updates_url_and_token(tmp_path, monkeypatch, capsys)
     monkeypatch.setattr("redcaplite.cli.setup.prompt_secret", lambda _: "new-token")
     monkeypatch.setattr("redcaplite.cli.setup.SetupCommand", lambda: command)
 
-    assert main(["demo", "setup"]) == 0
+    assert main(["setup", "demo"]) == 0
 
     captured = capsys.readouterr()
     assert captured.err == ""
