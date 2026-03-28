@@ -125,14 +125,9 @@ def compare_metadata(
     """Return metadata differences as additions, updates, and removals."""
     source_only = _left_anti_rows(source_metadata, target_metadata)
     target_only = _left_anti_rows(target_metadata, source_metadata)
-    updates = pd.DataFrame()
-
-    if "field_name" in source_only.columns and "field_name" in target_only.columns:
-        updates = target_only.merge(source_only[["field_name"]], how="inner", on="field_name")
-        if not updates.empty:
-            update_fields = updates[["field_name"]].drop_duplicates()
-            source_only = source_only.merge(update_fields, how="left_anti", on=["field_name"])
-            target_only = target_only.merge(update_fields, how="left_anti", on=["field_name"])
+    updates = target_only.merge(source_only[["field_name"]], how="inner", on="field_name")
+    source_only = source_only.merge(updates[["field_name"]], how="left_anti", on=["field_name"])
+    target_only = target_only.merge(updates[["field_name"]], how="left_anti", on=["field_name"])
 
     return {
         "adds": source_only,
