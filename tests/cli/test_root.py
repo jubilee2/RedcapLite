@@ -7,9 +7,14 @@ def test_main_without_args_prints_help(capsys) -> None:
     assert main([]) == 0
 
     captured = capsys.readouterr()
-    assert "usage: rcl [-h] {setup,metadata,sync,profiles} ..." in captured.out
+    assert (
+        "usage: rcl [-h] {setup,metadata,records,users,arms,events,project,survey,files,sync,profiles} ..."
+        in captured.out
+    )
     assert "setup" in captured.out
     assert "metadata" in captured.out
+    assert "records" in captured.out
+    assert "users" in captured.out
     assert "sync" in captured.out
 
 
@@ -27,7 +32,10 @@ def test_main_with_root_help_flag_prints_root_help(capsys) -> None:
     assert main(["--help"]) == 0
 
     captured = capsys.readouterr()
-    assert "usage: rcl [-h] {setup,metadata,sync,profiles} ..." in captured.out
+    assert (
+        "usage: rcl [-h] {setup,metadata,records,users,arms,events,project,survey,files,sync,profiles} ..."
+        in captured.out
+    )
     assert "Create or update stored access for a REDCap profile." in captured.out
     assert "sync" in captured.out
     assert captured.err == ""
@@ -192,3 +200,35 @@ def test_build_parser_supports_profiles_command() -> None:
 
     assert parsed.command == "profiles"
     assert callable(parsed.handler)
+
+
+def test_build_parser_supports_records_command() -> None:
+    parser = build_parser()
+
+    parsed = parser.parse_args(["records", "demo", "list", "--record", "1"])
+
+    assert parsed.command == "records"
+    assert parsed.profile == "demo"
+    assert parsed.records_command == "list"
+    assert parsed.records == ["1"]
+
+
+def test_build_parser_supports_users_command() -> None:
+    parser = build_parser()
+
+    parsed = parser.parse_args(["users", "demo", "delete", "alice"])
+
+    assert parsed.command == "users"
+    assert parsed.profile == "demo"
+    assert parsed.users_command == "delete"
+    assert parsed.usernames == ["alice"]
+
+
+def test_build_parser_supports_project_command() -> None:
+    parser = build_parser()
+
+    parsed = parser.parse_args(["project", "demo", "export"])
+
+    assert parsed.command == "project"
+    assert parsed.profile == "demo"
+    assert parsed.project_command == "export"
