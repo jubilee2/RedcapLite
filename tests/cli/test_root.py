@@ -177,12 +177,29 @@ def test_build_parser_supports_setup_command() -> None:
 def test_build_parser_supports_sync_command() -> None:
     parser = build_parser()
 
-    parsed = parser.parse_args(["sync", "profile1", "profile2", "--yes"])
+    parsed = parser.parse_args(
+        [
+            "sync",
+            "profile1",
+            "profile2",
+            "--yes",
+            "--dry-run",
+            "--summary-only",
+            "--diff-by",
+            "field_name",
+            "--backup-file",
+            "backup.csv",
+        ]
+    )
 
     assert parsed.profile == "profile1"
     assert parsed.command == "sync"
     assert parsed.target_profile == "profile2"
     assert parsed.yes is True
+    assert parsed.dry_run is True
+    assert parsed.summary_only is True
+    assert parsed.diff_by == "field_name"
+    assert parsed.backup_file == "backup.csv"
 
 
 def test_build_parser_supports_profiles_command() -> None:

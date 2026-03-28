@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import argparse
+from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -28,10 +30,40 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
         action="store_true",
         help="Skip the import confirmation prompt.",
     )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Preview differences but never import metadata into the target profile.",
+    )
+    parser.add_argument(
+        "--diff-by",
+        metavar="FIELD_NAME",
+        default=None,
+        help="Match rows by this column and show per-column updates for matching identities.",
+    )
+    parser.add_argument(
+        "--summary-only",
+        action="store_true",
+        help="Show only counts for adds, updates, and removals.",
+    )
+    parser.add_argument(
+        "--backup-file",
+        metavar="PATH",
+        default=None,
+        help="Export target metadata to this CSV path before importing source metadata.",
+    )
     parser.set_defaults(handler=_handle_sync)
 
 
-def run_sync(source_profile: str, target_profile: str, assume_yes: bool = False) -> int:
+def run_sync(
+    source_profile: str,
+    target_profile: str,
+    assume_yes: bool = False,
+    dry_run: bool = False,
+    diff_by: str | None = None,
+    summary_only: bool = False,
+    backup_file: str | None = None,
+) -> int:
     """Compare source metadata to target metadata and optionally import source into target."""
     if source_profile == target_profile:
         print_error("Source and target profiles cannot be the same.")
@@ -46,25 +78,43 @@ def run_sync(source_profile: str, target_profile: str, assume_yes: bool = False)
         print_error(str(exc))
         return 1
 
-    comparison = compare_metadata(source_metadata, target_metadata)
+    comparison = compare_metadata(source_metadata, target_metadata, diff_by=diff_by)
+    updates = comparison["updates"]
+    adds = comparison["adds"]
+    removals = comparison["removals"]
+
     print_preview(
         [
             f'Metadata comparison: source "{source_profile}" -> target "{target_profile}"',
             f'Source fields: {len(source_metadata.index)}',
             f'Target fields: {len(target_metadata.index)}',
-            "Comparison prints rows that appear only in the source export and only in the target export using paired all-column anti joins.",
+            _comparison_description(diff_by=diff_by),
+            f"Adds: {len(adds.index)}",
+            f"Updates: {len(updates.index)}",
+            f"Removals: {len(removals.index)}",
         ]
     )
-    _print_comparison_table(
-        "Fields that will import:",
-        metadata_to_records(comparison["source_only"]),
-    )
-    _print_comparison_table(
-        "Fields that will be removed or updated after import:",
-        metadata_to_records(comparison["target_only"]),
-    )
-    if comparison["source_only"].empty and comparison["target_only"].empty:
+    if not summary_only:
+        _print_comparison_table(
+            "Fields to add in target:",
+            metadata_to_records(adds),
+        )
+        _print_update_table(
+            "Fields to update in target:",
+            updates.to_dict(orient="records"),
+            diff_by=diff_by,
+        )
+        _print_comparison_table(
+            "Fields to remove from target:",
+            metadata_to_records(removals),
+        )
+
+    if adds.empty and updates.empty and removals.empty:
         print_success(f'No metadata differences found between "{source_profile}" and "{target_profile}".')
+        return 0
+
+    if dry_run:
+        print_success("Dry run enabled; no metadata was imported.")
         return 0
 
     if not assume_yes and not confirm(
@@ -73,25 +123,46 @@ def run_sync(source_profile: str, target_profile: str, assume_yes: bool = False)
         print_error("cancelled by user.")
         return 1
 
+    if backup_file:
+        backup_path = _normalize_backup_file_path(backup_file)
+        target_client.get_metadata(format="csv", output_file=str(backup_path))
+        print_success(f'Exported target metadata backup to "{backup_path}".')
+
     target_client.import_metadata(source_metadata, format="csv")
     print_success(f'Imported metadata from "{source_profile}" into "{target_profile}".')
     return 0
 
 
-def compare_metadata(source_metadata: pd.DataFrame, target_metadata: pd.DataFrame) -> dict[str, pd.DataFrame]:
-    """Return metadata rows that only exist in one export or the other."""
+def compare_metadata(
+    source_metadata: pd.DataFrame,
+    target_metadata: pd.DataFrame,
+    diff_by: str | None = None,
+) -> dict[str, pd.DataFrame]:
+    """Return metadata differences as additions, updates, and removals."""
+    if diff_by:
+        return _compare_metadata_by_identity(source_metadata, target_metadata, diff_by=diff_by)
+
     source_only = _left_anti_rows(source_metadata, target_metadata)
     target_only = _left_anti_rows(target_metadata, source_metadata)
 
     return {
-        "source_only": source_only,
-        "target_only": target_only,
+        "adds": source_only,
+        "updates": pd.DataFrame(),
+        "removals": target_only,
     }
 
 
 def _handle_sync(args: argparse.Namespace) -> int:
     """CLI handler for ``sync``."""
-    return run_sync(args.profile, args.target_profile, assume_yes=args.yes)
+    return run_sync(
+        args.profile,
+        args.target_profile,
+        assume_yes=args.yes,
+        dry_run=args.dry_run,
+        diff_by=args.diff_by,
+        summary_only=args.summary_only,
+        backup_file=args.backup_file,
+    )
 
 
 def _left_anti_rows(
@@ -112,6 +183,70 @@ def _left_anti_rows(
         on=columns
     )
 
+
+def _compare_metadata_by_identity(
+    source_metadata: pd.DataFrame,
+    target_metadata: pd.DataFrame,
+    diff_by: str,
+) -> dict[str, pd.DataFrame]:
+    """Compare metadata by row identity and return adds, updates, removals."""
+    if diff_by not in source_metadata.columns or diff_by not in target_metadata.columns:
+        raise ValueError(f'Column "{diff_by}" must exist in both source and target metadata.')
+
+    source_frame = source_metadata.fillna("").drop_duplicates(subset=[diff_by], keep="first")
+    target_frame = target_metadata.fillna("").drop_duplicates(subset=[diff_by], keep="first")
+    source_ids = set(source_frame[diff_by].tolist())
+    target_ids = set(target_frame[diff_by].tolist())
+
+    adds = source_frame.loc[source_frame[diff_by].isin(source_ids - target_ids)].copy()
+    removals = target_frame.loc[target_frame[diff_by].isin(target_ids - source_ids)].copy()
+
+    source_indexed = source_frame.set_index(diff_by, drop=False)
+    target_indexed = target_frame.set_index(diff_by, drop=False)
+    shared_ids = sorted(source_ids & target_ids)
+    comparison_columns = sorted(set(source_frame.columns) | set(target_frame.columns))
+    changed_rows: list[dict[str, Any]] = []
+
+    for identity in shared_ids:
+        source_row = source_indexed.loc[identity].to_dict()
+        target_row = target_indexed.loc[identity].to_dict()
+        changed_columns = [
+            column
+            for column in comparison_columns
+            if source_row.get(column, "") != target_row.get(column, "")
+        ]
+        for column in changed_columns:
+            changed_rows.append(
+                {
+                    diff_by: identity,
+                    "column": column,
+                    "source_value": source_row.get(column, ""),
+                    "target_value": target_row.get(column, ""),
+                }
+            )
+
+    return {
+        "adds": adds,
+        "updates": pd.DataFrame(changed_rows),
+        "removals": removals,
+    }
+
+
+def _comparison_description(diff_by: str | None) -> str:
+    """Return a human-readable explanation of comparison strategy."""
+    if diff_by:
+        return f'Comparison matched rows by "{diff_by}" and expanded per-column updates for matching identities.'
+    return "Comparison derives adds/removals from paired all-column anti joins."
+
+
+def _normalize_backup_file_path(backup_file: str) -> Path:
+    """Resolve backup file path, defaulting directories to a timestamped filename."""
+    backup_path = Path(backup_file)
+    if backup_path.suffix.lower() == ".csv":
+        return backup_path
+    timestamp = datetime.now(tz=UTC).strftime("%Y%m%dT%H%M%SZ")
+    return backup_path / f"target_metadata_backup_{timestamp}.csv"
+
 def _print_comparison_table(title: str, rows: list[dict[str, Any]]) -> None:
     """Print a titled comparison section."""
     print_preview([title])
@@ -125,3 +260,15 @@ def _comparison_table_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Reduce comparison rows to the columns shown in sync output."""
     columns = ["field_name", "form_name", "field_type"]
     return [{column: row.get(column, "") for column in columns} for row in rows]
+
+
+def _print_update_table(title: str, rows: list[dict[str, Any]], diff_by: str | None) -> None:
+    """Print per-column update rows."""
+    print_preview([title])
+    if not rows:
+        print_preview(["  (none)"])
+        return
+    if diff_by:
+        print_table(rows)
+        return
+    print_preview([f'  (use --diff-by to expand update details, e.g. --diff-by field_name; detected {len(rows)} row changes)'])
