@@ -72,7 +72,7 @@ def test_main_sync_prints_differences_and_imports_source_metadata(monkeypatch, c
 
     captured = capsys.readouterr()
     assert 'Metadata comparison: source "profile1" -> target "profile2"' in captured.out
-    assert 'matches rows by "field_name"' in captured.out
+    assert "all-column anti joins" in captured.out
     assert "Fields to add in target:" in captured.out
     assert "height" in captured.out
     assert "Fields to update in target:" in captured.out

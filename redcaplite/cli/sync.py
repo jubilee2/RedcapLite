@@ -81,7 +81,7 @@ def run_sync(
             f'Metadata comparison: source "{source_profile}" -> target "{target_profile}"',
             f'Source fields: {len(source_metadata.index)}',
             f'Target fields: {len(target_metadata.index)}',
-            'Comparison matches rows by "field_name" to derive adds/updates/removals.',
+            'Comparison derives adds/removals from all-column anti joins and detects updates for matching field_name values.',
             f"Adds: {len(adds.index)}",
             f"Updates: {len(updates.index)}",
             f"Removals: {len(removals.index)}",
