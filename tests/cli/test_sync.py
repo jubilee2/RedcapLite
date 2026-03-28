@@ -244,35 +244,35 @@ def test_main_sync_dry_run_never_imports(monkeypatch, capsys) -> None:
     assert target_client.imported_metadata is None
 
 
-def test_main_sync_supports_summary_only(monkeypatch, capsys) -> None:
+def test_main_sync_prints_summary_counts(monkeypatch, capsys) -> None:
     source_client = SyncMetadataClient(
         "https://source.example.edu/api/",
-        "source-token",
-        metadata=[
-            {"field_name": "record_id", "field_label": "Record ID", "field_type": "text"},
-            {"field_name": "age", "field_label": "Participant Age", "field_type": "text"},
-        ],
-    )
+            "source-token",
+            metadata=[
+                {"field_name": "record_id", "form_name": "enrollment", "field_label": "Record ID", "field_type": "text"},
+                {"field_name": "age", "form_name": "demographics", "field_label": "Participant Age", "field_type": "text"},
+            ],
+        )
     target_client = SyncMetadataClient(
         "https://target.example.edu/api/",
-        "target-token",
-        metadata=[
-            {"field_name": "record_id", "field_label": "Record ID", "field_type": "text"},
-            {"field_name": "age", "field_label": "Age", "field_type": "text"},
-        ],
-    )
+            "target-token",
+            metadata=[
+                {"field_name": "record_id", "form_name": "enrollment", "field_label": "Record ID", "field_type": "text"},
+                {"field_name": "age", "form_name": "demographics", "field_label": "Age", "field_type": "text"},
+            ],
+        )
     monkeypatch.setattr(
         "redcaplite.cli.sync.build_client",
         lambda profile: source_client if profile == "profile1" else target_client,
     )
 
-    assert main(["sync", "profile1", "profile2", "--summary-only", "--yes"]) == 0
+    assert main(["sync", "profile1", "profile2", "--yes"]) == 0
 
     captured = capsys.readouterr()
     assert "Adds: 0" in captured.out
     assert "Updates: 1" in captured.out
     assert "Removals: 0" in captured.out
-    assert "Fields to update in target:" not in captured.out
+    assert "Fields to update in target:" in captured.out
 
 
 def test_main_sync_exports_backup_before_import(monkeypatch, capsys, tmp_path) -> None:

@@ -36,11 +36,6 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
         help="Preview differences but never import metadata into the target profile.",
     )
     parser.add_argument(
-        "--summary-only",
-        action="store_true",
-        help="Show only counts for adds, updates, and removals.",
-    )
-    parser.add_argument(
         "--backup-file",
         metavar="PATH",
         default=None,
@@ -54,7 +49,6 @@ def run_sync(
     target_profile: str,
     assume_yes: bool = False,
     dry_run: bool = False,
-    summary_only: bool = False,
     backup_file: str | None = None,
 ) -> int:
     """Compare source metadata to target metadata and optionally import source into target."""
@@ -87,19 +81,18 @@ def run_sync(
             f"Removals: {len(removals.index)}",
         ]
     )
-    if not summary_only:
-        _print_comparison_table(
-            "Fields to add in target:",
-            metadata_to_records(adds),
-        )
-        _print_update_table(
-            "Fields to update in target:",
-            updates.to_dict(orient="records"),
-        )
-        _print_comparison_table(
-            "Fields to remove from target:",
-            metadata_to_records(removals),
-        )
+    _print_comparison_table(
+        "Fields to add in target:",
+        metadata_to_records(adds),
+    )
+    _print_update_table(
+        "Fields to update in target:",
+        updates.to_dict(orient="records"),
+    )
+    _print_comparison_table(
+        "Fields to remove from target:",
+        metadata_to_records(removals),
+    )
 
     if adds.empty and updates.empty and removals.empty:
         print_success(f'No metadata differences found between "{source_profile}" and "{target_profile}".')
@@ -150,7 +143,6 @@ def _handle_sync(args: argparse.Namespace) -> int:
         args.target_profile,
         assume_yes=args.yes,
         dry_run=args.dry_run,
-        summary_only=args.summary_only,
         backup_file=args.backup_file,
     )
 

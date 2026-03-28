@@ -184,7 +184,6 @@ def test_build_parser_supports_sync_command() -> None:
             "profile2",
             "--yes",
             "--dry-run",
-            "--summary-only",
             "--backup-file",
             "backup.csv",
         ]
@@ -195,7 +194,6 @@ def test_build_parser_supports_sync_command() -> None:
     assert parsed.target_profile == "profile2"
     assert parsed.yes is True
     assert parsed.dry_run is True
-    assert parsed.summary_only is True
     assert parsed.backup_file == "backup.csv"
 
 
