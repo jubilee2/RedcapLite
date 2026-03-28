@@ -127,9 +127,8 @@ def compare_metadata(
     target_only = _left_anti_rows(target_metadata, source_metadata)
     updates = pd.DataFrame()
 
-    if "field_name" in source_only.columns and "field_name" in target_metadata.columns:
-        changed_fields = source_only[["field_name"]].drop_duplicates()
-        updates = target_metadata.fillna("").merge(changed_fields, how="inner", on=["field_name"])
+    if "field_name" in source_only.columns and "field_name" in target_only.columns:
+        updates = target_only.merge(source_only[["field_name"]], how="inner", on="field_name")
         if not updates.empty:
             update_fields = updates[["field_name"]].drop_duplicates()
             source_only = source_only.merge(update_fields, how="left_anti", on=["field_name"])
