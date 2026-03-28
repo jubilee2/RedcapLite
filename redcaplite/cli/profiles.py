@@ -29,6 +29,16 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
         prog="rcl profiles",
         help="List stored profiles and URLs.",
         description="List stored profiles and URLs.",
+        epilog=(
+            "Common patterns:\n"
+            "  rcl profiles\n\n"
+            "Safety defaults:\n"
+            "  This is a read-only command and does not call REDCap write APIs.\n\n"
+            "Automation examples:\n"
+            "  rcl profiles | sed -n '2,$p'\n"
+            "  python -c \"from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.get_metadata(format='csv').head())\""
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.set_defaults(handler=ProfilesCommand().run)
 

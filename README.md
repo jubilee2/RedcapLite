@@ -180,6 +180,70 @@ Internally, `redcaplite.metadata_ops.transform` and `redcaplite.metadata_ops.val
 
 The preview/output layer is also centralized for reuse: `redcaplite.cli.output` now exposes consistent `print_error`, `print_success`, `print_preview`, and `print_table` helpers, while `redcaplite.cli.prompts` provides `prompt`, `prompt_secret`, and `confirm` wrappers for interactive CLI input.
 
+## Command Matrix by Domain
+
+The matrix below groups common REDCap operations by domain and provides one-liner examples per subcommand-style action. CLI examples use `rcl`; API examples use `python -c` and highlight output format flags such as `format='json'` and `format='csv'`.
+
+### Metadata
+
+| Subcommand | One-liner example |
+|---|---|
+| list | `rcl metadata demo list --form demographics` |
+| pull | `rcl metadata demo pull` |
+| add | `rcl metadata demo add bmi vitals --field-type calc --calculation "(weight/(height^2))*703" --yes` |
+| edit | `rcl metadata demo edit age --field-label "Participant Age" --yes` |
+| remove | `rcl metadata demo remove obsolete_field --yes` |
+| export (API/json) | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.get_metadata(format='json')[:2])"` |
+| export (API/csv) | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); c.get_metadata(format='csv', output_file='metadata.csv')"` |
+
+### Records
+
+| Subcommand | One-liner example |
+|---|---|
+| export | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.export_records(format='json')[:2])"` |
+| import | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.import_records([{'record_id':'1001'}], format='json'))"` |
+| delete | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.delete_records(records=['1001']))"` |
+| next-id | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.generate_next_record_name())"` |
+| rename | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.rename_record('1001','1001A'))"` |
+
+### Users
+
+| Subcommand | One-liner example |
+|---|---|
+| export-users | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.get_users()[:2])"` |
+| import-users | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.import_users([{'username':'jsmith','expiration':'2030-01-01'}]))"` |
+| delete-users | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.delete_users(users=['jsmith']))"` |
+| export-roles | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.get_user_roles()[:2])"` |
+| export-role-maps | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.get_user_role_mappings()[:2])"` |
+
+### Files
+
+| Subcommand | One-liner example |
+|---|---|
+| export-file | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); c.get_file(record='1001', field='consent_pdf', event='baseline_arm_1', file_dictionary='.')"` |
+| import-file | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.import_file(record='1001', field='consent_pdf', event='baseline_arm_1', file_path='consent.pdf'))"` |
+| delete-file | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.delete_file(record='1001', field='consent_pdf', event='baseline_arm_1'))"` |
+| list-repo | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.list_file_repository()[:2])"` |
+| upload-repo-file | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.import_file_repository('study_doc.pdf', folder_id=1))"` |
+
+### Project
+
+| Subcommand | One-liner example |
+|---|---|
+| export-project | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.get_project())"` |
+| export-project-xml | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); c.get_project_xml(output_file='project.xml')"` |
+| import-settings | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.import_project_settings({'project_title':'Pilot Study'}))"` |
+| export-version | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.get_version())"` |
+
+### Survey
+
+| Subcommand | One-liner example |
+|---|---|
+| survey-link | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.get_survey_link(record='1001', instrument='consent'))"` |
+| survey-queue-link | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.get_survey_queue_link(record='1001'))"` |
+| survey-return-code | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.get_survey_return_code(record='1001', instrument='consent'))"` |
+| participant-list | `python -c "from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.get_participant_list(instrument='consent', format='json')[:2])"` |
+
 ## Detailed Usage
 
 ### Importing the Package

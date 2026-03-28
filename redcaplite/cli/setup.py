@@ -51,7 +51,21 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
         "setup",
         prog="rcl setup <profile>",
         help="Create or update stored access for a REDCap profile.",
-        description="Create or update stored access for a REDCap profile.",
+        description=(
+            "Create or update stored access for a REDCap profile.\n"
+            "This command validates credentials before saving them."
+        ),
+        epilog=(
+            "Common patterns:\n"
+            "  rcl setup demo\n"
+            "  rcl setup prod\n\n"
+            "Safety defaults:\n"
+            "  Setup never imports or updates REDCap project data; it only validates and stores access credentials.\n\n"
+            "Automation examples:\n"
+            "  Use setup once, then automate with --yes on metadata/sync commands.\n"
+            "  python -c \"from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.get_metadata(format='json')[:1])\""
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("profile", metavar="<profile>", help="Profile name.")
     parser.set_defaults(handler=SetupCommand().run)

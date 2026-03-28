@@ -19,7 +19,22 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
         "sync",
         prog="rcl sync <source_profile>",
         help="Compare metadata with another profile and optionally import it.",
-        description="Compare metadata with another profile and optionally import it.",
+        description=(
+            "Compare metadata with another profile and optionally import it.\n"
+            "The command previews differences before any import."
+        ),
+        epilog=(
+            "Common patterns:\n"
+            "  rcl sync qa prod\n"
+            "  rcl sync demo training --yes\n\n"
+            "Safety defaults:\n"
+            "  Sync prints source-only and target-only previews and prompts before import unless --yes is set.\n\n"
+            "Automation examples:\n"
+            "  rcl sync qa prod --yes\n"
+            "  python -c \"from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); "
+            "print(c.get_metadata(format='json')[:2])\""
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("profile", metavar="<source_profile>", help="Source profile name.")
     parser.add_argument("target_profile", metavar="<target_profile>", help="Profile to compare against and optionally update.")

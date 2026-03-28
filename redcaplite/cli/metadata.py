@@ -42,7 +42,23 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
         "metadata",
         prog="rcl metadata <profile>",
         help="Inspect and edit project metadata.",
-        description="Inspect and edit project metadata.",
+        description=(
+            "Inspect and edit project metadata.\n"
+            "Read commands are safe by default; write commands always preview changes first."
+        ),
+        epilog=(
+            "Common patterns:\n"
+            "  rcl metadata demo list --form demographics\n"
+            "  rcl metadata demo pull\n"
+            "  rcl metadata demo add bmi vitals --field-type calc --calculation '(weight/(height^2))*703'\n\n"
+            "Safety defaults:\n"
+            "  add/edit/remove show a preview and prompt for confirmation unless --yes is supplied.\n\n"
+            "Automation examples:\n"
+            "  rcl metadata demo edit age --field-label 'Participant Age' --yes\n"
+            "  python -c \"from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); "
+            "print(c.get_metadata(format='json')[:2])\""
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     metadata_parser.add_argument("profile", metavar="<profile>", help="Profile name.")
     metadata_subparsers = metadata_parser.add_subparsers(dest="metadata_command")
@@ -51,11 +67,38 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
     # Keep subcommand registration in one loop so the public CLI surface is easy
     # to scan and update as metadata features are added.
     for name in _METADATA_SUBCOMMANDS:
-        command_parser = metadata_subparsers.add_parser(name, prog=f"rcl metadata <profile> {name}")
+        command_parser = metadata_subparsers.add_parser(
+            name,
+            prog=f"rcl metadata <profile> {name}",
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+        )
         if name == "pull":
+            command_parser.description = "Export metadata to a timestamped CSV file for backup/review."
+            command_parser.epilog = (
+                "Common patterns:\n"
+                "  rcl metadata demo pull\n\n"
+                "Safety defaults:\n"
+                "  pull is read-only and never imports metadata.\n\n"
+                "Automation examples:\n"
+                "  rcl metadata demo pull && ls demo_metadata_*.csv\n"
+                "  python -c \"from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); "
+                "c.get_metadata(format='csv', output_file='demo_metadata.csv')\""
+            )
             command_parser.set_defaults(handler=_handle_pull_metadata)
             continue
         if name == "list":
+            command_parser.description = "List metadata fields in a compact table, optionally filtered by form/field."
+            command_parser.epilog = (
+                "Common patterns:\n"
+                "  rcl metadata demo list\n"
+                "  rcl metadata demo list --form demographics --field age\n\n"
+                "Safety defaults:\n"
+                "  list is read-only and only exports metadata for display.\n\n"
+                "Automation examples:\n"
+                "  rcl metadata demo list --field record_id\n"
+                "  python -c \"from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); "
+                "print(c.get_metadata(format='json', fields=['record_id']))\""
+            )
             command_parser.add_argument(
                 "--form",
                 dest="form_names",
@@ -73,6 +116,19 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
         if name in {"add", "edit", "remove"}:
             command_parser.add_argument("field_name")
         if name == "add":
+            command_parser.description = "Add a new metadata field, preview it, then optionally import."
+            command_parser.epilog = (
+                "Common patterns:\n"
+                "  rcl metadata demo add height demographics --field-type text\n"
+                "  rcl metadata demo add smoker demographics --field-type radio "
+                "--select-choices-or-calculations '1, Yes | 0, No'\n\n"
+                "Safety defaults:\n"
+                "  add previews the generated row and prompts before import unless --yes is included in flags.\n\n"
+                "Automation examples:\n"
+                "  rcl metadata demo add bmi vitals --field-type calc --calculation '(weight/(height^2))*703' --yes\n"
+                "  python -c \"from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); "
+                "print(c.get_metadata(format='json')[-1])\""
+            )
             command_parser.add_argument("form_name")
             command_parser.add_argument(
                 "field_flags",
@@ -82,6 +138,18 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
             command_parser.set_defaults(handler=_handle_add_field)
             continue
         if name == "edit":
+            command_parser.description = "Edit an existing metadata field, preview only changed values, then optionally import."
+            command_parser.epilog = (
+                "Common patterns:\n"
+                "  rcl metadata demo edit age --field-label 'Participant Age'\n"
+                "  rcl metadata demo edit smoker --field-type radio --select-choices-or-calculations '1, Yes | 0, No'\n\n"
+                "Safety defaults:\n"
+                "  edit previews changed keys and prompts before import unless --yes is included in flags.\n\n"
+                "Automation examples:\n"
+                "  rcl metadata demo edit age --required-field --yes\n"
+                "  python -c \"from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); "
+                "print(c.get_metadata(format='json', fields=['age']))\""
+            )
             command_parser.add_argument(
                 "field_flags",
                 nargs=argparse.REMAINDER,
@@ -90,6 +158,17 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
             command_parser.set_defaults(handler=_handle_edit_field)
             continue
         if name == "remove":
+            command_parser.description = "Remove one metadata field after preview and confirmation."
+            command_parser.epilog = (
+                "Common patterns:\n"
+                "  rcl metadata demo remove obsolete_field\n\n"
+                "Safety defaults:\n"
+                "  remove previews the full row and prompts before import unless --yes is set.\n\n"
+                "Automation examples:\n"
+                "  rcl metadata demo remove obsolete_field --yes\n"
+                "  python -c \"from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); "
+                "print(c.get_metadata(format='csv').shape)\""
+            )
             command_parser.add_argument(
                 "--yes",
                 action="store_true",
