@@ -14,7 +14,23 @@ def build_parser() -> argparse.ArgumentParser:
     """Create the top-level parser for the ``rcl`` CLI."""
     parser = argparse.ArgumentParser(
         prog="rcl",
-        description="Command-line interface for the redcaplite package.",
+        description=(
+            "Command-line interface for redcaplite. "
+            "Use command-first ordering: rcl <command> <profile> ..."
+        ),
+        epilog=(
+            "Common patterns:\n"
+            "  rcl setup demo\n"
+            "  rcl metadata demo list --form demographics\n"
+            "  rcl metadata demo edit age --field-label 'Participant Age' --yes\n"
+            "  rcl sync demo source_prod --yes\n\n"
+            "Safety defaults:\n"
+            "  Metadata write workflows and sync show a preview and prompt for confirmation unless --yes is provided.\n\n"
+            "Automation examples:\n"
+            "  rcl metadata demo add bmi vitals --field-type calc --calculation '(weight/(height^2))*703' --yes\n"
+            "  python -c \"from redcaplite import RedcapClient; c=RedcapClient('https://redcap.example.edu/api/','TOKEN'); print(c.get_metadata(format='json'))\""
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--version", action="store_true", help="Show the CLI version and exit.")
     subparsers = parser.add_subparsers(dest="command")
