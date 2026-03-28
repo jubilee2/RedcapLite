@@ -167,7 +167,7 @@ rcl profiles
 The metadata sync workflow is a top-level command:
 
 ```sh
-rcl sync <source_profile> <target_profile> [--yes] [--dry-run] [--summary-only] [--diff-by field_name] [--backup-file path]
+rcl sync <source_profile> <target_profile> [--yes] [--dry-run] [--summary-only] [--backup-file path]
 ```
 
 Use `sync` when you want to compare full metadata exports between two saved profiles and optionally import the source metadata into the target project after review.
@@ -176,7 +176,6 @@ Available today:
 
 - `sync <source_profile> <target_profile> [--yes]` exports metadata from both profiles, derives source-only and target-only row sets with paired DataFrame-based all-column anti-joins for review, and then optionally imports the source profile metadata into the target profile
 - `--dry-run` previews differences but never imports metadata
-- `--diff-by field_name` treats that column as row identity and prints per-column updates for matching rows (for example, changed `field_label` values for the same `field_name`)
 - `--summary-only` prints only aggregate add/update/remove counts to keep output concise on large projects
 - `--backup-file path` exports the target metadata CSV before import to support rollback/audit workflows
 

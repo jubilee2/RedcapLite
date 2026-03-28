@@ -36,12 +36,6 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
         help="Preview differences but never import metadata into the target profile.",
     )
     parser.add_argument(
-        "--diff-by",
-        metavar="FIELD_NAME",
-        default=None,
-        help="Match rows by this column and show per-column updates for matching identities.",
-    )
-    parser.add_argument(
         "--summary-only",
         action="store_true",
         help="Show only counts for adds, updates, and removals.",
@@ -60,7 +54,6 @@ def run_sync(
     target_profile: str,
     assume_yes: bool = False,
     dry_run: bool = False,
-    diff_by: str | None = None,
     summary_only: bool = False,
     backup_file: str | None = None,
 ) -> int:
@@ -78,7 +71,7 @@ def run_sync(
         print_error(str(exc))
         return 1
 
-    comparison = compare_metadata(source_metadata, target_metadata, diff_by=diff_by)
+    comparison = compare_metadata(source_metadata, target_metadata)
     updates = comparison["updates"]
     adds = comparison["adds"]
     removals = comparison["removals"]
@@ -88,7 +81,7 @@ def run_sync(
             f'Metadata comparison: source "{source_profile}" -> target "{target_profile}"',
             f'Source fields: {len(source_metadata.index)}',
             f'Target fields: {len(target_metadata.index)}',
-            _comparison_description(diff_by=diff_by),
+            _comparison_description(),
             f"Adds: {len(adds.index)}",
             f"Updates: {len(updates.index)}",
             f"Removals: {len(removals.index)}",
@@ -102,7 +95,6 @@ def run_sync(
         _print_update_table(
             "Fields to update in target:",
             updates.to_dict(orient="records"),
-            diff_by=diff_by,
         )
         _print_comparison_table(
             "Fields to remove from target:",
@@ -136,11 +128,10 @@ def run_sync(
 def compare_metadata(
     source_metadata: pd.DataFrame,
     target_metadata: pd.DataFrame,
-    diff_by: str | None = None,
 ) -> dict[str, pd.DataFrame]:
     """Return metadata differences as additions, updates, and removals."""
-    if diff_by:
-        return _compare_metadata_by_identity(source_metadata, target_metadata, diff_by=diff_by)
+    if "field_name" in source_metadata.columns and "field_name" in target_metadata.columns:
+        return _compare_metadata_by_identity(source_metadata, target_metadata, key_column="field_name")
 
     source_only = _left_anti_rows(source_metadata, target_metadata)
     target_only = _left_anti_rows(target_metadata, source_metadata)
@@ -159,7 +150,6 @@ def _handle_sync(args: argparse.Namespace) -> int:
         args.target_profile,
         assume_yes=args.yes,
         dry_run=args.dry_run,
-        diff_by=args.diff_by,
         summary_only=args.summary_only,
         backup_file=args.backup_file,
     )
@@ -187,22 +177,22 @@ def _left_anti_rows(
 def _compare_metadata_by_identity(
     source_metadata: pd.DataFrame,
     target_metadata: pd.DataFrame,
-    diff_by: str,
+    key_column: str,
 ) -> dict[str, pd.DataFrame]:
     """Compare metadata by row identity and return adds, updates, removals."""
-    if diff_by not in source_metadata.columns or diff_by not in target_metadata.columns:
-        raise ValueError(f'Column "{diff_by}" must exist in both source and target metadata.')
+    if key_column not in source_metadata.columns or key_column not in target_metadata.columns:
+        raise ValueError(f'Column "{key_column}" must exist in both source and target metadata.')
 
-    source_frame = source_metadata.fillna("").drop_duplicates(subset=[diff_by], keep="first")
-    target_frame = target_metadata.fillna("").drop_duplicates(subset=[diff_by], keep="first")
-    source_ids = set(source_frame[diff_by].tolist())
-    target_ids = set(target_frame[diff_by].tolist())
+    source_frame = source_metadata.fillna("").drop_duplicates(subset=[key_column], keep="first")
+    target_frame = target_metadata.fillna("").drop_duplicates(subset=[key_column], keep="first")
+    source_ids = set(source_frame[key_column].tolist())
+    target_ids = set(target_frame[key_column].tolist())
 
-    adds = source_frame.loc[source_frame[diff_by].isin(source_ids - target_ids)].copy()
-    removals = target_frame.loc[target_frame[diff_by].isin(target_ids - source_ids)].copy()
+    adds = source_frame.loc[source_frame[key_column].isin(source_ids - target_ids)].copy()
+    removals = target_frame.loc[target_frame[key_column].isin(target_ids - source_ids)].copy()
 
-    source_indexed = source_frame.set_index(diff_by, drop=False)
-    target_indexed = target_frame.set_index(diff_by, drop=False)
+    source_indexed = source_frame.set_index(key_column, drop=False)
+    target_indexed = target_frame.set_index(key_column, drop=False)
     shared_ids = sorted(source_ids & target_ids)
     comparison_columns = sorted(set(source_frame.columns) | set(target_frame.columns))
     changed_rows: list[dict[str, Any]] = []
@@ -218,7 +208,7 @@ def _compare_metadata_by_identity(
         for column in changed_columns:
             changed_rows.append(
                 {
-                    diff_by: identity,
+                    "field_name": identity,
                     "column": column,
                     "source_value": source_row.get(column, ""),
                     "target_value": target_row.get(column, ""),
@@ -232,11 +222,9 @@ def _compare_metadata_by_identity(
     }
 
 
-def _comparison_description(diff_by: str | None) -> str:
+def _comparison_description() -> str:
     """Return a human-readable explanation of comparison strategy."""
-    if diff_by:
-        return f'Comparison matched rows by "{diff_by}" and expanded per-column updates for matching identities.'
-    return "Comparison derives adds/removals from paired all-column anti joins."
+    return 'Comparison matches rows by "field_name" to derive adds/updates/removals.'
 
 
 def _normalize_backup_file_path(backup_file: str) -> Path:
@@ -262,13 +250,10 @@ def _comparison_table_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [{column: row.get(column, "") for column in columns} for row in rows]
 
 
-def _print_update_table(title: str, rows: list[dict[str, Any]], diff_by: str | None) -> None:
+def _print_update_table(title: str, rows: list[dict[str, Any]]) -> None:
     """Print per-column update rows."""
     print_preview([title])
     if not rows:
         print_preview(["  (none)"])
         return
-    if diff_by:
-        print_table(rows)
-        return
-    print_preview([f'  (use --diff-by to expand update details, e.g. --diff-by field_name; detected {len(rows)} row changes)'])
+    print_table(rows)

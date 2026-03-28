@@ -72,18 +72,18 @@ def test_main_sync_prints_differences_and_imports_source_metadata(monkeypatch, c
 
     captured = capsys.readouterr()
     assert 'Metadata comparison: source "profile1" -> target "profile2"' in captured.out
-    assert "all-column anti joins" in captured.out
+    assert 'matches rows by "field_name"' in captured.out
     assert "Fields to add in target:" in captured.out
     assert "height" in captured.out
     assert "Fields to update in target:" in captured.out
-    assert "  (none)" in captured.out
+    assert "field_label" in captured.out
+    assert "Participant Age" in captured.out
+    assert "Age" in captured.out
     assert "Fields to remove from target:" in captured.out
     assert "weight" in captured.out
     assert "field_name" in captured.out
     assert "form_name" in captured.out
     assert "field_type" in captured.out
-    assert "field_label" not in captured.out
-    assert "Participant Age" not in captured.out
     assert "Weight" not in captured.out
     assert 'Imported metadata from "profile1" into "profile2".' in captured.out
     assert target_client.imported_metadata is not None
@@ -153,7 +153,7 @@ def test_main_sync_reports_when_metadata_matches(monkeypatch, capsys) -> None:
     assert captured.err == ""
 
 
-def test_compare_metadata_uses_all_column_anti_join_for_source_and_target_sets() -> None:
+def test_compare_metadata_uses_field_name_identity_for_updates() -> None:
     source_metadata = pd.DataFrame(
         [
             {
@@ -179,28 +179,19 @@ def test_compare_metadata_uses_all_column_anti_join_for_source_and_target_sets()
 
     comparison = compare_metadata(source_metadata, target_metadata)
 
-    assert metadata_to_records(comparison["adds"]) == [
+    assert comparison["adds"].empty
+    assert comparison["removals"].empty
+    assert comparison["updates"].to_dict(orient="records") == [
         {
             "field_name": "age",
-            "form_name": "demographics",
-            "field_type": "text",
-            "field_label": "Participant Age",
-            "required_field": "",
+            "column": "field_label",
+            "source_value": "Participant Age",
+            "target_value": "Age",
         }
     ]
-    assert metadata_to_records(comparison["removals"]) == [
-        {
-            "field_name": "age",
-            "form_name": "demographics",
-            "field_type": "text",
-            "field_label": "Age",
-            "required_field": "",
-        }
-    ]
-    assert comparison["updates"].empty
 
 
-def test_compare_metadata_with_diff_by_reports_adds_updates_and_removals() -> None:
+def test_compare_metadata_reports_adds_updates_and_removals_by_field_name() -> None:
     source_metadata = pd.DataFrame(
         [
             {"field_name": "record_id", "field_label": "Record ID", "field_type": "text"},
@@ -216,7 +207,7 @@ def test_compare_metadata_with_diff_by_reports_adds_updates_and_removals() -> No
         ]
     )
 
-    comparison = compare_metadata(source_metadata, target_metadata, diff_by="field_name")
+    comparison = compare_metadata(source_metadata, target_metadata)
 
     assert list(comparison["adds"]["field_name"]) == ["height"]
     assert list(comparison["removals"]["field_name"]) == ["weight"]
@@ -253,7 +244,7 @@ def test_main_sync_dry_run_never_imports(monkeypatch, capsys) -> None:
     assert target_client.imported_metadata is None
 
 
-def test_main_sync_supports_summary_only_with_diff_by(monkeypatch, capsys) -> None:
+def test_main_sync_supports_summary_only(monkeypatch, capsys) -> None:
     source_client = SyncMetadataClient(
         "https://source.example.edu/api/",
         "source-token",
@@ -275,7 +266,7 @@ def test_main_sync_supports_summary_only_with_diff_by(monkeypatch, capsys) -> No
         lambda profile: source_client if profile == "profile1" else target_client,
     )
 
-    assert main(["sync", "profile1", "profile2", "--summary-only", "--diff-by", "field_name", "--yes"]) == 0
+    assert main(["sync", "profile1", "profile2", "--summary-only", "--yes"]) == 0
 
     captured = capsys.readouterr()
     assert "Adds: 0" in captured.out

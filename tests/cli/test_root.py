@@ -185,8 +185,6 @@ def test_build_parser_supports_sync_command() -> None:
             "--yes",
             "--dry-run",
             "--summary-only",
-            "--diff-by",
-            "field_name",
             "--backup-file",
             "backup.csv",
         ]
@@ -198,7 +196,6 @@ def test_build_parser_supports_sync_command() -> None:
     assert parsed.yes is True
     assert parsed.dry_run is True
     assert parsed.summary_only is True
-    assert parsed.diff_by == "field_name"
     assert parsed.backup_file == "backup.csv"
 
 
