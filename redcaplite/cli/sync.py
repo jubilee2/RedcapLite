@@ -87,7 +87,7 @@ def run_sync(
     )
     _print_update_table(
         "Fields to update in target:",
-        updates.to_dict(orient="records"),
+        metadata_to_records(updates),
     )
     _print_comparison_table(
         "Fields to remove from target:",
