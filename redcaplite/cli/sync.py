@@ -85,7 +85,7 @@ def run_sync(
         "Fields to add in target:",
         metadata_to_records(adds),
     )
-    _print_update_table(
+    _print_comparison_table(
         "Fields to update in target:",
         metadata_to_records(updates),
     )
@@ -187,12 +187,3 @@ def _comparison_table_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Reduce comparison rows to the columns shown in sync output."""
     columns = ["field_name", "form_name", "field_type"]
     return [{column: row.get(column, "") for column in columns} for row in rows]
-
-
-def _print_update_table(title: str, rows: list[dict[str, Any]]) -> None:
-    """Print per-column update rows."""
-    print_preview([title])
-    if not rows:
-        print_preview(["  (none)"])
-        return
-    print_table(rows)

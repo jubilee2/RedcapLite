@@ -76,13 +76,13 @@ def test_main_sync_prints_differences_and_imports_source_metadata(monkeypatch, c
     assert "Fields to add in target:" in captured.out
     assert "height" in captured.out
     assert "Fields to update in target:" in captured.out
-    assert "field_label" in captured.out
-    assert "Age" in captured.out
+    assert "age" in captured.out
     assert "Fields to remove from target:" in captured.out
     assert "weight" in captured.out
     assert "field_name" in captured.out
     assert "form_name" in captured.out
     assert "field_type" in captured.out
+    assert "field_label" not in captured.out
     assert "Weight" not in captured.out
     assert 'Imported metadata from "profile1" into "profile2".' in captured.out
     assert target_client.imported_metadata is not None
