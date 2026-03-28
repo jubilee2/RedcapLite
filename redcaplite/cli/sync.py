@@ -81,7 +81,7 @@ def run_sync(
             f'Metadata comparison: source "{source_profile}" -> target "{target_profile}"',
             f'Source fields: {len(source_metadata.index)}',
             f'Target fields: {len(target_metadata.index)}',
-            _comparison_description(),
+            'Comparison matches rows by "field_name" to derive adds/updates/removals.',
             f"Adds: {len(adds.index)}",
             f"Updates: {len(updates.index)}",
             f"Removals: {len(removals.index)}",
@@ -220,12 +220,6 @@ def _compare_metadata_by_identity(
         "updates": pd.DataFrame(changed_rows),
         "removals": removals,
     }
-
-
-def _comparison_description() -> str:
-    """Return a human-readable explanation of comparison strategy."""
-    return 'Comparison matches rows by "field_name" to derive adds/updates/removals.'
-
 
 def _normalize_backup_file_path(backup_file: str) -> Path:
     """Resolve backup file path, defaulting directories to a timestamped filename."""
