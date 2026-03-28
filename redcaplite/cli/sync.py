@@ -169,10 +169,10 @@ def _left_anti_rows(
 def _normalize_backup_file_path(backup_file: str) -> Path:
     """Resolve backup file path, defaulting directories to a timestamped filename."""
     backup_path = Path(backup_file)
-    if backup_path.suffix.lower() == ".csv":
-        return backup_path
-    timestamp = datetime.now(tz=UTC).strftime("%Y%m%dT%H%M%SZ")
-    return backup_path / f"target_metadata_backup_{timestamp}.csv"
+    if backup_path.is_dir():
+        timestamp = datetime.now(tz=UTC).strftime("%Y%m%dT%H%M%SZ")
+        return backup_path / f"target_metadata_backup_{timestamp}.csv"
+    return backup_path
 
 def _print_comparison_table(title: str, rows: list[dict[str, Any]]) -> None:
     """Print a titled comparison section."""
