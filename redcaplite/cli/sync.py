@@ -123,15 +123,21 @@ def compare_metadata(
     target_metadata: pd.DataFrame,
 ) -> dict[str, pd.DataFrame]:
     """Return metadata differences as additions, updates, and removals."""
-    if "field_name" in source_metadata.columns and "field_name" in target_metadata.columns:
-        return _compare_metadata_by_identity(source_metadata, target_metadata, key_column="field_name")
-
     source_only = _left_anti_rows(source_metadata, target_metadata)
     target_only = _left_anti_rows(target_metadata, source_metadata)
+    updates = pd.DataFrame()
+
+    if "field_name" in source_only.columns and "field_name" in target_metadata.columns:
+        changed_fields = source_only[["field_name"]].drop_duplicates()
+        updates = target_metadata.fillna("").merge(changed_fields, how="inner", on=["field_name"])
+        if not updates.empty:
+            update_fields = updates[["field_name"]].drop_duplicates()
+            source_only = source_only.merge(update_fields, how="left_anti", on=["field_name"])
+            target_only = target_only.merge(update_fields, how="left_anti", on=["field_name"])
 
     return {
         "adds": source_only,
-        "updates": pd.DataFrame(),
+        "updates": updates,
         "removals": target_only,
     }
 
@@ -165,53 +171,6 @@ def _left_anti_rows(
         on=columns
     )
 
-
-def _compare_metadata_by_identity(
-    source_metadata: pd.DataFrame,
-    target_metadata: pd.DataFrame,
-    key_column: str,
-) -> dict[str, pd.DataFrame]:
-    """Compare metadata by row identity and return adds, updates, removals."""
-    if key_column not in source_metadata.columns or key_column not in target_metadata.columns:
-        raise ValueError(f'Column "{key_column}" must exist in both source and target metadata.')
-
-    source_frame = source_metadata.fillna("").drop_duplicates(subset=[key_column], keep="first")
-    target_frame = target_metadata.fillna("").drop_duplicates(subset=[key_column], keep="first")
-    source_ids = set(source_frame[key_column].tolist())
-    target_ids = set(target_frame[key_column].tolist())
-
-    adds = source_frame.loc[source_frame[key_column].isin(source_ids - target_ids)].copy()
-    removals = target_frame.loc[target_frame[key_column].isin(target_ids - source_ids)].copy()
-
-    source_indexed = source_frame.set_index(key_column, drop=False)
-    target_indexed = target_frame.set_index(key_column, drop=False)
-    shared_ids = sorted(source_ids & target_ids)
-    comparison_columns = sorted(set(source_frame.columns) | set(target_frame.columns))
-    changed_rows: list[dict[str, Any]] = []
-
-    for identity in shared_ids:
-        source_row = source_indexed.loc[identity].to_dict()
-        target_row = target_indexed.loc[identity].to_dict()
-        changed_columns = [
-            column
-            for column in comparison_columns
-            if source_row.get(column, "") != target_row.get(column, "")
-        ]
-        for column in changed_columns:
-            changed_rows.append(
-                {
-                    "field_name": identity,
-                    "column": column,
-                    "source_value": source_row.get(column, ""),
-                    "target_value": target_row.get(column, ""),
-                }
-            )
-
-    return {
-        "adds": adds,
-        "updates": pd.DataFrame(changed_rows),
-        "removals": removals,
-    }
 
 def _normalize_backup_file_path(backup_file: str) -> Path:
     """Resolve backup file path, defaulting directories to a timestamped filename."""

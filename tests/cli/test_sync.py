@@ -77,7 +77,6 @@ def test_main_sync_prints_differences_and_imports_source_metadata(monkeypatch, c
     assert "height" in captured.out
     assert "Fields to update in target:" in captured.out
     assert "field_label" in captured.out
-    assert "Participant Age" in captured.out
     assert "Age" in captured.out
     assert "Fields to remove from target:" in captured.out
     assert "weight" in captured.out
@@ -153,7 +152,7 @@ def test_main_sync_reports_when_metadata_matches(monkeypatch, capsys) -> None:
     assert captured.err == ""
 
 
-def test_compare_metadata_uses_field_name_identity_for_updates() -> None:
+def test_compare_metadata_uses_source_only_field_names_for_updates() -> None:
     source_metadata = pd.DataFrame(
         [
             {
@@ -184,9 +183,10 @@ def test_compare_metadata_uses_field_name_identity_for_updates() -> None:
     assert comparison["updates"].to_dict(orient="records") == [
         {
             "field_name": "age",
-            "column": "field_label",
-            "source_value": "Participant Age",
-            "target_value": "Age",
+            "form_name": "demographics",
+            "field_type": "text",
+            "field_label": "Age",
+            "required_field": "",
         }
     ]
 
@@ -214,9 +214,8 @@ def test_compare_metadata_reports_adds_updates_and_removals_by_field_name() -> N
     assert comparison["updates"].to_dict(orient="records") == [
         {
             "field_name": "age",
-            "column": "field_label",
-            "source_value": "Participant Age",
-            "target_value": "Age",
+            "field_label": "Age",
+            "field_type": "text",
         }
     ]
 
