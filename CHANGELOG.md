@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog, with entries listed in reverse chronological order.
 
+## [Unreleased]
+
+## [2.2.1]
+
+### Added
+- Added `--dry-run` mode to `rcl metadata <source_profile> sync <target_profile>` to preview differences without importing metadata.
+- Added optional backup export creation before metadata import during sync operations.
+- Added sync summary output with total fields and a concise list of changed field names.
+
+### Changed
+- Improved sync comparison output to report identity fields (`field_name`, `form_name`) for additions, removals, and modifications.
+- Updated CLI docs and examples for safer metadata sync workflows in this release.
+
 ## [2.2.0]
 
 ### Added
