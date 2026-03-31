@@ -46,7 +46,7 @@ This installs the package together with its runtime dependencies: `keyring`, `pa
 rcl --help
 ```
 
-> **Windows PATH note:** If `rcl` is not recognized after installation, add `C:\Users\jubil\AppData\Local\Python\pythoncore-3.14-64\Scripts` to your `PATH`, then open a new terminal and run `rcl --help` again.
+> **Windows PATH note:** If `rcl` is not recognized after installation, add `C:\Users\YOUR_USERNAME\AppData\Local\Python\pythoncore-3.14-64\Scripts` to your `PATH`, then open a new terminal and run `rcl --help` again.
 
 ### From Source (for Development)
 If you plan to contribute to `redcaplite` or require the latest development version, you can install it directly from the source code:
