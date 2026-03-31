@@ -9,7 +9,7 @@ The format is based on Keep a Changelog, with entries listed in reverse chronolo
 ## [2.2.1]
 
 ### Added
-- Added `--dry-run` mode to `rcl metadata <source_profile> sync <target_profile>` to preview differences without importing metadata.
+- Added `--dry-run` mode to `rcl sync <source_profile> <target_profile>` to preview differences without importing metadata.
 - Added optional backup export creation before metadata import during sync operations.
 - Added sync summary output with total fields and a concise list of changed field names.
 
