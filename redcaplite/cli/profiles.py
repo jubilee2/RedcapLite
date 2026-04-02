@@ -28,7 +28,17 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
         "profiles",
         prog="rcl profiles",
         help="List stored profiles and URLs.",
-        description="List stored profiles and URLs.",
+        description=(
+            "List stored profiles and URLs.\n\n"
+            "Common usage patterns:\n"
+            "  rcl profiles\n"
+            "  rcl setup production && rcl profiles"
+        ),
+        epilog=(
+            "Tip: use `rcl setup <profile>` before `rcl profiles` to create your first profile.\n"
+            "Example: rcl setup mysite"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.set_defaults(handler=ProfilesCommand().run)
 
