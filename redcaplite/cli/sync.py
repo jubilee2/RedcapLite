@@ -19,7 +19,7 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
     """Attach the ``sync`` command parser to the CLI root."""
     parser = subparsers.add_parser(
         "sync",
-        prog="rcl sync <source_profile>",
+        prog="rcl sync",
         help="Compare metadata with another profile and optionally import it.",
         description=(
             "Compare metadata with another profile and optionally import it.\n\n"
