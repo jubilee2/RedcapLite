@@ -37,10 +37,6 @@ def build_parser() -> argparse.ArgumentParser:
     for module in iter_command_modules():
         module.register_parser(subparsers)
 
-    command_names = ",".join(subparsers.choices)
-    # Keep root usage focused on subcommands; ``--version`` is handled
-    # separately in ``main`` and does not need to appear in help usage lines.
-    parser.usage = f"%(prog)s [-h] {{{command_names}}} ..."
     return parser
 
 

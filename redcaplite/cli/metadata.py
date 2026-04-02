@@ -58,8 +58,6 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    # Explicit usage keeps existing CLI output ordering stable for users/tests.
-    metadata_parser.usage = "rcl metadata <profile> [-h] {pull,list,add,edit,remove} ..."
     metadata_parser.add_argument("profile", metavar="<profile>", help="Profile name.")
     metadata_subparsers = metadata_parser.add_subparsers(dest="metadata_command")
     metadata_subparsers.required = True

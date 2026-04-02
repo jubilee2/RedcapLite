@@ -64,8 +64,6 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    # Explicit usage keeps existing CLI output ordering stable for users/tests.
-    parser.usage = "rcl setup <profile> [-h]"
     parser.add_argument("profile", metavar="<profile>", help="Profile name.")
     parser.set_defaults(handler=SetupCommand().run)
 
