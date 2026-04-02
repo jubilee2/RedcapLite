@@ -42,16 +42,68 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
         "metadata",
         prog="rcl metadata <profile>",
         help="Inspect and edit project metadata.",
-        description="Inspect and edit project metadata.",
+        description=(
+            "Inspect and edit project metadata.\n\n"
+            "Common usage patterns:\n"
+            "  rcl metadata mysite pull\n"
+            "  rcl metadata mysite list --form demographics\n"
+            "  rcl metadata mysite add age demographics --field_type text\n"
+            "  rcl metadata mysite edit age --field_label \"Age in years\"\n"
+            "  rcl metadata mysite remove age --yes"
+        ),
+        epilog=(
+            "Examples:\n"
+            "  rcl metadata mysite list --field record_id\n"
+            "  rcl metadata mysite add consent demographics --field_type yesno"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
+    metadata_parser.usage = "rcl metadata <profile> [-h] {pull,list,add,edit,remove} ..."
     metadata_parser.add_argument("profile", metavar="<profile>", help="Profile name.")
     metadata_subparsers = metadata_parser.add_subparsers(dest="metadata_command")
     metadata_subparsers.required = True
 
     # Keep subcommand registration in one loop so the public CLI surface is easy
     # to scan and update as metadata features are added.
+    descriptions = {
+        "pull": (
+            "Export all metadata for a profile.\n\n"
+            "Common usage patterns:\n"
+            "  rcl metadata mysite pull"
+        ),
+        "list": (
+            "List metadata fields with optional form/field filters.\n\n"
+            "Common usage patterns:\n"
+            "  rcl metadata mysite list\n"
+            "  rcl metadata mysite list --form demographics\n"
+            "  rcl metadata mysite list --field record_id"
+        ),
+        "add": (
+            "Add a new field to metadata and import changes.\n\n"
+            "Common usage patterns:\n"
+            "  rcl metadata mysite add age demographics --field_type text\n"
+            "  rcl metadata mysite add status visit --field_type radio --select_choices_or_calculations \"1, Yes | 0, No\""
+        ),
+        "edit": (
+            "Edit an existing field and import changes.\n\n"
+            "Common usage patterns:\n"
+            "  rcl metadata mysite edit age --field_label \"Age\"\n"
+            "  rcl metadata mysite edit status --field_type dropdown"
+        ),
+        "remove": (
+            "Remove a field from metadata and import changes.\n\n"
+            "Common usage patterns:\n"
+            "  rcl metadata mysite remove old_field\n"
+            "  rcl metadata mysite remove old_field --yes"
+        ),
+    }
     for name in _METADATA_SUBCOMMANDS:
-        command_parser = metadata_subparsers.add_parser(name, prog=f"rcl metadata <profile> {name}")
+        command_parser = metadata_subparsers.add_parser(
+            name,
+            prog=f"rcl metadata <profile> {name}",
+            description=descriptions[name],
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+        )
         if name == "pull":
             command_parser.set_defaults(handler=_handle_pull_metadata)
             continue
