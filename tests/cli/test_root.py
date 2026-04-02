@@ -7,7 +7,7 @@ def test_main_without_args_prints_help(capsys) -> None:
     assert main([]) == 0
 
     captured = capsys.readouterr()
-    assert "usage: rcl [-h] {setup,metadata,sync,profiles} ..." in captured.out
+    assert "usage: rcl [-h] [--version] {setup,metadata,sync,profiles} ..." in captured.out
     assert "setup" in captured.out
     assert "metadata" in captured.out
     assert "sync" in captured.out
@@ -27,7 +27,7 @@ def test_main_with_root_help_flag_prints_root_help(capsys) -> None:
     assert main(["--help"]) == 0
 
     captured = capsys.readouterr()
-    assert "usage: rcl [-h] {setup,metadata,sync,profiles} ..." in captured.out
+    assert "usage: rcl [-h] [--version] {setup,metadata,sync,profiles} ..." in captured.out
     assert "Create or update stored access for a REDCap profile." in captured.out
     assert "sync" in captured.out
     assert captured.err == ""
@@ -37,7 +37,7 @@ def test_main_with_setup_help_prints_setup_help(capsys) -> None:
     assert main(["setup", "demo", "--help"]) == 0
 
     captured = capsys.readouterr()
-    assert "usage: rcl setup <profile> [-h]" in captured.out
+    assert "usage: rcl setup [-h] <profile>" in captured.out
     assert "Create or update stored access for a REDCap profile." in captured.out
     assert captured.err == ""
 
@@ -46,7 +46,7 @@ def test_main_with_metadata_help_prints_metadata_help(capsys) -> None:
     assert main(["metadata", "demo", "--help"]) == 0
 
     captured = capsys.readouterr()
-    assert "usage: rcl metadata <profile> [-h]" in captured.out
+    assert "usage: rcl metadata [-h] <profile> {pull,list,add,edit,remove} ..." in captured.out
     assert "Inspect and edit project metadata." in captured.out
     assert captured.err == ""
 

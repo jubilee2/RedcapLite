@@ -6,6 +6,12 @@ The format is based on Keep a Changelog, with entries listed in reverse chronolo
 
 ## [Unreleased]
 
+### Changed
+- Expanded CLI parser descriptions and help examples across command modules to highlight common usage patterns and command-specific help flows.
+- Switched root/setup/metadata help output back to default argparse-generated `usage` formatting.
+- Corrected `rcl sync` parser `prog` formatting so positional arguments are not duplicated in generated help usage output.
+- Standardized `prog` values for `setup` and `metadata` to base command names so error messages avoid placeholder-style command prefixes.
+
 ## [2.2.1]
 
 ### Added

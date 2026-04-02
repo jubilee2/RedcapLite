@@ -14,7 +14,21 @@ def build_parser() -> argparse.ArgumentParser:
     """Create the top-level parser for the ``rcl`` CLI."""
     parser = argparse.ArgumentParser(
         prog="rcl",
-        description="Command-line interface for the redcaplite package.",
+        description=(
+            "Command-line interface for the redcaplite package.\n\n"
+            "Common usage patterns:\n"
+            "  rcl setup mysite\n"
+            "  rcl profiles\n"
+            "  rcl metadata mysite list --form demographics\n"
+            "  rcl sync source_profile target_profile --dry-run"
+        ),
+        epilog=(
+            "Example help lookups:\n"
+            "  rcl setup --help\n"
+            "  rcl metadata --help\n"
+            "  rcl metadata mysite list --help"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--version", action="store_true", help="Show the CLI version and exit.")
     subparsers = parser.add_subparsers(dest="command")
@@ -23,8 +37,6 @@ def build_parser() -> argparse.ArgumentParser:
     for module in iter_command_modules():
         module.register_parser(subparsers)
 
-    command_names = ",".join(subparsers.choices)
-    parser.usage = f"%(prog)s [-h] {{{command_names}}} ..."
     return parser
 
 

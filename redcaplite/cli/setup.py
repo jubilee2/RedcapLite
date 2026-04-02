@@ -49,9 +49,20 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
     """Attach the ``setup`` command parser to the CLI root."""
     parser = subparsers.add_parser(
         "setup",
-        prog="rcl setup <profile>",
+        prog="rcl setup",
         help="Create or update stored access for a REDCap profile.",
-        description="Create or update stored access for a REDCap profile.",
+        description=(
+            "Create or update stored access for a REDCap profile.\n\n"
+            "Common usage patterns:\n"
+            "  rcl setup mysite\n"
+            "  rcl setup production"
+        ),
+        epilog=(
+            "Examples:\n"
+            "  rcl setup mysite\n"
+            "  rcl setup mysite  # rerun later to replace URL/token"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("profile", metavar="<profile>", help="Profile name.")
     parser.set_defaults(handler=SetupCommand().run)

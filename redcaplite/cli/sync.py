@@ -19,9 +19,21 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
     """Attach the ``sync`` command parser to the CLI root."""
     parser = subparsers.add_parser(
         "sync",
-        prog="rcl sync <source_profile>",
+        prog="rcl sync",
         help="Compare metadata with another profile and optionally import it.",
-        description="Compare metadata with another profile and optionally import it.",
+        description=(
+            "Compare metadata with another profile and optionally import it.\n\n"
+            "Common usage patterns:\n"
+            "  rcl sync dev prod --dry-run\n"
+            "  rcl sync dev prod --backup-file ./backups/\n"
+            "  rcl sync dev prod --yes"
+        ),
+        epilog=(
+            "Examples:\n"
+            "  rcl sync source_profile target_profile --dry-run\n"
+            "  rcl sync source_profile target_profile --backup-file target_backup.csv"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("profile", metavar="<source_profile>", help="Source profile name.")
     parser.add_argument("target_profile", metavar="<target_profile>", help="Profile to compare against and optionally update.")
