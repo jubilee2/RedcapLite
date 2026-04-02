@@ -50,7 +50,7 @@ _METADATA_EPILOG = (
     "  rcl metadata demo edit age --field-label \"Age in years\" --yes\n\n"
     "Safe/preview notes:\n"
     "  • add/edit/remove show change previews before import.\n"
-    "  • remove prompts for confirmation unless --yes is passed.\n\n"
+    "  • add/edit/remove prompt for confirmation unless --yes is passed.\n\n"
     "Automation examples:\n"
     "  • rcl metadata demo add bmi vitals --field-type text --field-label \"BMI\" --yes\n"
     "  • rcl metadata demo remove obsolete_field --yes\n"
