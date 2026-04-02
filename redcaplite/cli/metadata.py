@@ -40,7 +40,7 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
     """Attach the ``metadata`` command group to the CLI root."""
     metadata_parser = subparsers.add_parser(
         "metadata",
-        prog="rcl metadata <profile>",
+        prog="rcl metadata",
         help="Inspect and edit project metadata.",
         description=(
             "Inspect and edit project metadata.\n\n"
