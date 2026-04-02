@@ -35,6 +35,81 @@ _METADATA_SUBCOMMANDS = (
     "remove",
 )
 
+_METADATA_DESCRIPTION = (
+    "Inspect and edit project metadata.\n\n"
+    "Common usage patterns:\n"
+    "  • list fields by form/field filters for quick inspection.\n"
+    "  • pull full metadata snapshots for review or archival.\n"
+    "  • add/edit/remove fields with previews before importing."
+)
+
+_METADATA_EPILOG = (
+    "Examples:\n"
+    "  rcl metadata demo list --form demographics\n"
+    "  rcl metadata demo pull\n"
+    "  rcl metadata demo edit age --field-label \"Age in years\" --yes\n\n"
+    "Safe/preview notes:\n"
+    "  • add/edit/remove show change previews before import.\n"
+    "  • remove prompts for confirmation unless --yes is passed.\n\n"
+    "Automation examples:\n"
+    "  • rcl metadata demo add bmi vitals --field-type text --field-label \"BMI\" --yes\n"
+    "  • rcl metadata demo remove obsolete_field --yes\n"
+    "  • metadata operations use REDCap CSV format for API reads/writes."
+)
+
+_METADATA_LIST_EPILOG = (
+    "Examples:\n"
+    "  rcl metadata demo list\n"
+    "  rcl metadata demo list --form demographics --form labs\n"
+    "  rcl metadata demo list --field age --field bmi\n\n"
+    "Safe/preview notes:\n"
+    "  • list is read-only and does not import metadata.\n\n"
+    "Automation note:\n"
+    "  • output is table-formatted for CLI pipelines and logs."
+)
+
+_METADATA_PULL_EPILOG = (
+    "Examples:\n"
+    "  rcl metadata demo pull\n\n"
+    "Safe/preview notes:\n"
+    "  • pull is read-only and writes a timestamped CSV export file.\n\n"
+    "Automation note:\n"
+    "  • export uses REDCap CSV format to keep snapshots import-ready."
+)
+
+_METADATA_ADD_EPILOG = (
+    "Examples:\n"
+    "  rcl metadata demo add bmi vitals --field-type text --field-label \"BMI\"\n"
+    "  rcl metadata demo add bmi vitals --field-type text --yes\n\n"
+    "Safe/preview notes:\n"
+    "  • add prints a preview of the exact row before import.\n"
+    "  • without --yes, confirmation is required before importing.\n\n"
+    "Automation note:\n"
+    "  • include --yes for unattended runs; metadata import uses CSV format."
+)
+
+_METADATA_EDIT_EPILOG = (
+    "Examples:\n"
+    "  rcl metadata demo edit age --field-label \"Age (years)\"\n"
+    "  rcl metadata demo edit age --field-type integer --yes\n\n"
+    "Safe/preview notes:\n"
+    "  • edit prints only changed keys to simplify review.\n"
+    "  • changing --field-type may require extra REDCap updates.\n\n"
+    "Automation note:\n"
+    "  • include --yes for unattended runs; metadata import uses CSV format."
+)
+
+_METADATA_REMOVE_EPILOG = (
+    "Examples:\n"
+    "  rcl metadata demo remove obsolete_flag\n"
+    "  rcl metadata demo remove obsolete_flag --yes\n\n"
+    "Safe/preview notes:\n"
+    "  • remove previews the full field definition before deletion.\n"
+    "  • without --yes, confirmation is required before importing.\n\n"
+    "Automation note:\n"
+    "  • include --yes for unattended runs; metadata import uses CSV format."
+)
+
 
 def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     """Attach the ``metadata`` command group to the CLI root."""
@@ -42,7 +117,9 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
         "metadata",
         prog="rcl metadata <profile>",
         help="Inspect and edit project metadata.",
-        description="Inspect and edit project metadata.",
+        description=_METADATA_DESCRIPTION,
+        epilog=_METADATA_EPILOG,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     metadata_parser.add_argument("profile", metavar="<profile>", help="Profile name.")
     metadata_subparsers = metadata_parser.add_subparsers(dest="metadata_command")
@@ -51,8 +128,13 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
     # Keep subcommand registration in one loop so the public CLI surface is easy
     # to scan and update as metadata features are added.
     for name in _METADATA_SUBCOMMANDS:
-        command_parser = metadata_subparsers.add_parser(name, prog=f"rcl metadata <profile> {name}")
+        command_parser = metadata_subparsers.add_parser(
+            name,
+            prog=f"rcl metadata <profile> {name}",
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+        )
         if name == "pull":
+            command_parser.epilog = _METADATA_PULL_EPILOG
             command_parser.set_defaults(handler=_handle_pull_metadata)
             continue
         if name == "list":
@@ -68,6 +150,7 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
                 action="append",
                 help="Limit results to one or more REDCap field names. Repeat to pass multiple fields.",
             )
+            command_parser.epilog = _METADATA_LIST_EPILOG
             command_parser.set_defaults(handler=_handle_list_fields)
             continue
         if name in {"add", "edit", "remove"}:
@@ -79,6 +162,7 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
                 nargs=argparse.REMAINDER,
                 help="Additional field configuration flags.",
             )
+            command_parser.epilog = _METADATA_ADD_EPILOG
             command_parser.set_defaults(handler=_handle_add_field)
             continue
         if name == "edit":
@@ -87,6 +171,7 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
                 nargs=argparse.REMAINDER,
                 help="Additional field configuration flags.",
             )
+            command_parser.epilog = _METADATA_EDIT_EPILOG
             command_parser.set_defaults(handler=_handle_edit_field)
             continue
         if name == "remove":
@@ -95,6 +180,7 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
                 action="store_true",
                 help="Skip the removal confirmation prompt.",
             )
+            command_parser.epilog = _METADATA_REMOVE_EPILOG
             command_parser.set_defaults(handler=_handle_remove_field)
             continue
         command_parser.set_defaults(handler=_not_implemented)

@@ -9,6 +9,23 @@ from redcaplite.config import ProfileStore
 
 from .output import print_table
 
+_PROFILES_DESCRIPTION = (
+    "List stored profiles and URLs.\n\n"
+    "Common usage patterns:\n"
+    "  • Verify which profiles are configured locally.\n"
+    "  • Confirm endpoint URLs before metadata operations."
+)
+
+_PROFILES_EPILOG = (
+    "Examples:\n"
+    "  rcl profiles\n\n"
+    "Safe/preview notes:\n"
+    "  • This command is read-only and never changes REDCap metadata.\n"
+    "  • Use it as a quick pre-flight check before sync or metadata updates.\n\n"
+    "Automation note:\n"
+    "  • output defaults to table format for terminal use."
+)
+
 
 class ProfilesCommand:
     """List all stored CLI profiles and their URLs."""
@@ -28,7 +45,9 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
         "profiles",
         prog="rcl profiles",
         help="List stored profiles and URLs.",
-        description="List stored profiles and URLs.",
+        description=_PROFILES_DESCRIPTION,
+        epilog=_PROFILES_EPILOG,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.set_defaults(handler=ProfilesCommand().run)
 

@@ -15,13 +15,36 @@ from .helpers import ClientBootstrapError, build_client
 from .output import print_error, print_preview, print_success, print_table
 from .prompts import confirm
 
+_SYNC_DESCRIPTION = (
+    "Compare metadata with another profile and optionally import it.\n\n"
+    "Common usage patterns:\n"
+    "  • Preview drift between staging and production metadata.\n"
+    "  • Apply approved metadata changes from a source profile to a target profile.\n"
+    "  • Capture a CSV backup before importing changes."
+)
+
+_SYNC_EPILOG = (
+    "Examples:\n"
+    "  rcl sync staging production --dry-run\n"
+    "  rcl sync staging production --yes --backup-file ./backups/\n\n"
+    "Safe/preview notes:\n"
+    "  • run with --dry-run to preview adds/updates/removals without importing.\n"
+    "  • use --backup-file to export target metadata before any import.\n\n"
+    "Automation examples:\n"
+    "  • rcl sync staging production --yes\n"
+    "  • rcl sync staging production --yes --backup-file ./target.csv\n"
+    "  • metadata reads/imports use REDCap CSV format internally."
+)
+
 def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     """Attach the ``sync`` command parser to the CLI root."""
     parser = subparsers.add_parser(
         "sync",
         prog="rcl sync <source_profile>",
         help="Compare metadata with another profile and optionally import it.",
-        description="Compare metadata with another profile and optionally import it.",
+        description=_SYNC_DESCRIPTION,
+        epilog=_SYNC_EPILOG,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("profile", metavar="<source_profile>", help="Source profile name.")
     parser.add_argument("target_profile", metavar="<target_profile>", help="Profile to compare against and optionally update.")

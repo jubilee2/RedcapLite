@@ -21,6 +21,26 @@ prompt_text = prompt
 
 ClientFactory = Callable[[str, str], RedcapClient]
 
+_SETUP_DESCRIPTION = (
+    "Create or update stored access for a REDCap profile.\n\n"
+    "Common usage patterns:\n"
+    "  • First-time setup: create profile + save API token.\n"
+    "  • Maintenance: update an existing profile URL.\n"
+    "  • Credential rotation: replace a previously stored token."
+)
+
+_SETUP_EPILOG = (
+    "Examples:\n"
+    "  rcl setup demo\n"
+    "  rcl setup production\n\n"
+    "Safe/preview notes:\n"
+    "  • setup validates credentials before saving them.\n"
+    "  • replacing an existing token always asks for confirmation.\n\n"
+    "Automation note:\n"
+    "  • setup is intentionally interactive; use non-interactive commands with --yes for automation.\n"
+    "  • output defaults to human-readable terminal text."
+)
+
 
 class SetupCommand:
     """Create or update a named CLI setup profile."""
@@ -51,7 +71,9 @@ def register_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentPars
         "setup",
         prog="rcl setup <profile>",
         help="Create or update stored access for a REDCap profile.",
-        description="Create or update stored access for a REDCap profile.",
+        description=_SETUP_DESCRIPTION,
+        epilog=_SETUP_EPILOG,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("profile", metavar="<profile>", help="Profile name.")
     parser.set_defaults(handler=SetupCommand().run)

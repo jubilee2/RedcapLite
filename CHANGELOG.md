@@ -6,6 +6,9 @@ The format is based on Keep a Changelog, with entries listed in reverse chronolo
 
 ## [Unreleased]
 
+### Changed
+- Expanded CLI parser descriptions and `--help` examples across command modules to highlight common workflows, preview/safety behavior, and automation usage with `--yes` plus CSV output format notes.
+
 ## [2.2.1]
 
 ### Added

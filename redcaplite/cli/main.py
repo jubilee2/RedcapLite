@@ -14,7 +14,20 @@ def build_parser() -> argparse.ArgumentParser:
     """Create the top-level parser for the ``rcl`` CLI."""
     parser = argparse.ArgumentParser(
         prog="rcl",
-        description="Command-line interface for the redcaplite package.",
+        description=(
+            "Command-line interface for the redcaplite package.\n\n"
+            "Common usage patterns:\n"
+            "  • Configure profiles with `rcl setup <profile>`.\n"
+            "  • Inspect metadata with `rcl metadata <profile> list`.\n"
+            "  • Preview/apply cross-profile updates with `rcl sync <source> <target>`."
+        ),
+        epilog=(
+            "Safety and automation tips:\n"
+            "  • Prefer preview modes (`--dry-run`) before metadata imports.\n"
+            "  • Use `--yes` only in vetted automation workflows.\n"
+            "  • Metadata import/export operations use REDCap CSV format."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--version", action="store_true", help="Show the CLI version and exit.")
     subparsers = parser.add_subparsers(dest="command")
