@@ -17,6 +17,7 @@ class MetadataClient(FakeClient):
         super().__init__(url, token)
         self.imported_metadata: pd.DataFrame | None = None
         self.imported_format: str | None = None
+        self.imported_dags: list[dict[str, str]] | None = None
         self.exported_metadata_output_file: str | None = None
         self._metadata = [
             {
@@ -34,6 +35,7 @@ class MetadataClient(FakeClient):
                 "required_field": "",
             },
         ]
+        self._dags = []
 
     def get_metadata(
         self,
@@ -58,11 +60,25 @@ class MetadataClient(FakeClient):
         self.imported_format = format
         return "1"
 
+    def get_dags(self) -> list[dict[str, str]]:
+        return self._dags
+
+    def import_dags(self, data: list[dict[str, str]]) -> str:
+        self.imported_dags = data
+        return "1"
+
 
 class SyncMetadataClient(MetadataClient):
-    def __init__(self, url: str, token: str, metadata: list[dict[str, str]]) -> None:
+    def __init__(
+        self,
+        url: str,
+        token: str,
+        metadata: list[dict[str, str]],
+        dags: list[dict[str, str]] | None = None,
+    ) -> None:
         super().__init__(url, token)
         self._metadata = metadata
+        self._dags = dags or []
 
 
 class FailingClient(FakeClient):

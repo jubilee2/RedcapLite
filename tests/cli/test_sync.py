@@ -79,13 +79,18 @@ def test_main_sync_prints_differences_and_imports_source_metadata(monkeypatch, c
     assert "age" in captured.out
     assert "Fields to remove from target:" in captured.out
     assert "weight" in captured.out
+    assert "DAGs to add in target:" in captured.out
+    assert "DAGs to update in target:" in captured.out
+    assert "DAGs to remove from target:" in captured.out
     assert "field_name" in captured.out
     assert "form_name" in captured.out
     assert "field_type" in captured.out
     assert "field_label" not in captured.out
     assert "Weight" not in captured.out
     assert 'Imported metadata from "profile1" into "profile2".' in captured.out
+    assert 'Imported DAGs from "profile1" into "profile2".' in captured.out
     assert target_client.imported_metadata is not None
+    assert target_client.imported_dags == []
     assert list(target_client.imported_metadata["field_name"]) == ["record_id", "age", "height"]
     assert captured.err == ""
 
@@ -147,9 +152,35 @@ def test_main_sync_reports_when_metadata_matches(monkeypatch, capsys) -> None:
     assert main(["sync", "profile1", "profile2"]) == 0
 
     captured = capsys.readouterr()
-    assert 'No metadata differences found between "profile1" and "profile2".' in captured.out
+    assert 'No metadata or DAG differences found between "profile1" and "profile2".' in captured.out
     assert target_client.imported_metadata is None
     assert captured.err == ""
+
+
+def test_main_sync_copies_dags(monkeypatch, capsys) -> None:
+    source_client = SyncMetadataClient(
+        "https://source.example.edu/api/",
+        "source-token",
+        metadata=[{"field_name": "record_id", "form_name": "enrollment", "field_type": "text", "field_label": "Record ID"}],
+        dags=[{"data_access_group_name": "Site A", "unique_group_name": "site_a"}],
+    )
+    target_client = SyncMetadataClient(
+        "https://target.example.edu/api/",
+        "target-token",
+        metadata=[{"field_name": "record_id", "form_name": "enrollment", "field_type": "text", "field_label": "Record ID"}],
+        dags=[],
+    )
+    monkeypatch.setattr(
+        "redcaplite.cli.sync.build_client",
+        lambda profile: source_client if profile == "profile1" else target_client,
+    )
+
+    assert main(["sync", "profile1", "profile2", "--yes"]) == 0
+
+    captured = capsys.readouterr()
+    assert "DAG adds: 1" in captured.out
+    assert "site_a" in captured.out
+    assert target_client.imported_dags == [{"data_access_group_name": "Site A", "unique_group_name": "site_a"}]
 
 
 def test_compare_metadata_uses_source_only_field_names_for_updates() -> None:

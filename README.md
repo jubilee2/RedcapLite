@@ -170,12 +170,12 @@ The metadata sync workflow is a top-level command:
 rcl sync <source_profile> <target_profile> [--yes] [--dry-run] [--backup-file path]
 ```
 
-Use `sync` when you want to compare full metadata exports between two saved profiles and optionally import the source metadata into the target project after review.
+Use `sync` when you want to compare full metadata exports (plus DAG assignments) between two saved profiles and optionally import the source configuration into the target project after review.
 
 Available today:
 
-- `sync <source_profile> <target_profile> [--yes]` exports metadata from both profiles, derives source-only and target-only row sets with paired DataFrame-based all-column anti-joins for review, and then optionally imports the source profile metadata into the target profile
-- `--dry-run` previews differences but never imports metadata
+- `sync <source_profile> <target_profile> [--yes]` exports metadata and DAGs from both profiles, derives source-only and target-only row sets with paired DataFrame-based all-column anti-joins for review, and then optionally imports source metadata and source DAGs into the target profile
+- `--dry-run` previews differences but never imports metadata or DAGs
 - `--backup-file path` exports the target metadata CSV before import to support rollback/audit workflows
 
 Internally, `redcaplite.metadata_ops.transform` and `redcaplite.metadata_ops.validate` now provide the reusable add/edit/remove helpers for metadata write workflows, including CLI flag-to-row conversion, field-type validation, light choice-field validation, default label generation, and DataFrame-based append/update/remove helpers.

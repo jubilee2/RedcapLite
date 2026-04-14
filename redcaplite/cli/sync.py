@@ -73,6 +73,8 @@ def run_sync(
         target_client = build_client(target_profile)
         source_metadata = source_client.get_metadata(format="csv")
         target_metadata = target_client.get_metadata(format="csv")
+        source_dags = _normalize_dag_rows(source_client.get_dags())
+        target_dags = _normalize_dag_rows(target_client.get_dags())
     except ClientBootstrapError as exc:
         print_error(str(exc))
         return 1
@@ -81,6 +83,10 @@ def run_sync(
     updates = comparison["updates"]
     adds = comparison["adds"]
     removals = comparison["removals"]
+    dag_comparison = compare_dags(source_dags, target_dags)
+    dag_adds = dag_comparison["adds"]
+    dag_updates = dag_comparison["updates"]
+    dag_removals = dag_comparison["removals"]
 
     print_preview(
         [
@@ -91,6 +97,11 @@ def run_sync(
             f"Adds: {len(adds.index)}",
             f"Updates: {len(updates.index)}",
             f"Removals: {len(removals.index)}",
+            f"Source DAGs: {len(source_dags.index)}",
+            f"Target DAGs: {len(target_dags.index)}",
+            f"DAG adds: {len(dag_adds.index)}",
+            f"DAG updates: {len(dag_updates.index)}",
+            f"DAG removals: {len(dag_removals.index)}",
         ]
     )
     _print_comparison_table(
@@ -105,9 +116,21 @@ def run_sync(
         "Fields to remove from target:",
         metadata_to_records(removals),
     )
+    _print_dag_comparison_table(
+        "DAGs to add in target:",
+        _rows_to_records(dag_adds),
+    )
+    _print_dag_comparison_table(
+        "DAGs to update in target:",
+        _rows_to_records(dag_updates),
+    )
+    _print_dag_comparison_table(
+        "DAGs to remove from target:",
+        _rows_to_records(dag_removals),
+    )
 
-    if adds.empty and updates.empty and removals.empty:
-        print_success(f'No metadata differences found between "{source_profile}" and "{target_profile}".')
+    if adds.empty and updates.empty and removals.empty and dag_adds.empty and dag_updates.empty and dag_removals.empty:
+        print_success(f'No metadata or DAG differences found between "{source_profile}" and "{target_profile}".')
         return 0
 
     if dry_run:
@@ -127,6 +150,8 @@ def run_sync(
 
     target_client.import_metadata(source_metadata, format="csv")
     print_success(f'Imported metadata from "{source_profile}" into "{target_profile}".')
+    target_client.import_dags(_rows_to_records(source_dags))
+    print_success(f'Imported DAGs from "{source_profile}" into "{target_profile}".')
     return 0
 
 
@@ -140,6 +165,24 @@ def compare_metadata(
     updates = target_only.merge(source_only[["field_name"]], how="inner", on="field_name")
     source_only = source_only.merge(updates[["field_name"]], how="left_anti", on=["field_name"])
     target_only = target_only.merge(updates[["field_name"]], how="left_anti", on=["field_name"])
+
+    return {
+        "adds": source_only,
+        "updates": updates,
+        "removals": target_only,
+    }
+
+
+def compare_dags(
+    source_dags: pd.DataFrame,
+    target_dags: pd.DataFrame,
+) -> dict[str, pd.DataFrame]:
+    """Return DAG differences as additions, updates, and removals."""
+    source_only = _left_anti_rows(source_dags, target_dags)
+    target_only = _left_anti_rows(target_dags, source_dags)
+    updates = target_only.merge(source_only[["unique_group_name"]], how="inner", on="unique_group_name")
+    source_only = source_only.merge(updates[["unique_group_name"]], how="left_anti", on=["unique_group_name"])
+    target_only = target_only.merge(updates[["unique_group_name"]], how="left_anti", on=["unique_group_name"])
 
     return {
         "adds": source_only,
@@ -186,6 +229,31 @@ def _normalize_backup_file_path(backup_file: str) -> Path:
         return backup_path / f"target_metadata_backup_{timestamp}.csv"
     return backup_path
 
+
+def _normalize_dag_rows(raw_dags: Any) -> pd.DataFrame:
+    """Return DAG rows using importable columns in a stable order."""
+    if isinstance(raw_dags, pd.DataFrame):
+        dag_rows = raw_dags.copy()
+    else:
+        dag_rows = pd.DataFrame(raw_dags or [])
+
+    if dag_rows.empty:
+        return pd.DataFrame(columns=["data_access_group_name", "unique_group_name"])
+
+    for column in ("data_access_group_name", "unique_group_name"):
+        if column not in dag_rows.columns:
+            dag_rows[column] = ""
+
+    return dag_rows[["data_access_group_name", "unique_group_name"]]
+
+
+def _rows_to_records(rows: pd.DataFrame) -> list[dict[str, Any]]:
+    """Convert any row-based DataFrame to records for display/import."""
+    if rows.empty:
+        return []
+    return rows.fillna("").to_dict(orient="records")
+
+
 def _print_comparison_table(title: str, rows: list[dict[str, Any]]) -> None:
     """Print a titled comparison section."""
     print_preview([title])
@@ -198,4 +266,19 @@ def _print_comparison_table(title: str, rows: list[dict[str, Any]]) -> None:
 def _comparison_table_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Reduce comparison rows to the columns shown in sync output."""
     columns = ["field_name", "form_name", "field_type"]
+    return [{column: row.get(column, "") for column in columns} for row in rows]
+
+
+def _print_dag_comparison_table(title: str, rows: list[dict[str, Any]]) -> None:
+    """Print a titled DAG comparison section."""
+    print_preview([title])
+    if not rows:
+        print_preview(["  (none)"])
+        return
+    print_table(_dag_comparison_table_rows(rows))
+
+
+def _dag_comparison_table_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Reduce DAG comparison rows to the columns shown in sync output."""
+    columns = ["unique_group_name", "data_access_group_name"]
     return [{column: row.get(column, "") for column in columns} for row in rows]
