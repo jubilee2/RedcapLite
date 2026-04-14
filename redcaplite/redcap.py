@@ -1191,7 +1191,7 @@ class RedcapClient(Client):
             output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
-            List[Dict]: A list of dictionaries containing user role information.
+            The response from the API containing user role information.
         """
         return self.post(
             api.get_user_roles({"format": format}),
