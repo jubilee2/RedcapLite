@@ -96,14 +96,17 @@ def run_sync(
     _print_comparison_table(
         "Fields to add in target:",
         metadata_to_records(adds),
+        columns=["field_name", "form_name", "field_type"],
     )
     _print_comparison_table(
         "Fields to update in target:",
         metadata_to_records(updates),
+        columns=["field_name", "form_name", "field_type"],
     )
     _print_comparison_table(
         "Fields to remove from target:",
         metadata_to_records(removals),
+        columns=["field_name", "form_name", "field_type"],
     )
 
     if adds.empty and updates.empty and removals.empty:
@@ -186,16 +189,22 @@ def _normalize_backup_file_path(backup_file: str) -> Path:
         return backup_path / f"target_metadata_backup_{timestamp}.csv"
     return backup_path
 
-def _print_comparison_table(title: str, rows: list[dict[str, Any]]) -> None:
+def _print_comparison_table(
+    title: str,
+    rows: list[dict[str, Any]],
+    columns: list[str],
+) -> None:
     """Print a titled comparison section."""
     print_preview([title])
     if not rows:
         print_preview(["  (none)"])
         return
-    print_table(_comparison_table_rows(rows))
+    print_table(_comparison_table_rows(rows, columns=columns))
 
 
-def _comparison_table_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _comparison_table_rows(
+    rows: list[dict[str, Any]],
+    columns: list[str],
+) -> list[dict[str, Any]]:
     """Reduce comparison rows to the columns shown in sync output."""
-    columns = ["field_name", "form_name", "field_type"]
     return [{column: row.get(column, "") for column in columns} for row in rows]
