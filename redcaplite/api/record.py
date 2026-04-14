@@ -1,6 +1,4 @@
-import pandas as pd
-import json
-from .utils import field_to_index, optional_field, require_field
+from .utils import data_formatter, field_to_index, optional_field, require_field
 
 
 @optional_field('format', 'csv')
@@ -28,6 +26,7 @@ def export_records(data):
     return (new_data)
 
 
+@data_formatter
 @optional_field('overwriteBehavior', 'normal')
 @optional_field('forceAutoNumber', 'false')
 @optional_field('backgroundProcess')
@@ -38,15 +37,8 @@ def import_records(data):
     new_data = {
         'content': 'record',
         'action': 'import',
-        'format': data['format'],
         'type': 'flat',
     }
-    if data['format'] == 'csv' and isinstance(data['data'], pd.DataFrame):
-        new_data['data'] = data['data'].to_csv(index=False)
-    elif data['format'] == 'json':
-        new_data['data'] = json.dumps(data['data'])
-    else:
-        new_data['data'] = data['data']
     return (new_data)
 
 

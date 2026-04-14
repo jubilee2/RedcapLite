@@ -7,10 +7,16 @@ The format is based on Keep a Changelog, with entries listed in reverse chronolo
 ## [Unreleased]
 
 ### Changed
+- Updated `data_formatter` to only auto-JSON serialize dict/list payloads when no non-JSON format is explicitly requested, preserving custom payload types (for example, bytes) for caller-selected formats.
+- Applied the shared `data_formatter` decorator to metadata and record import API payload builders, removing duplicated manual CSV/JSON serialization logic.
+- Renamed shared API JSON formatting decorator references from `json_data_formatter` to `data_formatter` across API modules.
+- Added unit tests for `data_formatter` JSON/CSV/string formatting behavior to guard decorator regressions.
+- Simplified shared `data_formatter` fallback behavior to rely on `result['format']` defaults (typically set via `@optional_field`) before defaulting to JSON.
 - Expanded CLI parser descriptions and help examples across command modules to highlight common usage patterns and command-specific help flows.
 - Switched root/setup/metadata help output back to default argparse-generated `usage` formatting.
 - Corrected `rcl sync` parser `prog` formatting so positional arguments are not duplicated in generated help usage output.
 - Standardized `prog` values for `setup` and `metadata` to base command names so error messages avoid placeholder-style command prefixes.
+- Updated DAG import payload formatting to use a shared data_formatter decorator with default format=json handling.
 - Updated sync comparison table helpers to accept caller-provided display columns for CLI output formatting.
 
 ## [2.2.1]

@@ -1,4 +1,4 @@
-from .utils import json_data_formatter
+from .utils import data_formatter
 
 
 def get_user_role_mappings(data):
@@ -9,7 +9,7 @@ def get_user_role_mappings(data):
     return (new_data)
 
 
-@json_data_formatter
+@data_formatter
 def import_user_role_mappings(data):
     new_data = {
         'content': 'userRoleMapping',

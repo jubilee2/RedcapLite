@@ -1,4 +1,4 @@
-from .utils import json_data_formatter, field_to_index
+from .utils import data_formatter, field_to_index
 
 
 @field_to_index('arms')
@@ -10,7 +10,7 @@ def get_form_event_mappings(data):
     return (new_data)
 
 
-@json_data_formatter
+@data_formatter
 def import_form_event_mappings(data):
     new_data = {
         'content': 'formEventMapping',
