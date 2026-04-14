@@ -1,4 +1,4 @@
-from .utils import json_data_formatter, field_to_index
+from .utils import data_formatter, field_to_index
 
 
 def get_users(data):
@@ -9,7 +9,7 @@ def get_users(data):
     return (new_data)
 
 
-@json_data_formatter
+@data_formatter
 def import_users(data):
     new_data = {
         'content': 'user',

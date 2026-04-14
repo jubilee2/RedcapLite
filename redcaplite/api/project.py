@@ -1,7 +1,7 @@
-from .utils import json_data_formatter, field_to_index, optional_field
+from .utils import data_formatter, field_to_index, optional_field
 
 
-@json_data_formatter
+@data_formatter
 def create_project(data):
     new_data = {
         'content': 'project',
@@ -9,7 +9,7 @@ def create_project(data):
     return (new_data)
 
 
-@json_data_formatter
+@data_formatter
 def import_project_settings(data):
     new_data = {
         'content': 'project_settings',
