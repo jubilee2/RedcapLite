@@ -14,7 +14,7 @@ def json_data_formatter(func):
     return wrapper
 
 
-def data_formater(func):
+def data_formatter(func):
     def wrapper(data):
         result = func(data)
 
