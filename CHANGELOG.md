@@ -6,6 +6,8 @@ The format is based on Keep a Changelog, with entries listed in reverse chronolo
 
 ## [Unreleased]
 
+## [2.2.2]
+
 ### Changed
 - Updated `data_formatter` to only auto-JSON serialize dict/list payloads when no non-JSON format is explicitly requested, preserving custom payload types (for example, bytes) for caller-selected formats.
 - Applied the shared `data_formatter` decorator to metadata and record import API payload builders, removing duplicated manual CSV/JSON serialization logic.

@@ -10,9 +10,9 @@
 
 `redcaplite` helps you connect to REDCap projects and perform common API and CLI workflows from one package. Whether you're a researcher automating data pulls or a developer building integrations, `redcaplite` supports both scripted API usage and command-line operations.
 
-## ✨ v2.2.1 – Safer metadata sync workflow
+## ✨ v2.2.2 – Metadata formatting and CLI help refinements
 
-Version 2.2.1 adds a safer metadata sync workflow with dry-run previews, clearer identity diagnostics, backup export support, and summary output while keeping the command-first style (`rcl <command> <profile> ...`).
+Version 2.2.2 improves shared API payload formatting behavior, expands CLI help text and examples, and refines sync display formatting while keeping the command-first style (`rcl <command> <profile> ...`).
 
 The CLI provides:
 - Profile-based access (`rcl <command> <profile> ...`)

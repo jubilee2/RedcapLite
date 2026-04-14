@@ -1,6 +1,6 @@
 [project]
 name = "redcaplite"
-version = "2.2.1"
+version = "2.2.2"
 authors = [
   { name="Jubilee Tan", email="jubilee2@gmail.com" },
 ]
