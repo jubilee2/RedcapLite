@@ -18,8 +18,6 @@ def data_formatter(func):
     def wrapper(data):
         result = func(data)
 
-        data_format = result.get('format')
-
         payload = data.get('data')
         if isinstance(payload, pd.DataFrame):
             result['data'] = payload.to_csv(index=False)
@@ -29,7 +27,7 @@ def data_formatter(func):
             result['format'] = 'json'
         else:
             result['data'] = payload
-            result['format'] = data_format
+            result['format'] = result.get('format')
             
 
         return result
