@@ -1,10 +1,10 @@
-from .utils import data_formatter
+from .utils import data_formatter, optional_field
 
 
+@optional_field('format', "json")
 def get_repeating_forms_events(data):
     new_data = {
         'content': 'repeatingFormsEvents',
-        'format': 'json'
     }
     return (new_data)
 

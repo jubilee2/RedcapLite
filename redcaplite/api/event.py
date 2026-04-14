@@ -1,11 +1,11 @@
-from .utils import data_formatter, field_to_index
+from .utils import data_formatter, field_to_index, optional_field
 
 
+@optional_field('format', "json")
 @field_to_index('arms')
 def get_events(data):
     new_data = {
         'content': 'event',
-        'format': 'json'
     }
     return (new_data)
 

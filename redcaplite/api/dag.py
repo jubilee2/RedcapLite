@@ -1,10 +1,10 @@
-from .utils import data_formatter, field_to_index, require_field
+from .utils import data_formatter, field_to_index, optional_field, require_field
 
 
+@optional_field('format', "json")
 def get_dags(data):
     new_data = {
         'content': 'dag',
-        'format': 'json'
     }
     return (new_data)
 
