@@ -16,7 +16,7 @@ def data_formatter(func):
             result['format'] = 'json'
         else:
             result['data'] = payload
-            result['format'] = existing_format if existing_format is not None else 'json'
+            result['format'] = result.get('format', data.get('format', 'json'))
         return result
     return wrapper
 
