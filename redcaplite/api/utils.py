@@ -5,19 +5,20 @@ import pandas as pd
 
 def data_formatter(func):
     def wrapper(data):
-        
         result = func(data)
 
         payload = data.get('data')
+        existing_format = result.get('format', data.get('format'))
+
         if isinstance(payload, pd.DataFrame):
             result['data'] = payload.to_csv(index=False)
             result['format'] = 'csv'
-        elif payload is not None and not isinstance(payload, str):
+        elif isinstance(payload, (dict, list)) and existing_format in (None, 'json'):
             result['data'] = json.dumps(payload)
             result['format'] = 'json'
         else:
             result['data'] = payload
-            result['format'] = result.get('format', data.get('format', 'json'))
+            result['format'] = existing_format if existing_format is not None else 'json'
         return result
     return wrapper
 
