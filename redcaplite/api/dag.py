@@ -1,4 +1,4 @@
-from .utils import data_formater, field_to_index, optional_field, require_field
+from .utils import data_formatter, field_to_index, optional_field, require_field
 
 
 def get_dags(data):
