@@ -21,12 +21,13 @@ def data_formatter(func):
         data_format = result.get('format', data.get('format', 'json'))
         result['format'] = data_format
 
-        if data_format == 'csv' and isinstance(data['data'], pd.DataFrame):
-            result['data'] = data['data'].to_csv(index=False)
-        elif data_format == 'json':
-            result['data'] = json.dumps(data['data'])
+        payload = data.get('data')
+        if data_format == 'csv' and isinstance(payload, pd.DataFrame):
+            result['data'] = payload.to_csv(index=False)
+        elif data_format == 'json' and payload is not None and not isinstance(payload, str):
+            result['data'] = json.dumps(payload)
         else:
-            result['data'] = data['data']
+            result['data'] = payload
 
         return result
     return wrapper
