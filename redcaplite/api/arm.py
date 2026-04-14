@@ -1,11 +1,11 @@
 from .utils import data_formatter, field_to_index, optional_field
 
 
+@optional_field('format', "json")
 @field_to_index('arms')
 def get_arms(data):
     new_data = {
         'content': 'arm',
-        'format': 'json'
     }
     return (new_data)
 
@@ -20,11 +20,11 @@ def import_arms(data):
     return (new_data)
 
 
+@optional_field('format', "json")
 @field_to_index('arms', True)
 def delete_arms(data):
     new_data = {
         'content': 'arm',
         'action': 'delete',
-        'format': 'json'
     }
     return (new_data)

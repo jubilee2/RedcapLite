@@ -17,10 +17,10 @@ def import_project_settings(data):
     return (new_data)
 
 
+@optional_field('format', "json")
 def get_project(data):
     new_data = {
         'content': 'project',
-        'format': 'json'
     }
     return (new_data)
 

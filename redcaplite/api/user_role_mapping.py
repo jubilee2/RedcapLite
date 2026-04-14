@@ -1,10 +1,10 @@
-from .utils import data_formatter
+from .utils import data_formatter, optional_field
 
 
+@optional_field('format', "json")
 def get_user_role_mappings(data):
     new_data = {
         'content': 'userRoleMapping',
-        'format': 'json'
     }
     return (new_data)
 

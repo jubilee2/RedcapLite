@@ -1,10 +1,10 @@
-from .utils import data_formatter, field_to_index
+from .utils import data_formatter, field_to_index, optional_field
 
 
+@optional_field('format', "json")
 def get_user_roles(data):
     new_data = {
         'content': 'userRole',
-        'format': 'json'
     }
     return (new_data)
 
@@ -17,11 +17,11 @@ def import_user_roles(data):
     return (new_data)
 
 
+@optional_field('format', "json")
 @field_to_index('roles', True)
 def delete_user_roles(data):
     new_data = {
         'content': 'userRole',
         'action': 'delete',
-        'format': 'json'
     }
     return (new_data)

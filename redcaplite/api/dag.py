@@ -1,10 +1,10 @@
-from .utils import data_formatter, field_to_index, require_field
+from .utils import data_formatter, field_to_index, optional_field, require_field
 
 
+@optional_field('format', "json")
 def get_dags(data):
     new_data = {
         'content': 'dag',
-        'format': 'json'
     }
     return (new_data)
 
@@ -19,11 +19,11 @@ def import_dags(data):
 
 
 @field_to_index('dags', True)
+@optional_field('format', "json")
 def delete_dags(data):
     new_data = {
         'content': 'dag',
         'action': 'delete',
-        'format': 'json'
     }
     return (new_data)
 

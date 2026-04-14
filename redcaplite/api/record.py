@@ -42,6 +42,7 @@ def import_records(data):
     return (new_data)
 
 
+@optional_field('format', "json")
 @field_to_index('records', True)
 @optional_field('arm')
 @optional_field('instrument')
@@ -52,11 +53,11 @@ def delete_records(data):
     new_data = {
         'content': 'record',
         'action': 'delete',
-        'format': 'json'
     }
     return (new_data)
 
 
+@optional_field('format', "json")
 @require_field('record')
 @require_field('new_record_name')
 @optional_field('arm')
@@ -64,14 +65,13 @@ def rename_record(data):
     new_data = {
         'content': 'record',
         'action': 'rename',
-        'format': 'json'
     }
     return (new_data)
 
 
+@optional_field('format', "json")
 def generate_next_record_name(data):
     new_data = {
         'content': 'generateNextRecordName',
-        'format': 'json'
     }
     return (new_data)

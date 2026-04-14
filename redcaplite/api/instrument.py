@@ -1,6 +1,9 @@
+from .utils import optional_field
+
+
+@optional_field('format', "json")
 def get_instruments(data):
     new_data = {
         'content': 'instrument',
-        'format': 'json'
     }
     return (new_data)
