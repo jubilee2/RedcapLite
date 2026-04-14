@@ -107,14 +107,17 @@ def run_sync(
     _print_comparison_table(
         "Fields to add in target:",
         metadata_to_records(adds),
+        columns=["field_name", "form_name", "field_type"],
     )
     _print_comparison_table(
         "Fields to update in target:",
         metadata_to_records(updates),
+        columns=["field_name", "form_name", "field_type"],
     )
     _print_comparison_table(
         "Fields to remove from target:",
         metadata_to_records(removals),
+        columns=["field_name", "form_name", "field_type"],
     )
     _print_comparison_table(
         "DAGs to add in target:",
@@ -260,7 +263,7 @@ def _rows_to_records(rows: pd.DataFrame) -> list[dict[str, Any]]:
 def _print_comparison_table(
     title: str,
     rows: list[dict[str, Any]],
-    columns: list[str] | None = None,
+    columns: list[str],
 ) -> None:
     """Print a titled comparison section."""
     print_preview([title])
@@ -272,8 +275,7 @@ def _print_comparison_table(
 
 def _comparison_table_rows(
     rows: list[dict[str, Any]],
-    columns: list[str] | None = None,
+    columns: list[str],
 ) -> list[dict[str, Any]]:
     """Reduce comparison rows to the columns shown in sync output."""
-    columns = columns or ["field_name", "form_name", "field_type"]
     return [{column: row.get(column, "") for column in columns} for row in rows]
