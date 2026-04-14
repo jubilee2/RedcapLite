@@ -14,6 +14,7 @@ The format is based on Keep a Changelog, with entries listed in reverse chronolo
 - Updated `rcl sync` to compare/import DAG configuration alongside metadata so profile sync operations copy data access groups as well.
 - Refactored sync comparison output to reuse the shared table-print helper for both metadata and DAG preview sections.
 - Made sync comparison table columns explicit at each call site, removing implicit default column selection.
+- Simplified DAG sync record conversion by inlining DataFrame-to-record transformations instead of a dedicated helper.
 
 ## [2.2.1]
 

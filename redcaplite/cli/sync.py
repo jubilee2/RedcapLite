@@ -121,17 +121,17 @@ def run_sync(
     )
     _print_comparison_table(
         "DAGs to add in target:",
-        _rows_to_records(dag_adds),
+        dag_adds.fillna("").to_dict(orient="records"),
         columns=["unique_group_name", "data_access_group_name"],
     )
     _print_comparison_table(
         "DAGs to update in target:",
-        _rows_to_records(dag_updates),
+        dag_updates.fillna("").to_dict(orient="records"),
         columns=["unique_group_name", "data_access_group_name"],
     )
     _print_comparison_table(
         "DAGs to remove from target:",
-        _rows_to_records(dag_removals),
+        dag_removals.fillna("").to_dict(orient="records"),
         columns=["unique_group_name", "data_access_group_name"],
     )
 
@@ -156,7 +156,7 @@ def run_sync(
 
     target_client.import_metadata(source_metadata, format="csv")
     print_success(f'Imported metadata from "{source_profile}" into "{target_profile}".')
-    target_client.import_dags(_rows_to_records(source_dags))
+    target_client.import_dags(source_dags.fillna("").to_dict(orient="records"))
     print_success(f'Imported DAGs from "{source_profile}" into "{target_profile}".')
     return 0
 
@@ -251,13 +251,6 @@ def _normalize_dag_rows(raw_dags: Any) -> pd.DataFrame:
             dag_rows[column] = ""
 
     return dag_rows[["data_access_group_name", "unique_group_name"]]
-
-
-def _rows_to_records(rows: pd.DataFrame) -> list[dict[str, Any]]:
-    """Convert any row-based DataFrame to records for display/import."""
-    if rows.empty:
-        return []
-    return rows.fillna("").to_dict(orient="records")
 
 
 def _print_comparison_table(
