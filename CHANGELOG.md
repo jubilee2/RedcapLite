@@ -13,6 +13,7 @@ The format is based on Keep a Changelog, with entries listed in reverse chronolo
 - Corrected `rcl sync` parser `prog` formatting so positional arguments are not duplicated in generated help usage output.
 - Standardized `prog` values for `setup` and `metadata` to base command names so error messages avoid placeholder-style command prefixes.
 - Updated DAG import payload formatting to use a shared data_formatter decorator with default format=json handling.
+- Updated sync comparison table helpers to accept caller-provided display columns for CLI output formatting.
 
 ## [2.2.1]
 
