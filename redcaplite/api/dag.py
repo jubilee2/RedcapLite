@@ -1,4 +1,4 @@
-from .utils import json_data_formatter, field_to_index, require_field
+from .utils import data_formater, field_to_index, optional_field, require_field
 
 
 def get_dags(data):
@@ -9,7 +9,8 @@ def get_dags(data):
     return (new_data)
 
 
-@json_data_formatter
+@data_formater
+@optional_field('format', 'json')
 def import_dags(data):
     new_data = {
         'content': 'dag',

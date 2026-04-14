@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+import pandas as pd
 
 
 def json_data_formatter(func):
@@ -9,6 +10,24 @@ def json_data_formatter(func):
 
         result['format'] = 'json'
         result['data'] = json.dumps(data['data'])
+        return result
+    return wrapper
+
+
+def data_formater(func):
+    def wrapper(data):
+        result = func(data)
+
+        data_format = result.get('format', data.get('format', 'json'))
+        result['format'] = data_format
+
+        if data_format == 'csv' and isinstance(data['data'], pd.DataFrame):
+            result['data'] = data['data'].to_csv(index=False)
+        elif data_format == 'json':
+            result['data'] = json.dumps(data['data'])
+        else:
+            result['data'] = data['data']
+
         return result
     return wrapper
 
