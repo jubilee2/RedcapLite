@@ -6,6 +6,8 @@ The format is based on Keep a Changelog, with entries listed in reverse chronolo
 
 ## [Unreleased]
 
+## [2.2.2]
+
 ### Changed
 - Replaced hard-coded API payload values of `'format': 'json'` with the shared `@optional_field('format', "json")` decorator across GET API request builders for consistent default handling.
 - Updated `data_formatter` to only auto-JSON serialize dict/list payloads when no non-JSON format is explicitly requested, preserving custom payload types (for example, bytes) for caller-selected formats.
