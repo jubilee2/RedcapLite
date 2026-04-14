@@ -8,8 +8,6 @@ def data_formatter(func):
         result = func(data)
 
         payload = data.get('data')
-        existing_format = result.get('format', data.get('format'))
-
         if isinstance(payload, pd.DataFrame):
             result['data'] = payload.to_csv(index=False)
             result['format'] = 'csv'
