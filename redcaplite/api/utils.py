@@ -18,16 +18,17 @@ def data_formatter(func):
     def wrapper(data):
         result = func(data)
 
-        data_format = result.get('format', data.get('format', 'json'))
-        result['format'] = data_format
-
         payload = data.get('data')
-        if data_format == 'csv' and isinstance(payload, pd.DataFrame):
+        if isinstance(payload, pd.DataFrame):
             result['data'] = payload.to_csv(index=False)
-        elif data_format == 'json' and payload is not None and not isinstance(payload, str):
+            result['format'] = 'csv'
+        elif payload is not None and not isinstance(payload, str):
             result['data'] = json.dumps(payload)
+            result['format'] = 'json'
         else:
             result['data'] = payload
+            result['format'] = result.get('format', data.get('format', 'json'))
+            
 
         return result
     return wrapper
