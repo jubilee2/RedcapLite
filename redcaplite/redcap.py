@@ -1146,7 +1146,7 @@ class RedcapClient(Client):
             output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
-            List[Dict]: A list of dictionaries containing user information.
+            The response from the API containing user information.
         """
         return self.post(
             api.get_users({"format": format}),
