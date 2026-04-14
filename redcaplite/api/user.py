@@ -17,11 +17,11 @@ def import_users(data):
     return (new_data)
 
 
-@optional_field('format', "json")
 @field_to_index('users', True)
 def delete_users(data):
     new_data = {
         'content': 'user',
         'action': 'delete',
+        'format': 'json'
     }
     return (new_data)

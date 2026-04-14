@@ -19,11 +19,11 @@ def import_events(data):
     return (new_data)
 
 
-@optional_field('format', "json")
 @field_to_index('events', True)
 def delete_events(data):
     new_data = {
         'content': 'event',
         'action': 'delete',
+        'format': 'json'
     }
     return (new_data)

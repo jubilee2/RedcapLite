@@ -20,11 +20,11 @@ def import_arms(data):
     return (new_data)
 
 
-@optional_field('format', "json")
 @field_to_index('arms', True)
 def delete_arms(data):
     new_data = {
         'content': 'arm',
         'action': 'delete',
+        'format': 'json'
     }
     return (new_data)

@@ -17,11 +17,11 @@ def import_user_roles(data):
     return (new_data)
 
 
-@optional_field('format', "json")
 @field_to_index('roles', True)
 def delete_user_roles(data):
     new_data = {
         'content': 'userRole',
         'action': 'delete',
+        'format': 'json'
     }
     return (new_data)

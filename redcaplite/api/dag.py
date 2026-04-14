@@ -19,11 +19,11 @@ def import_dags(data):
 
 
 @field_to_index('dags', True)
-@optional_field('format', "json")
 def delete_dags(data):
     new_data = {
         'content': 'dag',
         'action': 'delete',
+        'format': 'json'
     }
     return (new_data)
 
