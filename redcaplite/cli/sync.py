@@ -116,17 +116,20 @@ def run_sync(
         "Fields to remove from target:",
         metadata_to_records(removals),
     )
-    _print_dag_comparison_table(
+    _print_comparison_table(
         "DAGs to add in target:",
         _rows_to_records(dag_adds),
+        columns=["unique_group_name", "data_access_group_name"],
     )
-    _print_dag_comparison_table(
+    _print_comparison_table(
         "DAGs to update in target:",
         _rows_to_records(dag_updates),
+        columns=["unique_group_name", "data_access_group_name"],
     )
-    _print_dag_comparison_table(
+    _print_comparison_table(
         "DAGs to remove from target:",
         _rows_to_records(dag_removals),
+        columns=["unique_group_name", "data_access_group_name"],
     )
 
     if adds.empty and updates.empty and removals.empty and dag_adds.empty and dag_updates.empty and dag_removals.empty:
@@ -254,31 +257,23 @@ def _rows_to_records(rows: pd.DataFrame) -> list[dict[str, Any]]:
     return rows.fillna("").to_dict(orient="records")
 
 
-def _print_comparison_table(title: str, rows: list[dict[str, Any]]) -> None:
+def _print_comparison_table(
+    title: str,
+    rows: list[dict[str, Any]],
+    columns: list[str] | None = None,
+) -> None:
     """Print a titled comparison section."""
     print_preview([title])
     if not rows:
         print_preview(["  (none)"])
         return
-    print_table(_comparison_table_rows(rows))
+    print_table(_comparison_table_rows(rows, columns=columns))
 
 
-def _comparison_table_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _comparison_table_rows(
+    rows: list[dict[str, Any]],
+    columns: list[str] | None = None,
+) -> list[dict[str, Any]]:
     """Reduce comparison rows to the columns shown in sync output."""
-    columns = ["field_name", "form_name", "field_type"]
-    return [{column: row.get(column, "") for column in columns} for row in rows]
-
-
-def _print_dag_comparison_table(title: str, rows: list[dict[str, Any]]) -> None:
-    """Print a titled DAG comparison section."""
-    print_preview([title])
-    if not rows:
-        print_preview(["  (none)"])
-        return
-    print_table(_dag_comparison_table_rows(rows))
-
-
-def _dag_comparison_table_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Reduce DAG comparison rows to the columns shown in sync output."""
-    columns = ["unique_group_name", "data_access_group_name"]
+    columns = columns or ["field_name", "form_name", "field_type"]
     return [{column: row.get(column, "") for column in columns} for row in rows]
