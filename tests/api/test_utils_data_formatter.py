@@ -52,3 +52,15 @@ def test_data_formatter_preserves_existing_format_for_string_payload():
         'format': 'xml',
         'data': '<project></project>',
     }
+
+
+def test_data_formatter_preserves_non_json_non_string_payload_without_serializing():
+    payload = {'data': b'\x00\x01', 'format': 'xml'}
+
+    result = _build_payload(payload)
+
+    assert result == {
+        'content': 'test',
+        'format': 'xml',
+        'data': b'\x00\x01',
+    }
