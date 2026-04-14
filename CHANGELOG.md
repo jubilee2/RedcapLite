@@ -7,6 +7,7 @@ The format is based on Keep a Changelog, with entries listed in reverse chronolo
 ## [Unreleased]
 
 ### Changed
+- Simplified shared `data_formatter` fallback behavior to rely on `result['format']` defaults (typically set via `@optional_field`) before defaulting to JSON.
 - Expanded CLI parser descriptions and help examples across command modules to highlight common usage patterns and command-specific help flows.
 - Switched root/setup/metadata help output back to default argparse-generated `usage` formatting.
 - Corrected `rcl sync` parser `prog` formatting so positional arguments are not duplicated in generated help usage output.

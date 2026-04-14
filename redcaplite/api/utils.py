@@ -18,7 +18,7 @@ def data_formatter(func):
     def wrapper(data):
         result = func(data)
 
-        data_format = result.get('format', data.get('format', 'json'))
+        data_format = result.get('format', 'json')
         result['format'] = data_format
 
         payload = data.get('data')
