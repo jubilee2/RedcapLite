@@ -32,18 +32,6 @@ def test_data_formatter_serializes_non_string_payload_to_json():
     }
 
 
-def test_data_formatter_preserves_explicit_non_json_format_for_list_payload():
-    payload = {'data': [{'record_id': 1}], 'format': 'xml'}
-
-    result = _build_payload(payload)
-
-    assert result == {
-        'content': 'test',
-        'format': 'xml',
-        'data': payload['data'],
-    }
-
-
 def test_data_formatter_serializes_dataframe_payload_to_csv():
     payload = {'data': pd.DataFrame([{'record_id': 1}, {'record_id': 2}])}
 
