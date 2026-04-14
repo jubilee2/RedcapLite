@@ -9,7 +9,7 @@ def get_dags(data):
     return (new_data)
 
 
-@data_formater
+@data_formatter
 @optional_field('format', 'json')
 def import_dags(data):
     new_data = {
