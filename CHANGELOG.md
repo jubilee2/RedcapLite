@@ -6,6 +6,9 @@ The format is based on Keep a Changelog, with entries listed in reverse chronolo
 
 ## [Unreleased]
 
+### Changed
+- Updated `RedcapClient` JSON-default export helpers (arms, DAGs, user-DAG mappings, events, field names, instruments, form-event mappings, project, repeating forms/events, users, user roles, and user-role mappings) to explicitly expose `format: Literal["json", "csv"] = "json"` and forward it in request payloads, aligning client method defaults with API `@optional_field('format', "json")` behavior.
+
 ## [2.2.2]
 
 ### Changed
