@@ -13,7 +13,7 @@ def data_formatter(func):
         if isinstance(payload, pd.DataFrame):
             result['data'] = payload.to_csv(index=False)
             result['format'] = 'csv'
-        elif isinstance(payload, (dict, list)) and existing_format in (None, 'json'):
+        elif isinstance(payload, (dict, list)):
             result['data'] = json.dumps(payload)
             result['format'] = 'json'
         else:
