@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from redcaplite.cli.sync import compare_metadata
-from redcaplite.metadata_ops.transform import metadata_to_records
+from redcaplite.cli.sync import compare_dags, compare_metadata
 from redcaplite.cli.main import main
 from tests.cli.fakes import SyncMetadataClient
 
@@ -35,6 +34,10 @@ def test_main_sync_prints_differences_and_imports_source_metadata(monkeypatch, c
                 "required_field": "",
             },
         ],
+        dags=[
+            {"unique_group_name": "site_b", "data_access_group_name": "Site B"},
+            {"unique_group_name": "site_a", "data_access_group_name": "Site A"},
+        ],
     )
     target_client = SyncMetadataClient(
         "https://target.example.edu/api/",
@@ -62,6 +65,10 @@ def test_main_sync_prints_differences_and_imports_source_metadata(monkeypatch, c
                 "required_field": "",
             },
         ],
+        dags=[
+            {"unique_group_name": "site_b", "data_access_group_name": "Site B"},
+            {"unique_group_name": "legacy_site", "data_access_group_name": "Legacy Site"},
+        ],
     )
     monkeypatch.setattr(
         "redcaplite.cli.sync.build_client",
@@ -82,11 +89,19 @@ def test_main_sync_prints_differences_and_imports_source_metadata(monkeypatch, c
     assert "field_name" in captured.out
     assert "form_name" in captured.out
     assert "field_type" in captured.out
+    assert "DAGs to add in target:" in captured.out
+    assert "DAGs to remove from target:" in captured.out
+    assert "site_a" in captured.out
+    assert "legacy_site" in captured.out
     assert "field_label" not in captured.out
     assert "Weight" not in captured.out
-    assert 'Imported metadata from "profile1" into "profile2".' in captured.out
+    assert 'Imported metadata and DAGs from "profile1" into "profile2".' in captured.out
     assert target_client.imported_metadata is not None
     assert list(target_client.imported_metadata["field_name"]) == ["record_id", "age", "height"]
+    assert target_client.imported_dags == [
+        {"data_access_group_name": "Site A", "unique_group_name": "site_a"},
+        {"data_access_group_name": "Site B", "unique_group_name": "site_b"},
+    ]
     assert captured.err == ""
 
 
@@ -147,8 +162,9 @@ def test_main_sync_reports_when_metadata_matches(monkeypatch, capsys) -> None:
     assert main(["sync", "profile1", "profile2"]) == 0
 
     captured = capsys.readouterr()
-    assert 'No metadata differences found between "profile1" and "profile2".' in captured.out
+    assert 'No metadata or DAG differences found between "profile1" and "profile2".' in captured.out
     assert target_client.imported_metadata is None
+    assert target_client.imported_dags is None
     assert captured.err == ""
 
 
@@ -239,8 +255,9 @@ def test_main_sync_dry_run_never_imports(monkeypatch, capsys) -> None:
     assert main(["sync", "profile1", "profile2", "--dry-run", "--yes"]) == 0
 
     captured = capsys.readouterr()
-    assert "Dry run enabled; no metadata was imported." in captured.out
+    assert "Dry run enabled; no metadata or DAGs were imported." in captured.out
     assert target_client.imported_metadata is None
+    assert target_client.imported_dags is None
 
 
 def test_main_sync_prints_summary_counts(monkeypatch, capsys) -> None:
@@ -272,6 +289,8 @@ def test_main_sync_prints_summary_counts(monkeypatch, capsys) -> None:
     assert "Updates: 1" in captured.out
     assert "Removals: 0" in captured.out
     assert "Fields to update in target:" in captured.out
+    assert "DAGs to add: 0" in captured.out
+    assert "DAGs to remove: 0" in captured.out
 
 
 def test_main_sync_exports_backup_before_import(monkeypatch, capsys, tmp_path) -> None:
@@ -297,3 +316,27 @@ def test_main_sync_exports_backup_before_import(monkeypatch, capsys, tmp_path) -
     assert "Exported target metadata backup" in captured.out
     assert target_client.exported_metadata_output_file == str(backup_file)
     assert target_client.imported_metadata is not None
+
+
+def test_compare_dags_reports_adds_and_removals() -> None:
+    source_dags = pd.DataFrame(
+        [
+            {"unique_group_name": "site_a", "data_access_group_name": "Site A"},
+            {"unique_group_name": "site_b", "data_access_group_name": "Site B"},
+        ]
+    )
+    target_dags = pd.DataFrame(
+        [
+            {"unique_group_name": "site_a", "data_access_group_name": "Site A"},
+            {"unique_group_name": "legacy_site", "data_access_group_name": "Legacy Site"},
+        ]
+    )
+
+    comparison = compare_dags(source_dags, target_dags)
+
+    assert comparison["adds"].to_dict(orient="records") == [
+        {"unique_group_name": "site_b", "data_access_group_name": "Site B"}
+    ]
+    assert comparison["removals"].to_dict(orient="records") == [
+        {"unique_group_name": "legacy_site", "data_access_group_name": "Legacy Site"}
+    ]

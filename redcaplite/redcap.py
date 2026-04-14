@@ -65,17 +65,22 @@ class RedcapClient(Client):
         return self.post(api.delete_arms({"arms": arms}))
 
     # dags
-    def get_dags(self, output_file: Optional[str] = None):
+    def get_dags(
+        self,
+        format: Literal["csv", "json"] = "json",
+        output_file: Optional[str] = None,
+    ):
         """
         Get all Data Access Groups (DAGs) for the project.
 
         Args:
+            format (Literal["csv", "json"]): Response format.
             output_file (Optional[str]): Path to save the raw API response.
 
         Returns:
             The response from the API containing DAG information.
         """
-        return self.post(api.get_dags({}), output_file=output_file)
+        return self.post(api.get_dags({"format": format}), output_file=output_file)
 
     def import_dags(self, data: RedcapDataType):
         """

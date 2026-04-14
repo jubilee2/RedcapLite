@@ -7,6 +7,7 @@ The format is based on Keep a Changelog, with entries listed in reverse chronolo
 ## [Unreleased]
 
 ### Changed
+- Simplified `rcl sync` DAG compare/import flow with explicit comparison table column constants and deterministic DAG import ordering for safer repeatable sync runs.
 - Replaced hard-coded API payload values of `'format': 'json'` with the shared `@optional_field('format', "json")` decorator across GET API request builders for consistent default handling.
 - Updated `data_formatter` to only auto-JSON serialize dict/list payloads when no non-JSON format is explicitly requested, preserving custom payload types (for example, bytes) for caller-selected formats.
 - Applied the shared `data_formatter` decorator to metadata and record import API payload builders, removing duplicated manual CSV/JSON serialization logic.
