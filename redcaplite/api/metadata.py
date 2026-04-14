@@ -1,6 +1,4 @@
-import json
-import pandas as pd
-from .utils import field_to_index, optional_field
+from .utils import data_formatter, field_to_index, optional_field
 
 
 @optional_field('format', 'csv')
@@ -13,15 +11,9 @@ def get_metadata(data):
     return (new_data)
 
 
+@data_formatter
 def import_metadata(data):
     new_data = {
         'content': 'metadata',
-        'format': data['format'],
     }
-    if data['format'] == 'csv' and isinstance(data['data'], pd.DataFrame):
-        new_data['data'] = data['data'].to_csv(index=False)
-    elif data['format'] == 'json':
-        new_data['data'] = json.dumps(data['data'])
-    else:
-        new_data['data'] = data['data']
     return (new_data)
