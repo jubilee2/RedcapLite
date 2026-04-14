@@ -1,4 +1,4 @@
-from .utils import json_data_formatter, field_to_index, optional_field
+from .utils import data_formatter, field_to_index, optional_field
 
 
 @field_to_index('arms')
@@ -10,7 +10,7 @@ def get_arms(data):
     return (new_data)
 
 
-@json_data_formatter
+@data_formatter
 @optional_field('override')
 def import_arms(data):
     new_data = {

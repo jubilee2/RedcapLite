@@ -3,17 +3,6 @@ from datetime import datetime
 import pandas as pd
 
 
-def json_data_formatter(func):
-    def wrapper(data):
-
-        result = func(data)
-
-        result['format'] = 'json'
-        result['data'] = json.dumps(data['data'])
-        return result
-    return wrapper
-
-
 def data_formatter(func):
     def wrapper(data):
         

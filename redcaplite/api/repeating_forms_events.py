@@ -1,4 +1,4 @@
-from .utils import json_data_formatter
+from .utils import data_formatter
 
 
 def get_repeating_forms_events(data):
@@ -9,7 +9,7 @@ def get_repeating_forms_events(data):
     return (new_data)
 
 
-@json_data_formatter
+@data_formatter
 def import_repeating_forms_events(data):
     new_data = {
         'content': 'repeatingFormsEvents',
