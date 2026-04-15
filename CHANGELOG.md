@@ -7,6 +7,11 @@ The format is based on Keep a Changelog, with entries listed in reverse chronolo
 ## [Unreleased]
 
 ### Changed
+- Aligned user-role CSV forwarding tests with the expanded fixed-schema column definitions used by the client for empty CSV responses.
+
+## [2.3.0]
+
+### Changed
 - Expanded the centralized CSV empty-schema registry and endpoint wiring to include user roles and user-role mappings exports so blank CSV responses now return correctly structured zero-row DataFrames for those fixed-schema APIs.
 - Simplified blank CSV handling in `csv_handler` to rely on `pd.DataFrame(columns=empty_columns)`, which naturally preserves the legacy fallback for `None` and schema columns when provided.
 - Simplified `Client.post(...)` CSV forwarding further by always passing `empty_columns` (including `None`) directly to `__csv_api`, reducing branching with no behavior change.

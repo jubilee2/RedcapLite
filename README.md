@@ -10,9 +10,9 @@
 
 `redcaplite` helps you connect to REDCap projects and perform common API and CLI workflows from one package. Whether you're a researcher automating data pulls or a developer building integrations, `redcaplite` supports both scripted API usage and command-line operations.
 
-## ✨ v2.2.3 – JSON-default export helper alignment
+## ✨ v2.3.0 – CSV empty-schema support and handler simplification
 
-Version 2.2.3 aligns `RedcapClient` JSON-default export helper signatures with API format defaults by explicitly exposing and forwarding `format` options while preserving the command-first CLI style (`rcl <command> <profile> ...`).
+Version 2.3.0 expands empty CSV handling with endpoint-aware schema defaults, so fixed-schema exports now return zero-row DataFrames with expected columns while dynamic exports preserve legacy fallback behavior.
 
 The CLI provides:
 - Profile-based access (`rcl <command> <profile> ...`)

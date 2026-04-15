@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import Mock, patch, mock_open
 from redcaplite import RedcapClient
+from redcaplite.api.schemas import get_empty_csv_columns
 import pandas as pd
 import numpy as np
 from pandas.testing import assert_frame_equal
@@ -715,7 +716,7 @@ def test_get_user_roles_forwards_empty_columns(client):
         mock_post.assert_called_once_with(
             {'content': 'userRole', 'format': 'csv'},
             output_file=None,
-            empty_columns=['unique_role_name', 'role_label'],
+            empty_columns=get_empty_csv_columns('get_user_roles'),
         )
 
 
@@ -755,7 +756,7 @@ def test_redcap_client_get_user_role_mappings_forwards_empty_columns(client):
         mock_post.assert_called_once_with(
             {'content': 'userRoleMapping', 'format': 'csv'},
             output_file=None,
-            empty_columns=['username', 'unique_role_name'],
+            empty_columns=get_empty_csv_columns('get_user_role_mappings'),
         )
 
 
