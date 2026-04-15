@@ -5,9 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on Keep a Changelog, with entries listed in reverse chronological order.
 
 ## [Unreleased]
+- No changes yet.
+
+
+## [2.3.0]
 
 ### Changed
-- No changes yet.
+- Aligned user-role CSV forwarding tests with the expanded fixed-schema column definitions used by the client for empty CSV responses.
+- Expanded the centralized CSV empty-schema registry and endpoint wiring to include user roles and user-role mappings exports so blank CSV responses now return correctly structured zero-row DataFrames for those fixed-schema APIs.
+- Simplified blank CSV handling in `csv_handler` to rely on `pd.DataFrame(columns=empty_columns)`, which naturally preserves the legacy fallback for `None` and schema columns when provided.
+- Simplified `Client.post(...)` CSV forwarding further by always passing `empty_columns` (including `None`) directly to `__csv_api`, reducing branching with no behavior change.
+- Added optional CSV empty-schema support in the HTTP client/handler pipeline via `empty_columns`, so blank CSV responses can return a zero-row DataFrame with known columns when provided.
+- Added a centralized REDCap CSV schema registry and wired fixed-schema export endpoints to pass their empty-column definitions while leaving dynamic exports on the previous empty DataFrame fallback.
+- Added regression tests for blank CSV handling with and without schema columns and `RedcapClient` endpoint wiring for empty-column forwarding.
 
 ## [2.2.3]
 

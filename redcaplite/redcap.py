@@ -1,4 +1,5 @@
 from redcaplite import api
+from redcaplite.api.schemas import get_empty_csv_columns
 from .http import Client
 from typing import List, Optional, Dict, Any, Union, Literal
 from datetime import datetime
@@ -44,6 +45,7 @@ class RedcapClient(Client):
         return self.post(
             api.get_arms({"arms": arms, "format": format}),
             output_file=output_file,
+            empty_columns=get_empty_csv_columns("get_arms"),
         )
 
     def import_arms(
@@ -92,6 +94,7 @@ class RedcapClient(Client):
         return self.post(
             api.get_dags({"format": format}),
             output_file=output_file,
+            empty_columns=get_empty_csv_columns("get_dags"),
         )
 
     def import_dags(self, data: RedcapDataType):
@@ -149,6 +152,7 @@ class RedcapClient(Client):
         return self.post(
             api.get_user_dag_mappings({"format": format}),
             output_file=output_file,
+            empty_columns=get_empty_csv_columns("get_user_dag_mappings"),
         )
 
     def import_user_dag_mappings(self, data: RedcapDataType):
@@ -184,6 +188,7 @@ class RedcapClient(Client):
         return self.post(
             api.get_events({"arms": arms, "format": format}),
             output_file=output_file,
+            empty_columns=get_empty_csv_columns("get_events"),
         )
 
     def import_events(self, data: RedcapDataType):
@@ -231,6 +236,7 @@ class RedcapClient(Client):
         return self.post(
             api.get_field_names({"field": field, "format": format}),
             output_file=output_file,
+            empty_columns=get_empty_csv_columns("get_field_names"),
         )
 
     # file
@@ -436,6 +442,7 @@ class RedcapClient(Client):
         return self.post(
             api.get_instruments({"format": format}),
             output_file=output_file,
+            empty_columns=get_empty_csv_columns("get_instruments"),
         )
 
     # pdf
@@ -499,6 +506,7 @@ class RedcapClient(Client):
         return self.post(
             api.get_form_event_mappings({"arms": arms, "format": format}),
             output_file=output_file,
+            empty_columns=get_empty_csv_columns("get_form_event_mappings"),
         )
 
     def import_form_event_mappings(self, data: RedcapDataType):
@@ -935,6 +943,7 @@ class RedcapClient(Client):
         return self.post(
             api.get_repeating_forms_events({"format": format}),
             output_file=output_file,
+            empty_columns=get_empty_csv_columns("get_repeating_forms_events"),
         )
 
     def import_repeating_forms_events(self, data: RedcapDataType):
@@ -1196,6 +1205,7 @@ class RedcapClient(Client):
         return self.post(
             api.get_user_roles({"format": format}),
             output_file=output_file,
+            empty_columns=get_empty_csv_columns("get_user_roles"),
         )
 
     def import_user_roles(self, data: RedcapDataType):
@@ -1241,6 +1251,7 @@ class RedcapClient(Client):
         return self.post(
             api.get_user_role_mappings({"format": format}),
             output_file=output_file,
+            empty_columns=get_empty_csv_columns("get_user_role_mappings"),
         )
 
     def import_user_role_mappings(self, data: RedcapDataType):

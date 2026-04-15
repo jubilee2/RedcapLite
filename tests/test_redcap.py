@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import Mock, patch, mock_open
 from redcaplite import RedcapClient
+from redcaplite.api.schemas import get_empty_csv_columns
 import pandas as pd
 import numpy as np
 from pandas.testing import assert_frame_equal
@@ -89,6 +90,17 @@ def test_redcap_client_delete_arms(client):
         expected_requests_data={'content': 'arm', 'action': 'delete', 'format': 'json',
                                 'arms[0]': '2', 'arms[1]': '3', 'returnFormat': 'json', 'token': 'token'},
     )
+
+
+def test_redcap_client_get_arms_forwards_empty_columns(client):
+    """Test get_arms forwards schema columns for empty CSV responses."""
+    with patch.object(client, 'post', return_value=Mock()) as mock_post:
+        client.get_arms(format='csv')
+        mock_post.assert_called_once_with(
+            {'content': 'arm', 'format': 'csv'},
+            output_file=None,
+            empty_columns=['arm_num', 'name'],
+        )
 
 
 # Dags
@@ -697,6 +709,17 @@ def test_get_user_roles(client):
     )
 
 
+def test_get_user_roles_forwards_empty_columns(client):
+    """Test get_user_roles forwards schema columns for empty CSV responses."""
+    with patch.object(client, 'post', return_value=Mock()) as mock_post:
+        client.get_user_roles(format='csv')
+        mock_post.assert_called_once_with(
+            {'content': 'userRole', 'format': 'csv'},
+            output_file=None,
+            empty_columns=["unique_role_name", "role_label", "design", "alerts", "user_rights", "data_access_groups", "reports", "stats_and_charts", "manage_survey_participants", "calendar", "data_import_tool", "data_comparison_tool", "logging", "email_logging", "file_repository", "data_quality_create", "data_quality_execute", "api_export", "api_import", "api_modules", "mobile_app", "mobile_app_download_data", "record_create", "record_rename", "record_delete", "lock_records_customization", "lock_records", "lock_records_all_forms", "forms", "forms_export", "data_quality_resolution"],
+        )
+
+
 def test_import_user_roles_with_kwargs(client):
     mock_redcap_client_post(
         client, 'import_user_roles',
@@ -724,6 +747,17 @@ def test_redcap_client_get_user_role_mappings(client):
         expected_requests_data={'content': 'userRoleMapping',
                                 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
     )
+
+
+def test_redcap_client_get_user_role_mappings_forwards_empty_columns(client):
+    """Test get_user_role_mappings forwards schema columns for empty CSV responses."""
+    with patch.object(client, 'post', return_value=Mock()) as mock_post:
+        client.get_user_role_mappings(format='csv')
+        mock_post.assert_called_once_with(
+            {'content': 'userRoleMapping', 'format': 'csv'},
+            output_file=None,
+            empty_columns=["username", "unique_role_name", "data_access_group"],
+        )
 
 
 def test_redcap_client_import_user_role_mappings(client):
