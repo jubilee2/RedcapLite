@@ -20,16 +20,19 @@ class Client:
             pd_read_csv_kwargs = {}
         format = data.get("format", None)
         if format == 'csv':
-            csv_kwargs = {
-                "pd_read_csv_kwargs": pd_read_csv_kwargs,
-                "output_file": output_file,
-            }
-            if empty_columns is not None:
-                csv_kwargs["empty_columns"] = empty_columns
-            response = self.__csv_api(
-                data,
-                **csv_kwargs,
-            )
+            if empty_columns is None:
+                response = self.__csv_api(
+                    data,
+                    pd_read_csv_kwargs=pd_read_csv_kwargs,
+                    output_file=output_file,
+                )
+            else:
+                response = self.__csv_api(
+                    data,
+                    pd_read_csv_kwargs=pd_read_csv_kwargs,
+                    output_file=output_file,
+                    empty_columns=empty_columns,
+                )
         elif format == 'json':
             response = self.__json_api(data, output_file=output_file)
         elif format == 'xml':
