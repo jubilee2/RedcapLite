@@ -1205,6 +1205,7 @@ class RedcapClient(Client):
         return self.post(
             api.get_user_roles({"format": format}),
             output_file=output_file,
+            empty_columns=get_empty_csv_columns("get_user_roles"),
         )
 
     def import_user_roles(self, data: RedcapDataType):
@@ -1250,6 +1251,7 @@ class RedcapClient(Client):
         return self.post(
             api.get_user_role_mappings({"format": format}),
             output_file=output_file,
+            empty_columns=get_empty_csv_columns("get_user_role_mappings"),
         )
 
     def import_user_role_mappings(self, data: RedcapDataType):

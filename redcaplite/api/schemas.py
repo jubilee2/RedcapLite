@@ -10,6 +10,8 @@ CSV_EMPTY_SCHEMAS: Dict[str, List[str]] = {
     "get_instruments": ["instrument_name", "instrument_label"],
     "get_form_event_mappings": ["arm_num", "unique_event_name", "form"],
     "get_repeating_forms_events": ["event_name", "form_name", "custom_form_label"],
+    "get_user_roles": ["unique_role_name", "role_label"],
+    "get_user_role_mappings": ["username", "unique_role_name"],
 }
 
 
