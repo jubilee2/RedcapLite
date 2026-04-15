@@ -18,17 +18,17 @@ class Client:
     ):
         if pd_read_csv_kwargs is None:
             pd_read_csv_kwargs = {}
-        format = data.get("format", None)
-        if format == 'csv':
+        fmt = data.get("format", None)
+        if fmt == 'csv':
             response = self.__csv_api(
                 data,
                 pd_read_csv_kwargs=pd_read_csv_kwargs,
                 output_file=output_file,
                 empty_columns=empty_columns,
             )
-        elif format == 'json':
+        elif fmt == 'json':
             response = self.__json_api(data, output_file=output_file)
-        elif format == 'xml':
+        elif fmt == 'xml':
             response = self.text_api(data, output_file=output_file)
         else:
             response = self.text_api(data, output_file=output_file)
