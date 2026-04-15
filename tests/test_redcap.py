@@ -91,6 +91,17 @@ def test_redcap_client_delete_arms(client):
     )
 
 
+def test_redcap_client_get_arms_forwards_empty_columns(client):
+    """Test get_arms forwards schema columns for empty CSV responses."""
+    with patch.object(client, 'post', return_value=Mock()) as mock_post:
+        client.get_arms(format='csv')
+        mock_post.assert_called_once_with(
+            {'content': 'arm', 'format': 'csv'},
+            output_file=None,
+            empty_columns=['arm_num', 'name'],
+        )
+
+
 # Dags
 def test_redcap_client_get_dags(client):
     """Test RedcapClient get_dags method"""

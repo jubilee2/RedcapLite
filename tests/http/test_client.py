@@ -27,20 +27,32 @@ def test_client_post_csv():
         response = client.post({'format': 'csv'})
         assert response == mock_response
         mock_csv_api.assert_called_once_with(
-            {'format': 'csv'}, pd_read_csv_kwargs={}, output_file=None)
+            {'format': 'csv'},
+            pd_read_csv_kwargs={},
+            output_file=None,
+            empty_columns=None,
+        )
 
     with patch.object(client, '_Client__csv_api', return_value=mock_response) as mock_csv_api:
         response = client.post(
             {'format': 'csv'}, pd_read_csv_kwargs={"foo": []})
         assert response == mock_response
         mock_csv_api.assert_called_once_with(
-            {'format': 'csv'}, pd_read_csv_kwargs={"foo": []}, output_file=None)
+            {'format': 'csv'},
+            pd_read_csv_kwargs={"foo": []},
+            output_file=None,
+            empty_columns=None,
+        )
 
     with patch.object(client, '_Client__csv_api', return_value=mock_response) as mock_csv_api:
         response = client.post({'format': 'csv'}, output_file='records.csv')
         assert response == mock_response
         mock_csv_api.assert_called_once_with(
-            {'format': 'csv'}, pd_read_csv_kwargs={}, output_file='records.csv')
+            {'format': 'csv'},
+            pd_read_csv_kwargs={},
+            output_file='records.csv',
+            empty_columns=None,
+        )
 
 
 def test_client_post_json_with_output_file():
@@ -111,3 +123,21 @@ def test_client_file_upload_api():
             response = client.file_upload_api('file.txt', {})
             assert response == mock_response
             mock_file.assert_called_once_with('file.txt', 'rb')
+
+
+def test_client_post_csv_with_empty_columns():
+    """Test Client post method forwards empty schema columns for CSV."""
+    client = Client('https://example.com', 'token')
+    mock_response = Mock()
+    with patch.object(client, '_Client__csv_api', return_value=mock_response) as mock_csv_api:
+        response = client.post(
+            {'format': 'csv'},
+            empty_columns=["arm_num", "name"],
+        )
+        assert response == mock_response
+        mock_csv_api.assert_called_once_with(
+            {'format': 'csv'},
+            pd_read_csv_kwargs={},
+            output_file=None,
+            empty_columns=["arm_num", "name"],
+        )

@@ -1,3 +1,5 @@
+from typing import Optional, Sequence
+
 import requests
 import redcaplite.http.handler as hd
 
@@ -7,7 +9,13 @@ class Client:
         self.url = url
         self.token = token
 
-    def post(self, data, pd_read_csv_kwargs=None, output_file=None):
+    def post(
+        self,
+        data,
+        pd_read_csv_kwargs=None,
+        output_file=None,
+        empty_columns: Optional[Sequence[str]] = None,
+    ):
         if pd_read_csv_kwargs is None:
             pd_read_csv_kwargs = {}
         format = data.get("format", None)
@@ -16,6 +24,7 @@ class Client:
                 data,
                 pd_read_csv_kwargs=pd_read_csv_kwargs,
                 output_file=output_file,
+                empty_columns=empty_columns,
             )
         elif format == 'json':
             response = self.__json_api(data, output_file=output_file)
