@@ -756,7 +756,7 @@ def test_redcap_client_get_user_role_mappings_forwards_empty_columns(client):
         mock_post.assert_called_once_with(
             {'content': 'userRoleMapping', 'format': 'csv'},
             output_file=None,
-            empty_columns=get_empty_csv_columns('get_user_role_mappings'),
+            empty_columns=["username", "unique_role_name", "data_access_group"],
         )
 
 
