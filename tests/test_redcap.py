@@ -716,7 +716,7 @@ def test_get_user_roles_forwards_empty_columns(client):
         mock_post.assert_called_once_with(
             {'content': 'userRole', 'format': 'csv'},
             output_file=None,
-            empty_columns=get_empty_csv_columns('get_user_roles'),
+            empty_columns=["unique_role_name", "role_label", "design", "alerts", "user_rights", "data_access_groups", "reports", "stats_and_charts", "manage_survey_participants", "calendar", "data_import_tool", "data_comparison_tool", "logging", "email_logging", "file_repository", "data_quality_create", "data_quality_execute", "api_export", "api_import", "api_modules", "mobile_app", "mobile_app_download_data", "record_create", "record_rename", "record_delete", "lock_records_customization", "lock_records", "lock_records_all_forms", "forms", "forms_export", "data_quality_resolution"],
         )
 
 
