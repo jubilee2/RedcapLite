@@ -123,6 +123,16 @@ def test_csv_handler_return_empty():
         response, pd.DataFrame())
 
 
+def test_csv_handler_return_empty_with_columns():
+    """Test csv_handler decorator returns schema-aware empty DataFrame."""
+    mock_func = Mock(return_value=Mock(text='\n'))
+    decorated_func = csv_handler(mock_func)
+    response = decorated_func(None, {}, empty_columns=["arm_num", "name"])
+    assert isinstance(response, pd.DataFrame)
+    pd.testing.assert_frame_equal(
+        response, pd.DataFrame(columns=["arm_num", "name"]))
+
+
 def test_csv_handler_csv_reader():
     """Test csv_handler decorator"""
     mock_func = Mock(return_value=Mock(text='csv data,date\n04,005'))

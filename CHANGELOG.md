@@ -7,7 +7,9 @@ The format is based on Keep a Changelog, with entries listed in reverse chronolo
 ## [Unreleased]
 
 ### Changed
-- No changes yet.
+- Added optional CSV empty-schema support in the HTTP client/handler pipeline via `empty_columns`, so blank CSV responses can return a zero-row DataFrame with known columns when provided.
+- Added a centralized REDCap CSV schema registry and wired fixed-schema export endpoints to pass their empty-column definitions while leaving dynamic exports on the previous empty DataFrame fallback.
+- Added regression tests for blank CSV handling with and without schema columns, CSV schema forwarding through the client, and `RedcapClient` endpoint wiring for empty-column metadata.
 
 ## [2.2.3]
 

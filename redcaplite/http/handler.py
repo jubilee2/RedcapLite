@@ -3,7 +3,7 @@ import os
 import io
 import pandas as pd
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Sequence, Union
 
 
 def output_handler(func):
@@ -57,7 +57,13 @@ def response_error_handler(func):
 
 
 def csv_handler(func):
-    def wrapper(obj, data, pd_read_csv_kwargs=None, output_file=None):
+    def wrapper(
+        obj,
+        data,
+        pd_read_csv_kwargs=None,
+        output_file=None,
+        empty_columns: Optional[Sequence[str]] = None,
+    ):
         if pd_read_csv_kwargs is None:
             pd_read_csv_kwargs = {}
         data['format'] = 'csv'
@@ -65,7 +71,9 @@ def csv_handler(func):
         if 'returnContent' in data and data['returnContent'] == 'ids':
             return response.json()
         if response.text.strip() == '':
-            return pd.DataFrame()  # Return an empty DataFrame if response is empty
+            if empty_columns:
+                return pd.DataFrame(columns=list(empty_columns))
+            return pd.DataFrame()
         io_string = io.StringIO(response.text)
         df = pd.read_csv(io_string, **pd_read_csv_kwargs)
         io_string.close()
