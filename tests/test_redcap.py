@@ -708,6 +708,17 @@ def test_get_user_roles(client):
     )
 
 
+def test_get_user_roles_forwards_empty_columns(client):
+    """Test get_user_roles forwards schema columns for empty CSV responses."""
+    with patch.object(client, 'post', return_value=Mock()) as mock_post:
+        client.get_user_roles(format='csv')
+        mock_post.assert_called_once_with(
+            {'content': 'userRole', 'format': 'csv'},
+            output_file=None,
+            empty_columns=['unique_role_name', 'role_label'],
+        )
+
+
 def test_import_user_roles_with_kwargs(client):
     mock_redcap_client_post(
         client, 'import_user_roles',
@@ -735,6 +746,17 @@ def test_redcap_client_get_user_role_mappings(client):
         expected_requests_data={'content': 'userRoleMapping',
                                 'format': 'json', 'returnFormat': 'json', 'token': 'token'},
     )
+
+
+def test_redcap_client_get_user_role_mappings_forwards_empty_columns(client):
+    """Test get_user_role_mappings forwards schema columns for empty CSV responses."""
+    with patch.object(client, 'post', return_value=Mock()) as mock_post:
+        client.get_user_role_mappings(format='csv')
+        mock_post.assert_called_once_with(
+            {'content': 'userRoleMapping', 'format': 'csv'},
+            output_file=None,
+            empty_columns=['username', 'unique_role_name'],
+        )
 
 
 def test_redcap_client_import_user_role_mappings(client):
