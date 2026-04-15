@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on Keep a Changelog, with entries listed in reverse chronological order.
 
 ## [Unreleased]
+- No changes yet.
 
 
 ## [2.3.0]
