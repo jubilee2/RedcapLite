@@ -3,10 +3,10 @@ from typing import Dict, List
 
 CSV_EMPTY_SCHEMAS: Dict[str, List[str]] = {
     "get_arms": ["arm_num", "name"],
-    "get_dags": ["data_access_group_name", "unique_group_name"],
+    "get_dags": ["data_access_group_name", "unique_group_name", "data_access_group_id"],
     "get_user_dag_mappings": ["username", "redcap_data_access_group"],
-    "get_events": ["event_name", "arm_num", "unique_event_name"],
-    "get_field_names": ["original_field_name", "export_field_name"],
+    "get_events": ["event_name", "arm_num", "unique_event_name", "custom_event_label", "event_id"],
+    "get_field_names": ["original_field_name", "choice_value", "export_field_name"],
     "get_instruments": ["instrument_name", "instrument_label"],
     "get_form_event_mappings": ["arm_num", "unique_event_name", "form"],
     "get_repeating_forms_events": ["event_name", "form_name", "custom_form_label"],
