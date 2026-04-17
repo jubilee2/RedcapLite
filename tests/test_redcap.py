@@ -94,9 +94,9 @@ def test_redcap_client_delete_arms(client):
 
 def test_redcap_client_get_arms_forwards_empty_columns(client):
     """Test get_arms forwards schema columns for empty CSV responses."""
-    with patch.object(client, 'post', return_value=Mock()) as mock_post:
+    with patch.object(client, 'export_api', return_value=Mock()) as mock_export_api:
         client.get_arms(format='csv')
-        mock_post.assert_called_once_with(
+        mock_export_api.assert_called_once_with(
             {'content': 'arm', 'format': 'csv'},
             output_file=None,
             empty_columns=['arm_num', 'name'],
@@ -433,9 +433,9 @@ def test_redcap_client_import_metadata_csv(client):
     mock_redcap_client_post(
         client, 'import_metadata', method_kwargs={'format': 'csv', 'data': 'a,c\n4,5\n'},
         mock_response=mock_response,
-        expected_json='5',
-        expected_text='5',
-        expected_requests_data={'content': 'metadata', 'format': 'csv',
+        expected_json=5,
+        expected_text=5,
+        expected_requests_data={'content': 'metadata', 'format': 'json',
                                 'data': 'a,c\n4,5\n', 'returnFormat': 'json', 'token': 'token'},
     )
 
@@ -711,9 +711,9 @@ def test_get_user_roles(client):
 
 def test_get_user_roles_forwards_empty_columns(client):
     """Test get_user_roles forwards schema columns for empty CSV responses."""
-    with patch.object(client, 'post', return_value=Mock()) as mock_post:
+    with patch.object(client, 'export_api', return_value=Mock()) as mock_export_api:
         client.get_user_roles(format='csv')
-        mock_post.assert_called_once_with(
+        mock_export_api.assert_called_once_with(
             {'content': 'userRole', 'format': 'csv'},
             output_file=None,
             empty_columns=["unique_role_name", "role_label", "design", "alerts", "user_rights", "data_access_groups", "reports", "stats_and_charts", "manage_survey_participants", "calendar", "data_import_tool", "data_comparison_tool", "logging", "email_logging", "file_repository", "data_quality_create", "data_quality_execute", "api_export", "api_import", "api_modules", "mobile_app", "mobile_app_download_data", "record_create", "record_rename", "record_delete", "lock_records_customization", "lock_records", "lock_records_all_forms", "forms", "forms_export", "data_quality_resolution"],
@@ -751,9 +751,9 @@ def test_redcap_client_get_user_role_mappings(client):
 
 def test_redcap_client_get_user_role_mappings_forwards_empty_columns(client):
     """Test get_user_role_mappings forwards schema columns for empty CSV responses."""
-    with patch.object(client, 'post', return_value=Mock()) as mock_post:
+    with patch.object(client, 'export_api', return_value=Mock()) as mock_export_api:
         client.get_user_role_mappings(format='csv')
-        mock_post.assert_called_once_with(
+        mock_export_api.assert_called_once_with(
             {'content': 'userRoleMapping', 'format': 'csv'},
             output_file=None,
             empty_columns=["username", "unique_role_name", "data_access_group"],

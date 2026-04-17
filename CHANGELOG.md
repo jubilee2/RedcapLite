@@ -5,7 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on Keep a Changelog, with entries listed in reverse chronological order.
 
 ## [Unreleased]
-- No changes yet.
+
+### Changed
+- Replaced the shared HTTP `Client.post(...)` entry point with explicit `export_api(...)` and `import_api(...)` methods, and updated `RedcapClient` endpoint routing to call the new API-specific helpers.
+- Updated HTTP client tests to cover `export_api(...)` behavior and added coverage ensuring `import_api(...)` always uses JSON handling.
 
 
 ## [2.3.0]
