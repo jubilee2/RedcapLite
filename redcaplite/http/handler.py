@@ -62,8 +62,6 @@ def csv_handler(func):
             pd_read_csv_kwargs = {}
         data['format'] = 'csv'
         response = func(obj, data, output_file=output_file)
-        if 'returnContent' in data and data['returnContent'] == 'ids':
-            return response.json()
         if response.text.strip() == '':
             return pd.DataFrame()  # Return an empty DataFrame if response is empty
         io_string = io.StringIO(response.text)

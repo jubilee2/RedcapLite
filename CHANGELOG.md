@@ -11,6 +11,8 @@ The format is based on Keep a Changelog, with entries listed in reverse chronolo
 - Switched root/setup/metadata help output back to default argparse-generated `usage` formatting.
 - Corrected `rcl sync` parser `prog` formatting so positional arguments are not duplicated in generated help usage output.
 - Standardized `prog` values for `setup` and `metadata` to base command names so error messages avoid placeholder-style command prefixes.
+- Replaced `RedcapClient` request calls from `self.post(...)` with direct routing where export-style operations use `self.export_api(...)` and all other operations use JSON handling via `self.import_api(...)`.
+- Updated `Client.import_api` to preserve request payload `format` values (including CSV imports) while still returning parsed JSON responses.
 
 ## [2.2.1]
 
