@@ -42,7 +42,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API containing arm information.
         """
-        return self.post(
+        return self.export_api(
             api.get_arms({"arms": arms, "format": format}),
             output_file=output_file,
             empty_columns=get_empty_csv_columns("get_arms"),
@@ -61,7 +61,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after importing arms.
         """
-        return self.post(api.import_arms({"data": data, "override": override}))
+        return self.import_api(api.import_arms({"data": data, "override": override}))
 
     def delete_arms(self, arms: List[int]):
         """
@@ -73,7 +73,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after deleting arms.
         """
-        return self.post(api.delete_arms({"arms": arms}))
+        return self.import_api(api.delete_arms({"arms": arms}))
 
     # dags
     def get_dags(
@@ -91,7 +91,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API containing DAG information.
         """
-        return self.post(
+        return self.export_api(
             api.get_dags({"format": format}),
             output_file=output_file,
             empty_columns=get_empty_csv_columns("get_dags"),
@@ -107,7 +107,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after importing DAGs.
         """
-        return self.post(api.import_dags({"data": data}))
+        return self.import_api(api.import_dags({"data": data}))
 
     def delete_dags(self, dags: List[str]):
         """
@@ -119,7 +119,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after deleting DAGs.
         """
-        return self.post(api.delete_dags({"dags": dags}))
+        return self.import_api(api.delete_dags({"dags": dags}))
 
     def switch_dag(self, dag: str):
         """
@@ -131,7 +131,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after switching DAGs.
         """
-        return self.post(api.switch_dag({"dag": dag}))
+        return self.import_api(api.switch_dag({"dag": dag}))
 
     # user_dag_mapping
     def get_user_dag_mappings(
@@ -149,7 +149,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API containing user-DAG mapping information.
         """
-        return self.post(
+        return self.export_api(
             api.get_user_dag_mappings({"format": format}),
             output_file=output_file,
             empty_columns=get_empty_csv_columns("get_user_dag_mappings"),
@@ -165,7 +165,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after importing user-DAG mappings.
         """
-        return self.post(api.import_user_dag_mappings({"data": data}))
+        return self.import_api(api.import_user_dag_mappings({"data": data}))
 
     # events
     def get_events(
@@ -185,7 +185,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API containing event information.
         """
-        return self.post(
+        return self.export_api(
             api.get_events({"arms": arms, "format": format}),
             output_file=output_file,
             empty_columns=get_empty_csv_columns("get_events"),
@@ -201,7 +201,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after importing events.
         """
-        return self.post(api.import_events({"data": data}))
+        return self.import_api(api.import_events({"data": data}))
 
     def delete_events(self, events: List[str]):
         """
@@ -213,7 +213,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after deleting events.
         """
-        return self.post(api.delete_events({"events": events}))
+        return self.import_api(api.delete_events({"events": events}))
 
     # field_names
     def get_field_names(
@@ -233,7 +233,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API containing field name information.
         """
-        return self.post(
+        return self.export_api(
             api.get_field_names({"field": field, "format": format}),
             output_file=output_file,
             empty_columns=get_empty_csv_columns("get_field_names"),
@@ -325,7 +325,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after deleting the file.
         """
-        return self.post(
+        return self.import_api(
             api.delete_file(
                 {
                     "record": record,
@@ -356,7 +356,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after creating the folder.
         """
-        return self.post(
+        return self.import_api(
             api.create_folder_file_repository(
                 {
                     "name": name,
@@ -377,7 +377,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API containing the file repository listing.
         """
-        return self.post(api.list_file_repository({"folder_id": folder_id}))
+        return self.export_api(api.list_file_repository({"folder_id": folder_id}))
 
     def export_file_repository(self, doc_id: int, file_dictionary: str = ""):
         """
@@ -421,7 +421,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after deleting the file.
         """
-        return self.post(api.delete_file_repository({"doc_id": doc_id}))
+        return self.import_api(api.delete_file_repository({"doc_id": doc_id}))
 
     # instrument
     def get_instruments(
@@ -439,7 +439,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API containing instrument information.
         """
-        return self.post(
+        return self.export_api(
             api.get_instruments({"format": format}),
             output_file=output_file,
             empty_columns=get_empty_csv_columns("get_instruments"),
@@ -503,7 +503,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API containing form-event mapping information.
         """
-        return self.post(
+        return self.export_api(
             api.get_form_event_mappings({"arms": arms, "format": format}),
             output_file=output_file,
             empty_columns=get_empty_csv_columns("get_form_event_mappings"),
@@ -519,7 +519,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after importing form-event mappings.
         """
-        return self.post(api.import_form_event_mappings({"data": data}))
+        return self.import_api(api.import_form_event_mappings({"data": data}))
 
     # log
     def get_logs(
@@ -563,7 +563,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API containing the log data.
         """
-        return self.post(
+        return self.export_api(
             api.get_logs(
                 {
                     "format": format,
@@ -617,7 +617,7 @@ class RedcapClient(Client):
             read_csv_kwargs['dtype'] = {**default_dtypes, **user_dtypes}
         read_csv_kwargs['keep_default_na'] = read_csv_kwargs.get('keep_default_na', False)
 
-        return self.post(
+        return self.export_api(
             api.get_metadata(
                 {"fields": fields, "forms": forms, "format": format}),
             pd_read_csv_kwargs=read_csv_kwargs,
@@ -639,7 +639,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after importing the metadata.
         """
-        return self.post(api.import_metadata({"data": data, "format": format}))
+        return self.import_api(api.import_metadata({"data": data, "format": format}))
 
     # project
     def create_project(self, data: RedcapDataType):
@@ -652,7 +652,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after creating the project.
         """
-        return self.post(api.create_project({"data": data}))
+        return self.import_api(api.create_project({"data": data}))
 
     def get_project(
         self,
@@ -669,7 +669,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API containing project information.
         """
-        return self.post(
+        return self.export_api(
             api.get_project({"format": format}),
             output_file=output_file,
         )
@@ -703,7 +703,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API containing the project XML.
         """
-        return self.post(
+        return self.export_api(
             api.get_project_xml(
                 {
                     "returnMetadataOnly": returnMetadataOnly,
@@ -729,7 +729,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after importing project settings.
         """
-        return self.post(api.import_project_settings({"data": data}))
+        return self.import_api(api.import_project_settings({"data": data}))
 
     # record
     def export_records(
@@ -779,7 +779,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API containing the exported records.
         """
-        return self.post(
+        return self.export_api(
             api.export_records(
                 {
                     "format": format,
@@ -831,7 +831,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after importing the records.
         """
-        return self.post(
+        return self.import_api(
             api.import_records(
                 {
                     "data": data,
@@ -869,7 +869,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after deleting the records.
         """
-        return self.post(
+        return self.import_api(
             api.delete_records(
                 {
                     "records": records,
@@ -899,7 +899,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after renaming the record.
         """
-        return self.post(
+        return self.import_api(
             api.rename_record(
                 {
                     "record": record,
@@ -919,7 +919,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API containing the next record name.
         """
-        return self.post(
+        return self.import_api(
             api.generate_next_record_name({}),
             output_file=output_file,
         )
@@ -940,7 +940,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API containing repeating forms events.
         """
-        return self.post(
+        return self.export_api(
             api.get_repeating_forms_events({"format": format}),
             output_file=output_file,
             empty_columns=get_empty_csv_columns("get_repeating_forms_events"),
@@ -956,7 +956,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after importing repeating forms events.
         """
-        return self.post(api.import_repeating_forms_events({"data": data}))
+        return self.import_api(api.import_repeating_forms_events({"data": data}))
 
     # report
     def get_report(
@@ -988,7 +988,7 @@ class RedcapClient(Client):
         Returns:
             The report data in the specified format.
         """
-        return self.post(
+        return self.export_api(
             api.get_report(
                 {
                     "report_id": report_id,
@@ -1072,7 +1072,7 @@ class RedcapClient(Client):
         Returns:
             The participant list in the specified format.
         """
-        return self.post(
+        return self.export_api(
             api.get_participant_list(
                 {
                     "instrument": instrument,
@@ -1157,7 +1157,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API containing user information.
         """
-        return self.post(
+        return self.export_api(
             api.get_users({"format": format}),
             output_file=output_file,
         )
@@ -1172,7 +1172,7 @@ class RedcapClient(Client):
         Returns:
             str: A message indicating the number of users added or updated.
         """
-        return self.post(api.import_users({"data": data}))
+        return self.import_api(api.import_users({"data": data}))
 
     def delete_users(self, users: List[str]):
         """
@@ -1184,7 +1184,7 @@ class RedcapClient(Client):
         Returns:
             str: A message indicating the number of users deleted.
         """
-        return self.post(api.delete_users({"users": users}))
+        return self.import_api(api.delete_users({"users": users}))
 
     # user_role
     def get_user_roles(
@@ -1202,7 +1202,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API containing user role information.
         """
-        return self.post(
+        return self.export_api(
             api.get_user_roles({"format": format}),
             output_file=output_file,
             empty_columns=get_empty_csv_columns("get_user_roles"),
@@ -1218,7 +1218,7 @@ class RedcapClient(Client):
         Returns:
             str: A message indicating the number of user roles added or updated.
         """
-        return self.post(api.import_user_roles({"data": data}))
+        return self.import_api(api.import_user_roles({"data": data}))
 
     def delete_user_roles(self, roles: List[str]):
         """
@@ -1230,7 +1230,7 @@ class RedcapClient(Client):
         Returns:
             str: A message indicating the number of user roles deleted.
         """
-        return self.post(api.delete_user_roles({"roles": roles}))
+        return self.import_api(api.delete_user_roles({"roles": roles}))
 
     #  user_role_mappings
     def get_user_role_mappings(
@@ -1248,7 +1248,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API containing user-role assignment information.
         """
-        return self.post(
+        return self.export_api(
             api.get_user_role_mappings({"format": format}),
             output_file=output_file,
             empty_columns=get_empty_csv_columns("get_user_role_mappings"),
@@ -1264,4 +1264,4 @@ class RedcapClient(Client):
         Returns:
             str: A message indicating the number of user-role assignments added or updated.
         """
-        return self.post(api.import_user_role_mappings({"data": data}))
+        return self.import_api(api.import_user_role_mappings({"data": data}))

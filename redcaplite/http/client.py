@@ -9,7 +9,7 @@ class Client:
         self.url = url
         self.token = token
 
-    def post(
+    def export_api(
         self,
         data,
         pd_read_csv_kwargs=None,
@@ -32,6 +32,10 @@ class Client:
             response = self.text_api(data, output_file=output_file)
         else:
             response = self.text_api(data, output_file=output_file)
+        return response
+
+    def import_api(self, data, output_file=None):
+        response = self.__json_api(data, output_file=output_file)
         return response
 
     @hd.response_error_handler
