@@ -325,7 +325,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after deleting the file.
         """
-        return self.export_api(
+        return self.import_api(
             api.delete_file(
                 {
                     "record": record,
@@ -356,7 +356,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after creating the folder.
         """
-        return self.export_api(
+        return self.import_api(
             api.create_folder_file_repository(
                 {
                     "name": name,
@@ -831,7 +831,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after importing the records.
         """
-        return self.export_api(
+        return self.import_api(
             api.import_records(
                 {
                     "data": data,
@@ -869,7 +869,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after deleting the records.
         """
-        return self.export_api(
+        return self.import_api(
             api.delete_records(
                 {
                     "records": records,
@@ -899,7 +899,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API after renaming the record.
         """
-        return self.export_api(
+        return self.import_api(
             api.rename_record(
                 {
                     "record": record,
@@ -919,7 +919,7 @@ class RedcapClient(Client):
         Returns:
             The response from the API containing the next record name.
         """
-        return self.export_api(
+        return self.import_api(
             api.generate_next_record_name({}),
             output_file=output_file,
         )
