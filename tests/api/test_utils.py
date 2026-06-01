@@ -155,7 +155,7 @@ def test_optional_field_none_is_ignored_if_no_default():
     result = _build_payload_optional_field(payload)
     assert result == {}
 
-def test_optional_field_none_uses_default():
+def test_optional_field_none_ignores_default():
     payload = {'status': None}
     result = _build_payload_optional_field_with_default(payload)
     # The current implementation of data.get(field, default) returns None
